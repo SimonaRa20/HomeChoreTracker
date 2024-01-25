@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 namespace HomeChoreTracker.Portal
 {
     public class Program
@@ -8,13 +10,14 @@ namespace HomeChoreTracker.Portal
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+            builder.Services.AddHttpClient();
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -23,6 +26,9 @@ namespace HomeChoreTracker.Portal
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            // Add this line to enable authentication
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
@@ -33,4 +39,5 @@ namespace HomeChoreTracker.Portal
             app.Run();
         }
     }
+
 }

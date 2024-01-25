@@ -68,7 +68,7 @@ namespace HomeChoreTracker.Api
             {
                 options.AddPolicy("Test", builder =>
                 {
-                    builder.WithOrigins("https://localhost:7085/")
+                    builder.WithOrigins("https://localhost:7127/")
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .SetIsOriginAllowed((x) => true)
