@@ -97,7 +97,8 @@ namespace HomeChoreTracker.Api.Controllers
                 return Created("", userLoginResponse);
             }
 
-            return NotFound("Invalid email or password. Please try again.");
+            return NotFound(new { ErrorMessage = "Invalid email or password. Please try again." });
+
         }
 
         [Route("RestorePassword")]
@@ -236,21 +237,18 @@ namespace HomeChoreTracker.Api.Controllers
 
         private string GenerateAccessToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Role)
+                Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.Id.ToString()) }),
+                Expires = DateTime.UtcNow.AddHours(2),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = _config["Jwt:Issuer"],
+                Audience = _config["Jwt:Audience"]
             };
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                expires: DateTime.Now.AddHours(2),
-                claims: claims,
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         private string HashPassword(string password)

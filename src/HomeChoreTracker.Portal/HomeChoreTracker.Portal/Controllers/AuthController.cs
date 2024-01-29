@@ -63,7 +63,8 @@ namespace HomeChoreTracker.Portal.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid email or password. Please try again.");
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    ViewData["ErrorMessage"] = errorResponse.ErrorMessage;
                     return View(userLoginRequest);
                 }
             }
@@ -85,31 +86,5 @@ namespace HomeChoreTracker.Portal.Controllers
         {
             return View("~/Views/Auth/Register.cshtml");
         }
-
-        [HttpGet]
-        public async Task<IActionResult> ForgotPassword(string email)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-
-            using (var httpClient = _httpClientFactory.CreateClient())
-            {
-                var apiUrl = _config["ApiUrl"] + "/Auth/RestorePassword";
-
-                var response = await httpClient.PostAsJsonAsync(apiUrl, email);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return RedirectToPage("./CheckEmail");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid email, username or password. Please try again.");
-                    return View();
-                }
-            }
-        }
-        }
+    }
 }

@@ -31,36 +31,35 @@
                             <div class="text-center">
                                 <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
                             </div>
-                            <form class="user">
+                            <form asp-controller="Auth" asp-action="Register" method="post" id="registrationForm">
 
                                 <div class="form-group">
-                                        <input type="text" class="form-control form-control-user" id="exampleFirstName"
-                                               placeholder="Username">
-                                    </div>
+                                    <input type="text" class="form-control form-control-user" id="exampleFirstName"
+                                           placeholder="Username" name="UserRegisterRequest.UserName">
+                                </div>
 
                                 <div class="form-group">
                                     <input type="email" class="form-control form-control-user" id="exampleInputEmail"
-                                           placeholder="Email Address">
+                                           placeholder="Email Address" name="UserRegisterRequest.Email">
                                 </div>
+                                
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <input type="password" class="form-control form-control-user"
-                                               id="exampleInputPassword" placeholder="Password">
+                                               id="exampleInputPassword" placeholder="Password" name="UserRegisterRequest.Password">
                                     </div>
                                     <div class="col-sm-6">
                                         <input type="password" class="form-control form-control-user"
                                                id="exampleRepeatPassword" placeholder="Repeat Password">
                                     </div>
                                 </div>
-                                <a href="Login" class="btn btn-primary btn-user btn-block">
+
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
                                     Register Account
-                                </a>
+                                </button>
 
                             </form>
                             <hr>
-                            <div class="text-center">
-                                <a class="small" href="ForgotPassword">Forgot Password?</a>
-                            </div>
                             <div class="text-center">
                                 <a class="small" href="Login">Already have an account? Login!</a>
                             </div>
@@ -72,15 +71,28 @@
 
     </div>
 
-    <!-- Bootstrap core JavaScript-->
+    <!-- Bootstrap core JavaScript and additional scripts -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Client-side validation script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var registrationForm = document.getElementById('registrationForm');
+
+            registrationForm.addEventListener('submit', function (event) {
+                var password = registrationForm.querySelector('#exampleInputPassword').value;
+                var repeatPassword = registrationForm.querySelector('#exampleRepeatPassword').value;
+
+                if (password !== repeatPassword) {
+                    alert('Passwords do not match. Please enter matching passwords.');
+                    event.preventDefault(); // Prevent form submission
+                }
+            });
+        });
+    </script>
 
 </body>
 
