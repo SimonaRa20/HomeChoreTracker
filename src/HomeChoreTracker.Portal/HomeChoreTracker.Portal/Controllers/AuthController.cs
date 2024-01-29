@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using HomeChoreTracker.Portal.Models;
 
 namespace HomeChoreTracker.Portal.Controllers
 {
@@ -63,7 +64,7 @@ namespace HomeChoreTracker.Portal.Controllers
                 }
                 else
                 {
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorRequest>();
                     ViewData["ErrorMessage"] = errorResponse.ErrorMessage;
                     return View(userLoginRequest);
                 }
@@ -120,7 +121,7 @@ namespace HomeChoreTracker.Portal.Controllers
                 }
                 else
                 {
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorRequest>();
                     ViewData["ErrorMessage"] = errorResponse.ErrorMessage;
                     return View(userRegisterRequest);
                 }
