@@ -53,7 +53,7 @@ namespace HomeChoreTracker.Api.Controllers
 
             if (errors.Count > 0)
             {
-                return new ObjectResult(errors)
+                return new ObjectResult(new { ErrorMessage = string.Join("\n", errors) })
                 {
                     StatusCode = (int)HttpStatusCode.UnprocessableEntity
                 };

@@ -77,14 +77,54 @@ namespace HomeChoreTracker.Portal.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult ForgotPassword()
-        {
-            return View("~/Views/Auth/ForgotPassword.cshtml");
-        }
+        //public IActionResult ForgotPassword()
+        //{
+        //    return View("~/Views/Auth/ForgotPassword.cshtml");
+        //}
 
         public IActionResult Register()
         {
             return View("~/Views/Auth/Register.cshtml");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(UserRegisterRequestForm userRegisterRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = string.Join("\n", ModelState.Values
+                                    .SelectMany(v => v.Errors)
+                                    .Select(e => e.ErrorMessage)
+                                    .Where(msg => !string.IsNullOrEmpty(msg)));
+
+                ViewData["ErrorMessage"] = errorMessage;
+
+                return View(userRegisterRequest);
+            }
+
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                UserRegisterRequest userRequest = new UserRegisterRequest 
+                { 
+                    UserName = userRegisterRequest.UserName,
+                    Email = userRegisterRequest.Email,
+                    Password = userRegisterRequest.Password,
+                };
+
+                var apiUrl = _config["ApiUrl"] + "/Auth/Register";
+                var response = await httpClient.PostAsJsonAsync(apiUrl, userRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    ViewData["ErrorMessage"] = errorResponse.ErrorMessage;
+                    return View(userRegisterRequest);
+                }
+            }
         }
     }
 }

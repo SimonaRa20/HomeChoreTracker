@@ -31,7 +31,7 @@
                             <div class="text-center">
                                 <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
                             </div>
-                            <form asp-controller="Auth" asp-action="Register" method="post" id="registrationForm">
+                            <form asp-controller="Auth" asp-action="Register" method="post">
 
                                 <div class="form-group">
                                     <input type="text" class="form-control form-control-user" id="exampleFirstName"
@@ -50,10 +50,15 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <input type="password" class="form-control form-control-user"
-                                               id="exampleRepeatPassword" placeholder="Repeat Password">
+                                               id="exampleRepeatPassword" placeholder="Repeat Password" name="UserRegisterRequest.RepeatPassword">
                                     </div>
                                 </div>
-
+                                @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+                                {
+                                    <div class="alert alert-danger">
+                                        @ViewData["ErrorMessage"]
+                                    </div>
+                                }
                                 <button type="submit" class="btn btn-primary btn-user btn-block">
                                     Register Account
                                 </button>
@@ -71,28 +76,10 @@
 
     </div>
 
-    <!-- Bootstrap core JavaScript and additional scripts -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="js/sb-admin-2.min.js"></script>
-
-    <!-- Client-side validation script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var registrationForm = document.getElementById('registrationForm');
-
-            registrationForm.addEventListener('submit', function (event) {
-                var password = registrationForm.querySelector('#exampleInputPassword').value;
-                var repeatPassword = registrationForm.querySelector('#exampleRepeatPassword').value;
-
-                if (password !== repeatPassword) {
-                    alert('Passwords do not match. Please enter matching passwords.');
-                    event.preventDefault(); // Prevent form submission
-                }
-            });
-        });
-    </script>
 
 </body>
 
