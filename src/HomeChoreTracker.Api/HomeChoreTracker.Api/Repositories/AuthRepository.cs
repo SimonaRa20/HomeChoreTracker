@@ -13,6 +13,7 @@ namespace HomeChoreTracker.Api.Repositories
         {
             _dbContext = dbContext;
         }
+        
         public async Task AddUser(User user)
         {
             await _dbContext.Users.AddAsync(user);

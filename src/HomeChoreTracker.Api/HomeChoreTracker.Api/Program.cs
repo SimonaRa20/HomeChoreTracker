@@ -24,28 +24,31 @@ namespace HomeChoreTracker.Api
             });
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
+            builder.Services.AddSwaggerGen(c =>
             {
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiPlayground", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Bearer Authentication with JWT Token",
-                    Type = SecuritySchemeType.Http
+                    Description = "Enter 'Bearer YOUR_TOKEN_HERE'"
                 });
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
                         {
                             Reference = new OpenApiReference
                             {
-                                Id = "Bearer",
-                                Type = ReferenceType.SecurityScheme
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
                             }
                         },
-                        new List<string>()
+                        Array.Empty<string>()
                     }
                 });
             });
@@ -79,6 +82,7 @@ namespace HomeChoreTracker.Api
             
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            builder.Services.AddScoped<IHomeChoreBaseRepository, HomeChoreBaseRepository>();
 
 
             var app = builder.Build();
