@@ -5,7 +5,6 @@ using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Controllers
 {
-    [Authorize]
     public class HomeChoreBaseController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -17,13 +16,6 @@ namespace HomeChoreTracker.Portal.Controllers
             _config = config;
         }
 
-        //public IActionResult Index()
-        //{
-        //    return View("~/Views/HomeChoreBase/Index.cshtml");
-        //}
-
-
-        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var token = User.FindFirstValue("Token");
@@ -45,12 +37,6 @@ namespace HomeChoreTracker.Portal.Controllers
                     return View("Error");
                 }
             }
-        }
-
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
         }
 
         [HttpPost]
