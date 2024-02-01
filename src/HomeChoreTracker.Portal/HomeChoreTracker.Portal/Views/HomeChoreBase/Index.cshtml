@@ -43,7 +43,6 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <!-- Your form goes here -->
                             <form method="post" action="@Url.Action("Create", "HomeChoreBase")">
                                 <div class="form-group">
                                     <label for="Name">Name</label>
@@ -55,7 +54,7 @@
                                         <select class="form-control" id="ChoreType" name="ChoreType" required>
                                             @foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.HomeChoreType)))
                                             {
-                                                <option value="@choreType">@choreType</option>
+                                                <option value="@((int)choreType)">@choreType</option>
                                             }
                                         </select>
                                     </div>
@@ -67,7 +66,7 @@
                                         <select class="form-control" id="Frequency" name="Frequency" required>
                                             @foreach (var frequency in Enum.GetValues(typeof(HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.Frequency)))
                                             {
-                                                <option value="@frequency">@frequency</option>
+                                                <option value="@((int)frequency)">@frequency</option>
                                             }
                                         </select>
                                     </div>
@@ -115,10 +114,6 @@
     </div>
 </div>
 
-
-
-<!-- Your scripts if needed -->
-<!-- Your scripts -->
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

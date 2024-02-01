@@ -44,7 +44,7 @@ namespace HomeChoreTracker.Api.Controllers
 
         [HttpPost]
         [Authorize(Roles = Role.Admin)]
-        public async Task<IActionResult> CreateHomeChoreBase([FromForm] HomeChoreBaseRequest homeChoreBaseRequest)
+        public async Task<IActionResult> CreateHomeChoreBase(HomeChoreBaseRequest homeChoreBaseRequest)
         {
             await _homeChoreBaseRepository.AddHomeChoreBase(homeChoreBaseRequest);
             await _homeChoreBaseRepository.Save();

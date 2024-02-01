@@ -47,9 +47,12 @@ namespace HomeChoreTracker.Portal.Controllers
                 return View(homeChoreBaseRequest);
             }
 
+            var token = User.FindFirstValue("Token");
+
             using (var httpClient = _httpClientFactory.CreateClient())
             {
-                var apiUrl = _config["ApiUrl"] + "/HomeChoreBase/CreateHomeChoreBase";
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var apiUrl = _config["ApiUrl"] + "/HomeChoreBase";
                 var response = await httpClient.PostAsJsonAsync(apiUrl, homeChoreBaseRequest);
 
                 if (response.IsSuccessStatusCode)
