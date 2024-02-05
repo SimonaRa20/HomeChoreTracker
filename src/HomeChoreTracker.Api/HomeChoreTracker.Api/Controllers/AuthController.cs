@@ -65,7 +65,7 @@ namespace HomeChoreTracker.Api.Controllers
                 user.Password = hashedPassword;
 
                 User userDto = _mapper.Map<User>(user);
-                userDto.Role = Role.HomeUser;
+                userDto.Role = Role.User;
                 await _authRepository.AddUser(userDto);
                 await _authRepository.Save();
 

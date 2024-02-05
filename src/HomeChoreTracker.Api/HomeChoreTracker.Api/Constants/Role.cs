@@ -3,7 +3,6 @@
     public class Role
     {
         public const string Admin = nameof(Admin);
-        public const string HomeAdmin = nameof(HomeAdmin);
-        public const string HomeUser = nameof(HomeUser);
+        public const string User = nameof(User);
     }
 }

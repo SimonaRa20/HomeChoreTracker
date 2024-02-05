@@ -83,6 +83,7 @@ namespace HomeChoreTracker.Api
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IHomeChoreBaseRepository, HomeChoreBaseRepository>();
+            builder.Services.AddScoped<IHomeRepository, HomeRepository>();
 
 
             var app = builder.Build();
