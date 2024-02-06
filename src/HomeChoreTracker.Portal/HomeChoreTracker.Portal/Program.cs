@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
 namespace HomeChoreTracker.Portal
 {
@@ -12,6 +13,12 @@ namespace HomeChoreTracker.Portal
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpClient();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+
+            builder.Services.AddControllers(options =>
+            {
+                options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model HomeChoreTracker.Portal.Models.Auth.UserLoginRequest
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -32,12 +34,12 @@
                                     <form asp-controller="Auth" asp-action="Login" method="post">
                                        
                                         <div class="form-group">
-                                            <input type="email" class="form-control form-control-user" id="exampleInputEmail"
-                                                   aria-describedby="emailHelp" placeholder="Email Address" name="userLoginRequest.Email">
+                                            <input type="email" class="form-control form-control-user" id="exampleInputEmail" asp-for=@Model.Email
+                                                   aria-describedby="emailHelp" placeholder="Email Address" >
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" class="form-control form-control-user" id="exampleInputPassword"
-                                                   placeholder="Password" name="userLoginRequest.Password">
+                                            <input type="password" class="form-control form-control-user" id="exampleInputPassword" asp-for=@Model.Password
+                                                   placeholder="Password" >
                                         </div>
                                         @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
                                         {

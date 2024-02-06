@@ -11,5 +11,6 @@ namespace HomeChoreTracker.Api.Interfaces
         Task Save();
         Task Update(HomeChoreBase homeChoreBase);
         Task Delete(int id);
+        Task<List<HomeChoreBase>> GetPaginated(int skip, int take);
     }
 }

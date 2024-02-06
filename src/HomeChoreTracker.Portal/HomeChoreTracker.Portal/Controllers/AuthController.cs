@@ -93,13 +93,6 @@ namespace HomeChoreTracker.Portal.Controllers
         {
             if (!ModelState.IsValid)
             {
-                string errorMessage = string.Join("\n", ModelState.Values
-                                    .SelectMany(v => v.Errors)
-                                    .Select(e => e.ErrorMessage)
-                                    .Where(msg => !string.IsNullOrEmpty(msg)));
-
-                ViewData["ErrorMessage"] = errorMessage;
-
                 return View(userRegisterRequest);
             }
 
@@ -121,8 +114,6 @@ namespace HomeChoreTracker.Portal.Controllers
                 }
                 else
                 {
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorRequest>();
-                    ViewData["ErrorMessage"] = errorResponse.ErrorMessage;
                     return View(userRegisterRequest);
                 }
             }

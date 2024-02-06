@@ -71,7 +71,7 @@ namespace HomeChoreTracker.Api
             {
                 options.AddPolicy("Test", builder =>
                 {
-                    builder.WithOrigins("https://localhost:7127/")
+                    builder.WithOrigins("https://localhost:7052/")
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .SetIsOriginAllowed((x) => true)
@@ -84,6 +84,7 @@ namespace HomeChoreTracker.Api
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IHomeChoreBaseRepository, HomeChoreBaseRepository>();
             builder.Services.AddScoped<IHomeRepository, HomeRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
             var app = builder.Build();

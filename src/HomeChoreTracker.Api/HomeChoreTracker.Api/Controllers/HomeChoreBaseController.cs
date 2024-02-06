@@ -21,17 +21,38 @@ namespace HomeChoreTracker.Api.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("skip{skip}/take{take}")]
+        [Authorize]
+        public async Task<IActionResult> GetHomeChoresBase(int skip = 0, int take = 5)
+        {
+            try
+            {
+                var homeChoreBases = await _homeChoreBaseRepository.GetPaginated(skip, take);
+
+                if (homeChoreBases == null || !homeChoreBases.Any())
+                {
+                    return NotFound("No home chore bases found");
+                }
+
+                return Ok(homeChoreBases);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while fetching home chore bases: {ex.Message}");
+            }
+        }
+
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult>GetHomeChoresBase()
+        public async Task<IActionResult> GetHomeChoresBase()
         {
             try
             {
                 var homeChoreBases = await _homeChoreBaseRepository.GetAll();
 
-                if (homeChoreBases == null)
+                if (homeChoreBases == null || !homeChoreBases.Any())
                 {
-                    return NotFound("Home chore bases not found");
+                    return NotFound("No home chore bases found");
                 }
 
                 return Ok(homeChoreBases);

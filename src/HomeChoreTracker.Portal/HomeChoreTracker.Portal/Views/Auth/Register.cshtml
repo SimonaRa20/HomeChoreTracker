@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model HomeChoreTracker.Portal.Models.Auth.UserRegisterRequestForm
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -34,31 +36,29 @@
                             <form asp-controller="Auth" asp-action="Register" method="post">
 
                                 <div class="form-group">
-                                    <input type="text" class="form-control form-control-user" id="exampleFirstName"
+                                    <input type="text" class="form-control form-control-user" id="exampleFirstName" asp-for=@Model.UserName
                                            placeholder="Username" name="UserRegisterRequest.UserName">
+                                    <span asp-validation-for="@Model.UserName" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <input type="email" class="form-control form-control-user" id="exampleInputEmail"
-                                           placeholder="Email Address" name="UserRegisterRequest.Email">
+                                           placeholder="Email Address" asp-for=@Model.Email>
+                                    <span asp-validation-for="@Model.Email" class="text-danger"></span>
                                 </div>
                                 
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <input type="password" class="form-control form-control-user"
-                                               id="exampleInputPassword" placeholder="Password" name="UserRegisterRequest.Password">
+                                               id="exampleInputPassword" placeholder="Password" asp-for=@Model.Password>
+                                        <span asp-validation-for="@Model.Password" class="text-danger"></span>
                                     </div>
                                     <div class="col-sm-6">
                                         <input type="password" class="form-control form-control-user"
-                                               id="exampleRepeatPassword" placeholder="Repeat Password" name="UserRegisterRequest.RepeatPassword">
+                                               id="exampleRepeatPassword" placeholder="Repeat Password" asp-for=@Model.RepeatPassword>
+                                        <span asp-validation-for="@Model.RepeatPassword" class="text-danger"></span>
                                     </div>
                                 </div>
-                                @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
-                                {
-                                    <div class="alert alert-danger">
-                                        @ViewData["ErrorMessage"]
-                                    </div>
-                                }
                                 <button type="submit" class="btn btn-primary btn-user btn-block">
                                     Register Account
                                 </button>
