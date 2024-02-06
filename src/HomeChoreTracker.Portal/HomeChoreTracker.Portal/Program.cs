@@ -10,14 +10,9 @@ namespace HomeChoreTracker.Portal
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages();
             builder.Services.AddHttpClient();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-
-            builder.Services.AddControllers(options =>
-            {
-                options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
-            });
 
             var app = builder.Build();
 
@@ -34,17 +29,12 @@ namespace HomeChoreTracker.Portal
 
             app.UseRouting();
 
-            // Add this line to enable authentication
             app.UseAuthentication();
-
             app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapRazorPages();
 
             app.Run();
         }
     }
-
 }

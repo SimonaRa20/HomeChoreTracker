@@ -1,0 +1,117 @@
+﻿@page 
+@model HomeChoreTracker.Portal.Pages.HomeChoreBase.IndexModel
+@{
+    ViewData["Title"] = "Home Chores";
+}
+<div class="row">
+
+    <div class="col-lg-6">
+        <div class="card mb-4 py-3 border-left-primary">
+            <a href="#collapseCardExample" class="d-block card-header bg-transparent" data-toggle="collapse"
+               role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Create new home chore
+            </a>
+            <div class="collapse show" id="collapseCardExample">
+                <div class="card-body">
+                    <form method="post" asp-action="Index">
+                        <div class="form-group">
+                            <label for="Name">Name</label>
+                            <input type="text" class="form-control" id="Name" name="CreateHomeChoreBase.Name" asp-for="CreateHomeChoreBase.Name">
+                            <span asp-validation-for="CreateHomeChoreBase.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label for="ChoreType">Chore Type</label>
+                                <select class="form-control" id="ChoreType" name="ChoreType" asp-for="CreateHomeChoreBase.ChoreType" required>
+                                    @foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.HomeChoreType)))
+                                    {
+                                        <option value="@choreType">@choreType</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CreateHomeChoreBase.ChoreType" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label for="Frequency">Frequency</label>
+                                <select class="form-control" id="Frequency" name="Frequency" asp-for="CreateHomeChoreBase.Frequency" required>
+                                    @foreach (var frequency in Enum.GetValues(typeof(HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.Frequency)))
+                                    {
+                                        <option value="@frequency">@frequency</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CreateHomeChoreBase.Frequency" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Description">Description</label>
+                            <textarea class="form-control" id="Description" name="Description" asp-for="CreateHomeChoreBase.Description"></textarea>
+                            <span asp-validation-for="CreateHomeChoreBase.Description" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-4 py-3 border-left-primary">
+
+            <div class="card-body">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+                    <div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
+                        <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
+                    </div>
+                </div>
+                @if (Model.HomeChoreBases != null && Model.HomeChoreBases.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Chore Type</th>
+                                <th>Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var choreBase in Model.HomeChoreBases)
+                            {
+                                <tr>
+                                    <td>@choreBase.Name</td>
+                                    <td>@choreBase.ChoreType</td>
+                                    <td>@choreBase.Frequency</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div>
+                        <ul class="pagination">
+
+                            @if (Model.ShowPrevious)
+                            {
+                                <li class="page-item">
+                                    <a asp-page="/HomeChoreBase/Index" asp-route-currentpage="@(Model.CurrentPage -1)" class="page-link">Previous</a>
+                                </li>
+                            }
+                            @if (Model.ShowNext)
+                            {
+                                <li class="page-item">
+                                    <a asp-page="/HomeChoreBase/Index" asp-route-currentpage="@(Model.CurrentPage + 1)" class="page-link">Next</a>
+                                </li>
+                            }
+
+                        </ul>
+                    </div>
+
+                }
+                else
+                {
+                    <p>No home chore bases found.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
