@@ -123,25 +123,34 @@ namespace HomeChoreTracker.Api.Controllers
 
         private void SendPasswordResetEmail(string email, string resetLink)
         {
-            string fromMail = _config["EmailConfigServer:Email"];
-            string fromPassword = _config["EmailConfigServer:Password"];
-
-            MailMessage message = new MailMessage();
-            message.From = new MailAddress(fromMail);
-            message.Subject = "Password Reset";
-            message.To.Add(new MailAddress(email));
-            message.Body = $"<html><body>Click the following link to reset your password: <a href=\"{resetLink}\">{resetLink}</a></body></html>";
-            message.IsBodyHtml = true;
-
-            var smtpClient = new SmtpClient(_config["EmailConfigServer:Server"])
+            try
             {
-                Port = int.Parse(_config["EmailConfigServer:Port"]),
-                Credentials = new NetworkCredential(fromMail, fromPassword),
-                EnableSsl = true,
-                UseDefaultCredentials = false,
-            };
+                string fromMail = _config["EmailConfigServer:Email"];
+                string fromPassword = _config["EmailConfigServer:Password"];
 
-            smtpClient.Send(message);
+                MailMessage message = new MailMessage();
+                message.From = new MailAddress(fromMail);
+                message.Subject = "Password Reset";
+                message.To.Add(new MailAddress(email));
+                message.Body = $"<html><body>Click the following link to reset your password: <a href=\"{resetLink}\">{resetLink}</a></body></html>";
+                message.IsBodyHtml = true;
+
+                var smtpClient = new SmtpClient(_config["EmailConfigServer:Server"])
+                {
+                    Port = int.Parse(_config["EmailConfigServer:Port"]),
+                    Credentials = new NetworkCredential(fromMail, fromPassword),
+                    EnableSsl = true,
+                    UseDefaultCredentials = false,
+                };
+
+                smtpClient.Send(message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error sending email: {ex.Message}");
+                throw; // Rethrow the exception to propagate it
+            }
         }
 
         [Route("RestoreForgotPassword")]

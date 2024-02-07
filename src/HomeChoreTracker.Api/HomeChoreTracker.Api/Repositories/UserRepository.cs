@@ -19,24 +19,5 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.Users.Where(x=>x.Email == inviteeEmail).Select(x => x.Id).FirstOrDefaultAsync();
         }
 
-        public async Task<List<Notification>> GetUserNotifications(int userId)
-        {
-            return await _dbContext.Notifications
-                .Where(n => n.UserId == userId && !n.IsRead)
-                .OrderByDescending(n => n.Created)
-                .ToListAsync();
-        }
-
-        public async Task MarkNotificationAsRead(int notificationId)
-        {
-            var notification = await _dbContext.Notifications.FindAsync(notificationId);
-
-            if (notification != null)
-            {
-                notification.IsRead = true;
-                await _dbContext.SaveChangesAsync();
-            }
-        }
-
     }
 }

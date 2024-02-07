@@ -72,28 +72,7 @@ namespace HomeChoreTracker.Api.Repositories
             _dbContext.HomeInvitations.Add(invitation);
             await _dbContext.SaveChangesAsync();
 
-            var invitedUserId = await _userRepository.GetUserIdByEmail(inviteeEmail);
-
-            if (invitedUserId != null)
-            {
-                await SendInvitationNotification(invitedUserId, $"You have been invited to join a home group.");
-            }
-
-
             return token;
-        }
-
-        private async Task SendInvitationNotification(int userId, string message)
-        {
-            var notification = new Notification
-            {
-                UserId = userId,
-                Message = message,
-                Created = DateTime.UtcNow,
-            };
-
-            _dbContext.Notifications.Add(notification);
-            await _dbContext.SaveChangesAsync();
         }
 
         private string GenerateInvitationToken()
@@ -115,51 +94,5 @@ namespace HomeChoreTracker.Api.Repositories
                 return token.Length >= tokenLength ? token.Substring(0, tokenLength) : token.PadRight(tokenLength, '0');
             }
         }
-
-        public async Task<bool> ValidateInvitationToken(string invitationToken)
-        {
-            var invitation = await _dbContext.HomeInvitations
-                .FirstOrDefaultAsync(i => i.InvitationToken == invitationToken);
-
-            return invitation != null && !IsInvitationExpired(invitation);
-        }
-
-        private bool IsInvitationExpired(HomeInvitation invitation)
-        {
-            return invitation.ExpirationDate < DateTime.UtcNow;
-        }
-
-        public async Task AssociateUserWithHome(int userId, string invitationToken, bool acceptInvitation)
-        {
-            var invitation = await _dbContext.HomeInvitations
-                .Include(i => i.Home)
-                .FirstOrDefaultAsync(i => i.InvitationToken == invitationToken);
-
-            if (invitation == null || IsInvitationExpired(invitation) || invitation.IsAccepted)
-            {
-                throw new InvalidOperationException("Invalid or expired invitation token.");
-            }
-
-            if (acceptInvitation)
-            {
-                var newUserHome = new UserHomes
-                {
-                    UserId = userId,
-                    HomeId = invitation.HomeId,
-                    HomeRole = HomeRole.HomeUser,
-                };
-
-                _dbContext.UserHomes.Add(newUserHome);
-                invitation.IsAccepted = true;
-                await _dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                _dbContext.HomeInvitations.Remove(invitation);
-                await _dbContext.SaveChangesAsync();
-            }
-        }
-        
-
     }
 }
