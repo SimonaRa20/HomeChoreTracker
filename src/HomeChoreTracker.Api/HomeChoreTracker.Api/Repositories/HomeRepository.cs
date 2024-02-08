@@ -43,6 +43,11 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<HomeInvitation> Get(int homeId)
+        {
+            return await _dbContext.HomeInvitations.FirstOrDefaultAsync(x => x.HomeId == homeId);
+        }
+
         public async Task<List<Home>> GetAll(int userId)
         {
             return await _dbContext.UserHomes.Where(x => x.UserId == userId).Select(h => h.Home).ToListAsync();
@@ -93,6 +98,23 @@ namespace HomeChoreTracker.Api.Repositories
                 // Ensure the token is exactly 8 characters
                 return token.Length >= tokenLength ? token.Substring(0, tokenLength) : token.PadRight(tokenLength, '0');
             }
+        }
+
+        public async Task<HomeInvitation> GetInvitationByToken(string token)
+        {
+            return await _dbContext.HomeInvitations.FirstOrDefaultAsync(x => x.InvitationToken.Equals(token));
+        }
+
+        public async Task AddToHome(UserHomes userHomes)
+        {
+            await _dbContext.UserHomes.AddAsync(userHomes);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveInvitation(HomeInvitation homeInvitation)
+        {
+            _dbContext.HomeInvitations.Remove(homeInvitation);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

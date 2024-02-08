@@ -21,15 +21,15 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task<User> GetUserByEmail(string email)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+            return await _dbContext.Users.FirstAsync(x => x.Email == email);
         }
 
-        public async Task<User> GetUserById(int id)
-        {
-            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
-        }
+		public async Task<User> GetUserById(int id)
+		{
+			return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+		}
 
-        public async Task Save()
+		public async Task Save()
         {
             await _dbContext.SaveChangesAsync();
         }

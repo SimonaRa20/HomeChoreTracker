@@ -1,0 +1,75 @@
+using HomeChoreTracker.Portal.Models.Auth;
+using HomeChoreTracker.Portal.Models.Home;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+
+namespace HomeChoreTracker.Portal.Pages.Home
+{
+    public class InviteModel : PageModel
+    {
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _config;
+
+        [BindProperty]
+        public InvitationResponseRequest InvitationResponseRequest { get; set; }
+
+        public InviteModel(IHttpClientFactory httpClientFactory, IConfiguration config)
+        {
+            _httpClientFactory = httpClientFactory;
+            _config = config;
+        }
+
+        public IActionResult OnGet()
+        {
+            InvitationResponseRequest = new InvitationResponseRequest();
+            InvitationResponseRequest.Token = Request.Query["token"];
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                var apiUrl = _config["ApiUrl"] + "/Home/InvitationAnswer";
+                var response = await httpClient.PostAsJsonAsync(apiUrl, InvitationResponseRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var isAuthenticated = User.Identity.IsAuthenticated;
+
+                    if (isAuthenticated)
+                    {
+                        // If the user is logged in, redirect to the home page
+                        return RedirectToPage("/Index");
+                    }
+                    else
+                    {
+                        // If the user is not logged in, redirect to the login page
+                        return RedirectToPage("/Auth/Login");
+                    }
+                }
+                else if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    // Invitation not found
+                    ModelState.AddModelError(string.Empty, "Invitation not found.");
+                }
+                else
+                {
+                    // Handle other errors if needed
+                    ModelState.AddModelError(string.Empty, "An error occurred while processing your request.");
+                }
+
+            }
+
+            return Page();
+        }
+
+    }
+}

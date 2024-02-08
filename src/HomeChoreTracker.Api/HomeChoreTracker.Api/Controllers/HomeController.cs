@@ -3,9 +3,14 @@ using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Home;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
+using HomeChoreTracker.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
+using System.Web;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -13,11 +18,15 @@ namespace HomeChoreTracker.Api.Controllers
     [ApiController]
     public class HomeController : Controller
     {
+        private readonly IConfiguration _config;
         private readonly IHomeRepository _homeRepository;
+        private readonly IAuthRepository _authRepository;
 
-        public HomeController(IHomeRepository homeRepository)
+        public HomeController(IHomeRepository homeRepository, IAuthRepository authRepository, IConfiguration config)
         {
             _homeRepository = homeRepository;
+            _authRepository = authRepository;
+            _config = config;
         }
 
         [HttpPost]
@@ -44,17 +53,102 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok(homes);
         }
 
-        [HttpPost("invite")]
-        [Authorize(Roles = Role.User)]
-        public async Task<IActionResult> InviteUserToHome([FromBody] InviteUserRequest inviteUserRequest)
+        [Route("GenerateInvitation")]
+        [HttpPost]
+        public async Task<ActionResult> GenerateInvitation([FromBody] InviteUserRequest inviteUserRequest)
         {
-            // Get the inviter user ID from your authentication system
-            int inviterUserId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 
-            // Call the repository method to invite the user
-            var token = await _homeRepository.InviteUserToHome(inviterUserId, inviteUserRequest.HomeId, inviteUserRequest.InviteeEmail);
+			var user = await _authRepository.GetUserByEmail(inviteUserRequest.InviteeEmail);
+			User sender = await _authRepository.GetUserById(userId);
+			if (user != null)
+            {
+                // Generate invitation token
+                string invitationToken = await _homeRepository.InviteUserToHome(userId, inviteUserRequest.HomeId, inviteUserRequest.InviteeEmail);
 
-            return Ok(new { InvitationToken = token });
+                // Construct invitation link
+                string invitationLink = $"{_config["AppUrl"]}/Home/Invite?token={HttpUtility.UrlEncode(invitationToken)}";
+               
+
+                // Send invitation email
+                SendInvitationEmail(inviteUserRequest.InviteeEmail, invitationLink, sender);
+
+                return Ok("Invitation sent successfully.");
+            }
+
+            return NotFound("User not found.");
         }
+
+        private async void SendInvitationEmail(string email, string invitationLink, User user)
+        {
+            try
+            {
+                string registerLink = $"{_config["AppUrl"]}/Auth/Register";
+
+                string fromMail = _config["EmailConfigServer:Email"];
+                string fromPassword = _config["EmailConfigServer:Password"];
+
+                MailMessage message = new MailMessage();
+                message.From = new MailAddress(fromMail);
+                message.Subject = "Invitation to Home";
+                message.To.Add(new MailAddress(email));
+                message.Body = $@"<html><body>
+                            <p>You have been invited to join a home.</p>
+                            <p>You were invited by {user.Email}.</p>
+                            <p>Click the following link to accept the invitation: <a href=""{invitationLink}"">{invitationLink}</a></p>
+                            <p>If you don't have an account, please register <a href=""{registerLink}"">here</a> and then press on the invitation link.</p>
+                         </body></html>";
+                message.IsBodyHtml = true;
+
+                var smtpClient = new SmtpClient(_config["EmailConfigServer:Server"])
+                {
+                    Port = int.Parse(_config["EmailConfigServer:Port"]),
+                    Credentials = new NetworkCredential(fromMail, fromPassword),
+                    EnableSsl = true,
+                    UseDefaultCredentials = false,
+                };
+
+                smtpClient.Send(message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error sending email: {ex.Message}");
+                throw; // Rethrow the exception to propagate it
+            }
+        }
+
+        [Route("InvitationAnswer")]
+        [HttpPost]
+        public async Task<ActionResult> InvitationAnswer([FromBody]InvitationAnswerRequest invitation)
+        {
+            var existingInvitation = await _homeRepository.GetInvitationByToken(invitation.Token);
+            var user = await _authRepository.GetUserByEmail(existingInvitation.InviteeEmail);
+            if (existingInvitation == null)
+            {
+                return NotFound("Invitation not found.");
+            }
+
+            if (invitation.IsAccept)
+            {
+                var userHome = new UserHomes
+                {
+                    UserId = user.Id,
+                    HomeId = existingInvitation.HomeId,
+                    HomeRole = HomeRole.HomeUser,
+                };
+
+                await _homeRepository.AddToHome(userHome);
+                await _homeRepository.RemoveInvitation(existingInvitation);
+
+                return Ok("Invitation accepted successfully.");
+            }
+            else
+            {
+                await _homeRepository.RemoveInvitation(existingInvitation);
+                return Ok("Invitation declined and removed.");
+            }
+        }
+
     }
 }
