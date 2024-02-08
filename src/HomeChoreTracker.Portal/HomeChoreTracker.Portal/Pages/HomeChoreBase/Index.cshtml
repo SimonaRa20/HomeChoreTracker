@@ -1,8 +1,9 @@
-﻿@page 
+﻿@page
 @model HomeChoreTracker.Portal.Pages.HomeChoreBase.IndexModel
 @{
     ViewData["Title"] = "Home Chores";
 }
+
 <div class="row">
 
     <div class="col-lg-6">
@@ -85,16 +86,38 @@
                                     <td>@choreBase.Frequency</td>
                                     <td>
                                         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                        <i class="fa fa-pencil-alt" aria-hidden="true"></i>
-                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                        <a class='btn btn-sm' id='btnEdit'><i class='fa fa-pencil-alt'></i></a>
+                                        <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
+
+                                        <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Delete Confirmation</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to delete this '@choreBase.Name' home chore?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                        <form method="post" asp-page-handler="Delete" asp-route-id="@choreBase.Id">
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             }
+
                         </tbody>
                     </table>
                     <div>
                         <ul class="pagination">
-
                             @if (Model.ShowPrevious)
                             {
                                 <li class="page-item">
@@ -107,10 +130,8 @@
                                     <a asp-page="/HomeChoreBase/Index" asp-route-currentpage="@(Model.CurrentPage + 1)" class="page-link">Next</a>
                                 </li>
                             }
-
                         </ul>
                     </div>
-
                 }
                 else
                 {
@@ -119,5 +140,4 @@
             </div>
         </div>
     </div>
-
 </div>

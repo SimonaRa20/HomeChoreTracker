@@ -1,8 +1,15 @@
+using HomeChoreTracker.Portal.Models.Home;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 {
@@ -12,12 +19,15 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
         private readonly IConfiguration _config;
 
         public List<HomeChoreBaseResponse> HomeChoreBases { get; set; }
-        
+
         [BindProperty(SupportsGet = true)]
         public int CurrentPage { get; set; } = 1;
         public int Count { get; set; }
         public int PageSize { get; set; } = 5;
         public int TotalPages { get; set; }
+
+        [BindProperty]
+        public int SelectedDelete { get; set; }
 
         [BindProperty]
         public HomeChoreBaseRequest CreateHomeChoreBase { get; set; }
@@ -66,8 +76,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
             }
         }
 
-
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -103,6 +111,29 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
                 await OnGetAsync();
                 return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
+
+                var response = await httpClient.DeleteAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToPage();
+                }
+                else
+                {
+                    // Handle deletion failure
+                    ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
+                    return Page();
+                }
             }
         }
     }
