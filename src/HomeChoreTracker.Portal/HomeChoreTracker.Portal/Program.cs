@@ -1,6 +1,8 @@
 using HomeChoreTracker.Portal.Pages.Home;
+using HomeChoreTracker.Portal.ViewComponents;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal
 {
@@ -14,9 +16,13 @@ namespace HomeChoreTracker.Portal
             builder.Services.AddRazorPages();
             builder.Services.AddHttpClient();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-			//builder.Services.AddTransient<InviteToHomeModel>();
+            //builder.Services.AddTransient<InviteToHomeModel>();
+            builder.Services.AddScoped<ClaimsPrincipal>(s => s.GetService<IHttpContextAccessor>()?.HttpContext?.User);
 
-			var app = builder.Build();
+            builder.Services.AddTransient<HomesListViewComponent>();
+            builder.Services.AddHttpContextAccessor();
+
+            var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

@@ -1,0 +1,16 @@
+﻿@model List<HomeChoreTracker.Portal.Models.Home.HomeResponse>
+
+<div class="bg-white py-2 collapse-inner rounded">
+    @foreach (var home in Model)
+    {
+        <a class="collapse-item" href="./Home/@home.Id">@home.Title</a>
+    }
+</div>
+
+@* <div class="bg-white py-2 collapse-inner rounded">
+    <a class="collapse-item" href="./Home">View & Organize</a>
+    <a class="collapse-item" href="./Home">Manage</a>
+    <!-- Inside _Layout.cshtml -->
+    @await Component.InvokeAsync("HomesList")
+
+</div> *@

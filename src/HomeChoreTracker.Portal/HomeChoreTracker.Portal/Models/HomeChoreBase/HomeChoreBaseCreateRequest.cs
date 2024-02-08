@@ -2,7 +2,7 @@
 
 namespace HomeChoreTracker.Portal.Models.HomeChoreBase
 {
-    public class HomeChoreBaseRequest
+    public class HomeChoreBaseCreateRequest
     {
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }

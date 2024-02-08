@@ -113,7 +113,7 @@ namespace HomeChoreTracker.Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = Role.Admin)]
-        public async Task<IActionResult> UpdateHomeChoreBase(int id, [FromForm] HomeChoreBaseRequest homeChoreBaseRequest)
+        public async Task<IActionResult> UpdateHomeChoreBase(int id, [FromBody] HomeChoreBaseRequest homeChoreBaseRequest)
         {
             try
             {

@@ -30,7 +30,10 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
         public int SelectedDelete { get; set; }
 
         [BindProperty]
-        public HomeChoreBaseRequest CreateHomeChoreBase { get; set; }
+        public HomeChoreBaseCreateRequest CreateHomeChoreBase { get; set; }
+
+        [BindProperty]
+        public HomeChoreBaseEditRequest EditHomeChore { get; set; }
 
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
@@ -78,6 +81,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
         public async Task<IActionResult> OnPostAsync()
         {
+            ClearFieldErrors(key => key == "Name");
             if (!ModelState.IsValid)
             {
                 await OnGetAsync();
@@ -133,6 +137,49 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     // Handle deletion failure
                     ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
                     return Page();
+                }
+            }
+        }
+
+        public async Task<IActionResult> OnPostEditAsync(int id)
+        {
+            ClearFieldErrors(key => key == "Name");
+            if (!ModelState.IsValid)
+            {
+                await OnGetAsync();
+                return Page();
+            }
+
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
+
+                var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Page();
+                }
+                else
+                {
+                    // Handle deletion failure
+                    ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
+                    return Page();
+                }
+            }
+        }
+        private void ClearFieldErrors(Func<string, bool> predicate)
+        {
+            foreach (var field in ModelState)
+            {
+                if (field.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                {
+                    if (predicate(field.Key))
+                    {
+                        field.Value.ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
+                    }
                 }
             }
         }

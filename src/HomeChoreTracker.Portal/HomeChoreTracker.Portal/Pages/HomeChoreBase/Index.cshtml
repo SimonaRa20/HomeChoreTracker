@@ -44,10 +44,10 @@
                                 <span asp-validation-for="CreateHomeChoreBase.Frequency" class="text-danger"></span>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label for="Description">Description</label>
-                            <textarea class="form-control" id="Description" name="Description" asp-for="CreateHomeChoreBase.Description"></textarea>
-                            <span asp-validation-for="CreateHomeChoreBase.Description" class="text-danger"></span>
+                            <input type="text" class="form-control" id="Description" name="CreateHomeChoreBase.Description" asp-for="CreateHomeChoreBase.Description">
                         </div>
                         <button type="submit" class="btn btn-primary">Create</button>
                     </form>
@@ -110,8 +110,43 @@
                                         </div>
 
 
-                                        <a class='btn btn-sm' id='btnEdit'><i class='fa fa-pencil-alt'></i></a>
-                                        <!-- Modal Edit-->
+                                        <a class='btn btn-sm' id='btnEdit' data-toggle="modal" data-target="#editModal-@choreBase.Id"><i class='fa fa-pencil-alt'></i></a>
+                                        <!-- Modal Edit -->
+                                        <div class="modal fade" id="editModal-@choreBase.Id" tabindex="-1" role="dialog" aria-labelledby="editModalLabel-@choreBase.Id" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editModalLabel-@choreBase.Id">Edit Home Chore - @choreBase.Name</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form method="post" asp-page-handler="Edit" asp-route-id="@choreBase.Id">
+                                                            <div class="form-group">
+                                                                <label for="EditName">Name</label>
+                                                                <input type="text" class="form-control" id="EditName" name="EditName" value="@choreBase.Name" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="EditChoreType">Chore Type</label>
+                                                                <input type="text" class="form-control" id="EditChoreType" name="EditChoreType" value="@choreBase.ChoreType" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="EditFrequency">Frequency</label>
+                                                                <input type="text" class="form-control" id="EditFrequency" name="EditFrequency" value="@choreBase.Frequency" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="EditDescription">Description</label>
+                                                                <textarea class="form-control" id="EditDescription" name="EditDescription" rows="3">@choreBase.Description</textarea>
+                                                            </div>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
 
                                         <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
                                         <!-- Modal Delete-->
