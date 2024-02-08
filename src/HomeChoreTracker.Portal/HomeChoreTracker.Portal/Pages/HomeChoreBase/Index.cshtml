@@ -85,10 +85,36 @@
                                     <td>@choreBase.ChoreType</td>
                                     <td>@choreBase.Frequency</td>
                                     <td>
-                                        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                        <a class='btn btn-sm' id='btnEdit'><i class='fa fa-pencil-alt'></i></a>
-                                        <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
+                                        <i class="fa fa-ellipsis-h" aria-hidden="true" data-toggle="modal" data-target="#detailModal-@choreBase.Id"></i>
+                                        <!-- Modal Detailed-->
+                                        <div class="modal fade" id="detailModal-@choreBase.Id" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel-@choreBase.Id" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="detailModalLabel-@choreBase.Id">Detailed info - @choreBase.Name</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p><strong>Name:</strong> @choreBase.Name</p>
+                                                        <p><strong>Chore Type:</strong> @choreBase.ChoreType</p>
+                                                        <p><strong>Frequency:</strong> @choreBase.Frequency</p>
+                                                        <p><strong>Description:</strong> @(choreBase.Description != null ? choreBase.Description : "-")</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
+
+                                        <a class='btn btn-sm' id='btnEdit'><i class='fa fa-pencil-alt'></i></a>
+                                        <!-- Modal Edit-->
+
+                                        <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
+                                        <!-- Modal Delete-->
                                         <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
