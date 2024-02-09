@@ -1,3 +1,4 @@
+using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Home;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
@@ -42,10 +43,13 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
+            EditHomeChore = new HomeChoreBaseEditRequest();
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
+            CreateHomeChoreBase = new HomeChoreBaseCreateRequest();
+
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
             {
@@ -144,32 +148,48 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
         public async Task<IActionResult> OnPostEditAsync(int id)
         {
             ClearFieldErrors(key => key == "Name");
+
             if (!ModelState.IsValid)
             {
-                await OnGetAsync();
+                await OnGetAsync(); // Refresh the data
                 return Page();
             }
 
-            var token = User.FindFirstValue("Token");
-            using (var httpClient = _httpClientFactory.CreateClient())
+            try
             {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
-
-                var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
-
-                if (response.IsSuccessStatusCode)
+                var token = User.FindFirstValue("Token");
+                using (var httpClient = _httpClientFactory.CreateClient())
                 {
-                    return Page();
-                }
-                else
-                {
-                    // Handle deletion failure
-                    ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
-                    return Page();
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
+
+                    // Update EditHomeChore with form values
+                    EditHomeChore.Name = Request.Form["EditName"];
+                    EditHomeChore.ChoreType = (Models.HomeChoreBase.Constants.HomeChoreType)Enum.Parse<HomeChoreType>(Request.Form["EditChoreType"]);
+                    EditHomeChore.Frequency = (Models.HomeChoreBase.Constants.Frequency)Enum.Parse<Frequency>(Request.Form["EditFrequency"]);
+                    EditHomeChore.Description = Request.Form["EditDescription"];
+
+                    var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToPage();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, $"Failed to update chore: {response.StatusCode}");
+                        return Page();
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                await OnGetAsync(); // Refresh the data
+                return Page();
+            }
         }
+
         private void ClearFieldErrors(Func<string, bool> predicate)
         {
             foreach (var field in ModelState)
