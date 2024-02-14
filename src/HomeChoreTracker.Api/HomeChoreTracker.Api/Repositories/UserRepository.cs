@@ -18,6 +18,16 @@ namespace HomeChoreTracker.Api.Repositories
         {
             return await _dbContext.Users.Where(x=>x.Email == inviteeEmail).Select(x => x.Id).FirstOrDefaultAsync();
         }
+        public async Task<User> GetUserById(int id)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task UpdateUser(User user)
+        {
+            _dbContext.Entry(user).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+        }
 
     }
 }

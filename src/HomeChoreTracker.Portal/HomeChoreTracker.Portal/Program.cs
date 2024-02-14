@@ -16,7 +16,6 @@ namespace HomeChoreTracker.Portal
             builder.Services.AddRazorPages();
             builder.Services.AddHttpClient();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-            //builder.Services.AddTransient<InviteToHomeModel>();
             builder.Services.AddScoped<ClaimsPrincipal>(s => s.GetService<IHttpContextAccessor>()?.HttpContext?.User);
 
             builder.Services.AddTransient<HomesListViewComponent>();
