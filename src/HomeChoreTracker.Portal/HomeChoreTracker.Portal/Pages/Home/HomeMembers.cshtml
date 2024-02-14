@@ -1,8 +1,9 @@
-﻿@page "{id}"
-@model HomeChoreTracker.Portal.Pages.Home.IndexModel
+﻿@page "{id:int}"
+@model HomeChoreTracker.Portal.Pages.Home.HomeMembersModel
+
 @{
     Layout = "~/Pages/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Home Members";
 }
 
 @section HeadContent
@@ -21,16 +22,10 @@
 
 <div class="row">
     <div class="col-lg-6">
-        <a class="btn btn-secondary btn-sm mb-2" href="/Home/@Model.Id">Home</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./HomeMembers" asp-route-id="@Model.Id">Home Members</a>
-
-        <div class="card mb-4 py-3 border-left-primary mt-2">
-
-            <div class="collapse show">
-                <div class="card-body">
-                    There have to be home page
-                </div>
-            </div>
+        <a class="btn btn-light btn-sm" href="/Home/@Model.Id">Home</a>
+        <a class="btn btn-secondary btn-sm" asp-page="./HomeMembers" asp-route-id="@Model.Id">Home Members</a>
+        <div>
+            Your content for Home Members page goes here.
         </div>
     </div>
 </div>
