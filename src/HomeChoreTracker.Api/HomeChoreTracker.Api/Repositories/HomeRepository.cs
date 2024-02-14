@@ -1,6 +1,7 @@
 ﻿using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Home;
 using HomeChoreTracker.Api.Contracts.HomeChoreBase;
+using HomeChoreTracker.Api.Contracts.User;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
@@ -115,6 +116,28 @@ namespace HomeChoreTracker.Api.Repositories
         {
             _dbContext.HomeInvitations.Remove(homeInvitation);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async  Task<List<UserGetResponse>> GetHomeMembers(int homeId)
+        {
+            var homeMembers = await _dbContext.UserHomes
+               .Where(uh => uh.HomeId == homeId)
+               .Include(uh => uh.User)
+               .Select(uh => new UserGetResponse
+               {
+                   UserName = uh.User.UserName,
+                   Email = uh.User.Email,
+                   Role = uh.HomeRole
+               })
+               .ToListAsync();
+
+            return homeMembers;
+        }
+
+        public async Task<bool> OrHomeMember (int homeId, int userId)
+        {
+            return await _dbContext.UserHomes
+                .AnyAsync(uh => uh.UserId == userId && uh.HomeId == homeId);
         }
     }
 }

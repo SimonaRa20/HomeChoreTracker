@@ -21,11 +21,44 @@
 }
 
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-12">
         <a class="btn btn-light btn-sm" href="/Home/@Model.Id">Home</a>
         <a class="btn btn-secondary btn-sm" asp-page="./HomeMembers" asp-route-id="@Model.Id">Home Members</a>
-        <div>
-            Your content for Home Members page goes here.
+        <div class="card mb-4 py-3 border-left-primary mt-2">
+
+            <div class="collapse show">
+                <div class="card-body">
+                    
+                    @if (Model.HomeMembers != null && Model.HomeMembers.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var member in Model.HomeMembers)
+                                {
+                                    <tr>
+                                        <td>@member.UserName</td>
+                                        <td>@member.Email</td>
+                                        <td>@member.Role</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+
+                    }
+                    else
+                    {
+                        <p>No home chore bases found.</p>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>

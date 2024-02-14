@@ -21,7 +21,7 @@ namespace HomeChoreTracker.Api.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserHomes>()
-                        .HasKey(uh => new { uh.UserId, uh.HomeId });
+        .HasKey(uh => new { uh.UserId, uh.HomeId });
         }
 
     }

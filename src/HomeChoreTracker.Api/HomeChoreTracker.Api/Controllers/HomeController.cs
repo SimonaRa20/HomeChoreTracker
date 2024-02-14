@@ -11,6 +11,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Web;
 using Microsoft.EntityFrameworkCore;
+using HomeChoreTracker.Api.Contracts.User;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -149,6 +150,22 @@ namespace HomeChoreTracker.Api.Controllers
                 return Ok("Invitation declined and removed.");
             }
         }
+        [HttpGet("HomeMembers")]
+        [Authorize(Roles = Role.User)]
+        public async Task<IActionResult> GetHomeMembers(int homeId)
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 
+            var isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+            if (!isMember)
+            {
+                return Forbid(); // User is not a member of the home, forbid access
+            }
+
+            var members = await _homeRepository.GetHomeMembers(homeId);
+
+            return Ok(members);
+        }
     }
 }

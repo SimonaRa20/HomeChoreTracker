@@ -1,4 +1,5 @@
 ﻿using HomeChoreTracker.Api.Contracts.Home;
+using HomeChoreTracker.Api.Contracts.User;
 using HomeChoreTracker.Api.Models;
 
 namespace HomeChoreTracker.Api.Interfaces
@@ -13,5 +14,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<HomeInvitation> GetInvitationByToken(string token);
         Task AddToHome(UserHomes userHomes);
         Task RemoveInvitation(HomeInvitation homeInvitation);
+        Task<bool> OrHomeMember(int homeId, int userId);
+        Task<List<UserGetResponse>> GetHomeMembers(int homeId);
     }
 }
