@@ -29,11 +29,6 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 var homeChoreBases = await _homeChoreBaseRepository.GetPaginated(skip, take);
 
-                if (homeChoreBases == null || !homeChoreBases.Any())
-                {
-                    return NotFound("No home chore bases found");
-                }
-
                 return Ok(homeChoreBases);
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HomeChoreTracker.Portal.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeChoreTracker.Portal.Models.HomeChoreBase
 {
@@ -6,8 +7,8 @@ namespace HomeChoreTracker.Portal.Models.HomeChoreBase
     {
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
-        public Constants.HomeChoreType ChoreType { get; set; }
-        public Constants.Frequency Frequency { get; set; }
+        public HomeChoreType ChoreType { get; set; }
+        public Frequency Frequency { get; set; }
         public string? Description { get; set; }
     }
 }

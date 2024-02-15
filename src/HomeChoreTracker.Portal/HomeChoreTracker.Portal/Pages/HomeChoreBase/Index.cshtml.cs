@@ -31,9 +31,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
         public int SelectedDelete { get; set; }
 
         [BindProperty]
-        public HomeChoreBaseCreateRequest CreateHomeChoreBase { get; set; }
-
-        [BindProperty]
         public HomeChoreBaseEditRequest EditHomeChore { get; set; }
 
         public bool ShowPrevious => CurrentPage > 1;
@@ -48,8 +45,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
         public async Task<IActionResult> OnGetAsync()
         {
-            CreateHomeChoreBase = new HomeChoreBaseCreateRequest();
-
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
             {
@@ -80,45 +75,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                 {
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
-            }
-        }
-
-        public async Task<IActionResult> OnPostAsync()
-        {
-            ClearFieldErrors(key => key == "Name");
-            if (!ModelState.IsValid)
-            {
-                await OnGetAsync();
-                return Page();
-            }
-
-            try
-            {
-                var token = User.FindFirstValue("Token");
-                using (var httpClient = _httpClientFactory.CreateClient())
-                {
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var apiUrl = _config["ApiUrl"] + "/HomeChoreBase";
-
-                    var response = await httpClient.PostAsJsonAsync(apiUrl, CreateHomeChoreBase);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
-                        await OnGetAsync();
-                        return Page();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-                await OnGetAsync();
-                return Page();
             }
         }
 
@@ -165,8 +121,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
                     // Update EditHomeChore with form values
                     EditHomeChore.Name = Request.Form["EditName"];
-                    EditHomeChore.ChoreType = (Models.HomeChoreBase.Constants.HomeChoreType)Enum.Parse<HomeChoreType>(Request.Form["EditChoreType"]);
-                    EditHomeChore.Frequency = (Models.HomeChoreBase.Constants.Frequency)Enum.Parse<Frequency>(Request.Form["EditFrequency"]);
+                    EditHomeChore.ChoreType = (HomeChoreType)(Models.HomeChoreBase.Constants.HomeChoreType)Enum.Parse<HomeChoreType>(Request.Form["EditChoreType"]);
+                    EditHomeChore.Frequency = (Frequency)(Models.HomeChoreBase.Constants.Frequency)Enum.Parse<Frequency>(Request.Form["EditFrequency"]);
                     EditHomeChore.Description = Request.Form["EditDescription"];
 
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
