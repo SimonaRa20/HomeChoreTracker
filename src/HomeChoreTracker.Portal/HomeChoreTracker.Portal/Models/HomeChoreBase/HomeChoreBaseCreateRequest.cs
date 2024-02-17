@@ -6,8 +6,8 @@ namespace HomeChoreTracker.Portal.Models.HomeChoreBase
     {
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
-        public Constants.HomeChoreType ChoreType { get; set; }
-        public Constants.Frequency Frequency { get; set; }
+        public int ChoreType { get; set; }
+        public int Frequency { get; set; }
         public string? Description { get; set; }
     }
 }

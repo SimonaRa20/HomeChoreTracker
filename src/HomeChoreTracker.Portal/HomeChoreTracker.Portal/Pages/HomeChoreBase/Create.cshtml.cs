@@ -22,6 +22,9 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
         public async Task<IActionResult> OnPostAsync()
         {
+            ClearFieldErrors(key => key == "CreateHomeChoreBase.ChoreType");
+            ClearFieldErrors(key => key == "CreateHomeChoreBase.Frequency");
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -39,7 +42,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToAction("Index");
+                        return RedirectToPage("/HomeChoreBase/Index");
                     }
                     else
                     {
@@ -52,6 +55,20 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
             {
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
                 return Page();
+            }
+        }
+
+        private void ClearFieldErrors(Func<string, bool> predicate)
+        {
+            foreach (var field in ModelState)
+            {
+                if (field.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                {
+                    if (predicate(field.Key))
+                    {
+                        field.Value.ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
+                    }
+                }
             }
         }
     }

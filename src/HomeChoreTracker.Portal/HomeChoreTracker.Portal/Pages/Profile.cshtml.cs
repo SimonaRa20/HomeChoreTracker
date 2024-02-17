@@ -47,6 +47,7 @@ namespace HomeChoreTracker.Portal.Pages
             return Redirect("/");
         }
 
+       
         public async Task<IActionResult> OnPostAsync()
         {
             try

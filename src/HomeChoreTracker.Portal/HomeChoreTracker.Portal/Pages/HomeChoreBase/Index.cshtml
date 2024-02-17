@@ -6,17 +6,21 @@
 
 <div class="row">
 
-   <div class="col-lg-12">
-        <a class="btn btn-secondary btn-sm mb-2" href="/">Home chores</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
-   
+    <div class="col-lg-12">
+        <a class="btn btn-secondary btn-sm mb-2" href="~/HomeChoreBase">Home chores</a>
+        <a class="btn btn-light btn-sm mb-2" asp-page="./Create">
+            <i class="fa fa-plus-circle mr-2"
+               aria-hidden="true"></i>Create
+        </a>
+
 
         <div class="card mb-4 py-3 border-left-primary">
 
             <div class="card-body">
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
-                    <div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
+                    <div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal"
+                         data-target="#createHomeChoreModal">
                         <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
                     </div>
                 </div>
@@ -39,93 +43,17 @@
                                     <td>@choreBase.ChoreType</td>
                                     <td>@choreBase.Frequency</td>
                                     <td>
-                                        <i class="fa fa-ellipsis-h" aria-hidden="true" data-toggle="modal" data-target="#detailModal-@choreBase.Id"></i>
-                                        <!-- Modal Detailed-->
-                                        <div class="modal fade" id="detailModal-@choreBase.Id" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel-@choreBase.Id" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="detailModalLabel-@choreBase.Id">Detailed info - @choreBase.Name</h5>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p><strong>Name:</strong> @choreBase.Name</p>
-                                                        <p><strong>Chore Type:</strong> @choreBase.ChoreType</p>
-                                                        <p><strong>Frequency:</strong> @choreBase.Frequency</p>
-                                                        <p><strong>Description:</strong> @(choreBase.Description != null ? choreBase.Description : "-")</p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
+                                        <button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
+                                            <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                                        </button>
 
-                                        <a class='btn btn-sm' id='btnEdit' data-toggle="modal" data-target="#editModal-@choreBase.Id"><i class='fa fa-pencil-alt'></i></a>
-                                        <!-- Modal Edit -->
-                                        <div class="modal fade" id="editModal-@choreBase.Id" tabindex="-1" role="dialog" aria-labelledby="editModalLabel-@choreBase.Id" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel-@choreBase.Id">Edit Home Chore - @choreBase.Name</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="post" asp-page-handler="Edit" asp-route-id="@choreBase.Id">
-                    <div class="form-group">
-                        <label for="EditName">Name</label>
-                        <input type="text" class="form-control" id="EditName" name="EditName" value="@choreBase.Name" required>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="EditChoreType">Chore Type</label>
-                                                                <select class="form-control" id="EditChoreType" name="EditChoreType" required>
-                                                                    @foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.HomeChoreType)))
-                                                                    {
-                                                                        var enumValue = (HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.HomeChoreType)choreType;
-                                                                        var selected = enumValue == (Models.HomeChoreBase.Constants.HomeChoreType)Model.EditHomeChore.ChoreType ? "selected" : "";
-                                                                        <option value="@enumValue" selected="@selected">@enumValue</option>
-                                                                    }
-                                                                </select>
-                                                            </div>
-
-                                                            <div class="form-group">
-                                                                <label for="EditFrequency">Frequency</label>
-                                                                <select class="form-control" id="EditFrequency" name="EditFrequency" required>
-                                                                    @foreach (var frequency in Enum.GetValues(typeof(HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.Frequency)))
-                                                                    {
-                                                                        var enumValue = (HomeChoreTracker.Portal.Models.HomeChoreBase.Constants.Frequency)frequency;
-                                                                        var selected = enumValue == (Models.HomeChoreBase.Constants.Frequency)Model.EditHomeChore.Frequency ? "selected" : "";
-                                                                        <option value="@enumValue" selected="@selected">@enumValue</option>
-                                                                    }
-                                                                </select>
-                                                            </div>
-
-
-
-
-
-
-                    <div class="form-group">
-                        <label for="EditDescription">Description</label>
-                        <textarea class="form-control" id="EditDescription" name="EditDescription" rows="3">@choreBase.Description</textarea>
-                    </div>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
+                                        <button class='btn btn-sm' onclick="DisplayEditModal('@choreBase.Id')">
+                                            <i class='fa fa-pencil-alt'></i>
+                                        </button>
 
                                         <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
-                                        <!-- Modal Delete-->
+
                                         <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
@@ -146,7 +74,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+
                                     </td>
                                 </tr>
                             }
@@ -158,13 +86,15 @@
                             @if (Model.ShowPrevious)
                             {
                                 <li class="page-item">
-                                    <a asp-page="/HomeChoreBase/Index" asp-route-currentpage="@(Model.CurrentPage -1)" class="page-link">Previous</a>
+                                    <a asp-page="/HomeChoreBase/Index" asp-route-currentpage="@(Model.CurrentPage -1)"
+                                       class="page-link">Previous</a>
                                 </li>
                             }
                             @if (Model.ShowNext)
                             {
                                 <li class="page-item">
-                                    <a asp-page="/HomeChoreBase/Index" asp-route-currentpage="@(Model.CurrentPage + 1)" class="page-link">Next</a>
+                                    <a asp-page="/HomeChoreBase/Index" asp-route-currentpage="@(Model.CurrentPage + 1)"
+                                       class="page-link">Next</a>
                                 </li>
                             }
                         </ul>
@@ -178,3 +108,145 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Chore Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="choreName"></p>
+                <p id="choreType"></p>
+                <p id="frequency"></p>
+                <p id="description"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Chore</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="editChoreId" name="id" value="" />
+                    <div class="form-group" method="post">
+                        <label for="editName">Name</label>
+                        <input asp-for="EditHomeChore.Name" name="EditName" type="text" class="form-control" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editChoreType">Chore Type</label>
+                        <select class="form-control" id="editChoreType" name="EditChoreType" asp-for="EditHomeChore.ChoreType" required>
+                            <option value="0">Cleaning</option>
+                            <option value="1">Laundry</option>
+                            <option value="2">Kitchen</option>
+                            <option value="3">Bathroom</option>
+                            <option value="4">Bedroom</option>
+                            <option value="5">Outdoors</option>
+                            <option value="6">Organize</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editFrequency">Frequency</label>
+                        <select class="form-control" id="editFrequency" name="EditFrequency" asp-for="EditHomeChore.Frequency" required>
+                            <option value="0">Daily</option>
+                            <option value="1">Weekly</option>
+                            <option value="2">Monthly</option>
+                            <option value="3">Seasonally</option>
+                            <option value="4">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDescription">Description</label>
+                        <textarea class="form-control" id="editDescription" name="EditDescription" asp-for="EditHomeChore.Description"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var currentChoreId; // Variable to store the current chore ID
+
+    function DisplayDetailModal(choreId) {
+        // Make an AJAX request to fetch detailed information about the chore
+        $.ajax({
+            url: '@Url.Page("/HomeChoreBase/Index")?handler=Detail&id=' + choreId,
+            type: 'GET',
+            success: function (data) {
+                // Populate the modal with the retrieved data
+                $('#detailModalLabel').text("Detailed info: " + data.name);
+                $('#choreName').text("Name: " + data.name);
+                $('#choreType').text("Chore Type: " + data.choreType);
+                $('#frequency').text("Frequency: " + data.frequency);
+                $('#description').text("Description: " + data.description);
+
+                // Show the modal
+                $('#detailModal').modal('show');
+            },
+            error: function (error) {
+                console.error('Error fetching chore details:', error);
+            }
+        });
+    }
+
+    function DisplayEditModal(choreId) {
+        currentChoreId = choreId; // Store the current chore ID
+        // Set the chore ID in the hidden input field
+        $('#editChoreId').val(choreId);
+        // Make an AJAX request to fetch detailed information about the chore
+        $.ajax({
+            url: '@Url.Page("/HomeChoreBase/Index")?handler=Detail&id=' + choreId,
+            type: 'GET',
+            success: function (data) {
+                console.log('Received data:', data); // Log the received data
+                // Check if data is not empty and contains the expected properties
+                if (data && data.name && data.choreType && data.frequency && data.description) {
+                    // Populate the edit modal with the retrieved data
+                    $('#editName').val(data.name);
+                    $('#editDescription').val(data.description);
+                    // Set the selected option for chore type
+                    var choreTypeText = data.choreType;
+                    $('#editChoreType option').filter(function () {
+                        return $(this).text() === choreTypeText;
+                    }).prop('selected', true);
+                    // Set the selected option for frequency
+                    var frequencyText = data.frequency;
+                    $('#editFrequency option').filter(function () {
+                        return $(this).text() === frequencyText;
+                    }).prop('selected', true);
+                    // Show the edit modal
+                    $('#editModal').modal('show');
+                } else {
+                    console.error('Invalid data format:', data);
+                    // Optionally, display an error message to the user
+                }
+            },
+            error: function (error) {
+                console.error('Error fetching chore details:', error);
+                // Optionally, display an error message to the user
+            }
+        });
+    }
+
+</script>

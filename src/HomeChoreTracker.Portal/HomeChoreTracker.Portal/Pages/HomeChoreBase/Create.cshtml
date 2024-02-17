@@ -37,9 +37,7 @@
 						<select class="form-control" id="ChoreType" name="CreateHomeChoreBase.ChoreType" asp-for="CreateHomeChoreBase.ChoreType" required>
 							@foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.HomeChoreType)))
 							{
-								var isSelected = choreType.ToString() == Model.CreateHomeChoreBase.ChoreType.ToString() ? "selected" : "";
-
-								<option value="@choreType" selected="@isSelected">@choreType</option>
+								<option value="@((int)choreType)">@choreType</option>
 							}
 						</select>
 						<span asp-validation-for="CreateHomeChoreBase.ChoreType" class="text-danger"></span>
@@ -49,12 +47,13 @@
 						<select class="form-control" id="Frequency" name="CreateHomeChoreBase.Frequency" asp-for="CreateHomeChoreBase.Frequency" required>
 							@foreach (var frequency in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.Frequency)))
 							{
-								var isSelected = frequency.ToString() == Model.CreateHomeChoreBase.Frequency.ToString() ? "selected" : "";
-								<option value="@frequency" selected="@isSelected">@frequency</option>
+								<option value="@((int)frequency)">@frequency</option>
 							}
 						</select>
 						<span asp-validation-for="CreateHomeChoreBase.Frequency" class="text-danger"></span>
 					</div>
+
+
 					<div class="form-group">
 						<label for="Description">Description</label>
 						<input type="text" class="form-control" id="Description" name="CreateHomeChoreBase.Description" asp-for="CreateHomeChoreBase.Description">
