@@ -5,27 +5,13 @@
 }
 <div class="row">
 	<div class="col-lg-6">
-		<div class="card mb-4 py-3 border-left-primary">
-			<a href="#collapseCardExample" class="d-block card-header bg-transparent" data-toggle="collapse"
-			   role="button" aria-expanded="true" aria-controls="collapseCardExample">
-				<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Create new home
-			</a>
-			<div class="collapse show" id="collapseCardExample">
-				<div class="card-body">
-					<form method="post" asp-page-handler="CreateHome">
-						<div class="form-group">
-							<label for="Name">Name</label>
-							<input type="text" class="form-control" id="Name" name="CreateHome.Title" asp-for="CreateHome.Title">
-							<span asp-validation-for="CreateHome.Title" class="text-danger"></span>
-						</div>
+		<a class="btn btn-secondary btn-sm mb-2" href="~/Homes">Home chores</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./Create">
+			<i class="fa fa-plus-circle mr-2"
+			   aria-hidden="true"></i>Create
+		</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./InviteToHome"><i class="fa fa-user-plus mr-2" aria-hidden="true"></i>Invite to home</a>
 
-						<button type="submit" class="btn btn-primary">Create</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-lg-6">
 		<div class="card mb-4 py-3 border-left-primary">
 
 			<div class="card-body">
@@ -52,44 +38,11 @@
 							}
 						</tbody>
 					</table>
-
-
 				}
 				else
 				{
 					<p>No home chore bases found.</p>
 				}
-			</div>
-		</div>
-	</div>
-</div>
-<div class="row">
-
-	<div class="col-lg-6">
-		<div class="card mb-4 py-3 border-left-info">
-			<a href="#collapseCardExample" class="d-block card-header bg-transparent text-info" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-				<i class="fa fa-plus-circle mr-2 text-info" aria-hidden="true"></i> Invite user to home
-			</a>
-			<div class="collapse show" id="collapseCardExample">
-				<div class="card-body">
-					<form method="post" asp-page-handler="GenerateInvitation">
-						<div class="form-group">
-							<label for="HomeId">Select Home</label>
-							<select class="form-control" id="HomeId" name="InviteUserRequest.HomeId" asp-for="InviteUserRequest.HomeId">
-								@foreach (var home in Model.Homes)
-								{
-									<option value="@home.Id">@home.Title</option>
-								}
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="InviteeEmail">Invitee Email</label>
-							<input type="email" class="form-control" id="InviteeEmail" name="InviteUserRequest.InviteeEmail" asp-for="InviteUserRequest.InviteeEmail">
-							<span asp-validation-for="InviteUserRequest.InviteeEmail" class="text-danger"></span>
-						</div>
-						<button type="submit" class="btn btn-info">Send Invitation</button>
-					</form>
-				</div>
 			</div>
 		</div>
 	</div>
