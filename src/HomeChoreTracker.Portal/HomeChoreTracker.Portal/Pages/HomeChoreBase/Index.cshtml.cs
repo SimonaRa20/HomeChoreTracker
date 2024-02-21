@@ -129,8 +129,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
                     // Update EditHomeChore with form values
                     EditHomeChore.Name = Request.Form["EditName"];
-                    EditHomeChore.ChoreType = (int)(HomeChoreType)(Models.HomeChoreBase.Constants.HomeChoreType)Enum.Parse<HomeChoreType>(Request.Form["EditChoreType"]);
-                    EditHomeChore.Frequency = (int)(Frequency)(Models.HomeChoreBase.Constants.Frequency)Enum.Parse<Frequency>(Request.Form["EditFrequency"]);
+                    EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["EditChoreType"]);
+                    EditHomeChore.Frequency = (int)Enum.Parse<Frequency>(Request.Form["EditFrequency"]);
                     EditHomeChore.Description = Request.Form["EditDescription"];
 
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);

@@ -4,6 +4,7 @@ using HomeChoreTracker.Api.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeChoreTracker.Api.Migrations
 {
     [DbContext(typeof(HomeChoreTrackerDbContext))]
-    partial class HomeChoreTrackerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221103219_AddFinancialTables")]
+    partial class AddFinancialTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,10 +37,8 @@ namespace HomeChoreTracker.Api.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HomeId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
@@ -151,10 +152,8 @@ namespace HomeChoreTracker.Api.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HomeId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("SubscriptionDuration")
                         .HasColumnType("int");
@@ -224,11 +223,13 @@ namespace HomeChoreTracker.Api.Migrations
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Expense", b =>
                 {
-                    b.HasOne("HomeChoreTracker.Api.Models.User", null)
+                    b.HasOne("HomeChoreTracker.Api.Models.User", "User")
                         .WithMany("Expenses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.HomeInvitation", b =>
@@ -252,11 +253,13 @@ namespace HomeChoreTracker.Api.Migrations
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Income", b =>
                 {
-                    b.HasOne("HomeChoreTracker.Api.Models.User", null)
+                    b.HasOne("HomeChoreTracker.Api.Models.User", "User")
                         .WithMany("Incomes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.UserHomes", b =>

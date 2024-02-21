@@ -1,4 +1,4 @@
-﻿using HomeChoreTracker.Portal.Models.HomeChoreBase.Constants;
+﻿using HomeChoreTracker.Portal.Constants;
 
 namespace HomeChoreTracker.Portal.Models.HomeChoreBase
 {

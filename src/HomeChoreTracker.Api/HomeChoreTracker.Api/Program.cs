@@ -85,9 +85,11 @@ namespace HomeChoreTracker.Api
             builder.Services.AddScoped<IHomeChoreBaseRepository, HomeChoreBaseRepository>();
             builder.Services.AddScoped<IHomeRepository, HomeRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+			builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
+			builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 
 
-            var app = builder.Build();
+			var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {

@@ -15,8 +15,10 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<Home> Homes { get; set; }
         public DbSet<UserHomes> UserHomes { get; set; }
         public DbSet<HomeInvitation> HomeInvitations { get; set; }
+		public DbSet<Income> Incomes { get; set; }
+		public DbSet<Expense> Expenses { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 

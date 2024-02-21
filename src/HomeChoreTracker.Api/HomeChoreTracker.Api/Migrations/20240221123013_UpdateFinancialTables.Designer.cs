@@ -4,6 +4,7 @@ using HomeChoreTracker.Api.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeChoreTracker.Api.Migrations
 {
     [DbContext(typeof(HomeChoreTrackerDbContext))]
-    partial class HomeChoreTrackerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221123013_UpdateFinancialTables")]
+    partial class UpdateFinancialTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,10 +37,8 @@ namespace HomeChoreTracker.Api.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HomeId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
@@ -151,10 +152,8 @@ namespace HomeChoreTracker.Api.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HomeId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("SubscriptionDuration")
                         .HasColumnType("int");

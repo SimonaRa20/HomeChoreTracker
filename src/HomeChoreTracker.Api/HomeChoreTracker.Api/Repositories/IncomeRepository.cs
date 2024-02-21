@@ -1,0 +1,67 @@
+﻿using HomeChoreTracker.Api.Database;
+using HomeChoreTracker.Api.Interfaces;
+using HomeChoreTracker.Api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace HomeChoreTracker.Api.Repositories
+{
+	public class IncomeRepository : IIncomeRepository
+	{
+		private readonly HomeChoreTrackerDbContext _dbContext;
+
+		public IncomeRepository(HomeChoreTrackerDbContext dbContext)
+		{
+			_dbContext = dbContext;
+		}
+
+		public async Task<Income> GetIncomeById(int id)
+		{
+			return await _dbContext.Incomes.FindAsync(id);
+		}
+
+		public async Task<List<Income>> GetAll()
+		{
+			return await _dbContext.Incomes.ToListAsync();
+		}
+
+		public async Task AddIncome(Income income)
+		{
+			await _dbContext.Incomes.AddAsync(income);
+			await Save();
+		}
+
+		public async Task<decimal> GetCurrentMonthTotalIncome()
+		{
+			DateTime currentDate = DateTime.Now;
+			DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+			DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+			return await _dbContext.Incomes
+				.Where(i => i.Time >= startOfMonth && i.Time <= endOfMonth)
+				.SumAsync(i => i.Amount);
+		}
+
+		public async Task Save()
+		{
+			await _dbContext.SaveChangesAsync();
+		}
+
+		public async Task Update(Income income)
+		{
+			_dbContext.Entry(income).State = EntityState.Modified;
+			await Save();
+		}
+
+		public async Task Delete(int id)
+		{
+			Income income = await _dbContext.Incomes.FindAsync(id);
+			if (income != null)
+			{
+				_dbContext.Incomes.Remove(income);
+			}
+			await Save();
+		}
+
+		
+	}
+}
