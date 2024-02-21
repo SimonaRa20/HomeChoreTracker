@@ -1,5 +1,5 @@
 ﻿@page
-@model HomeChoreTracker.Portal.Pages.Finance.CreateIncomeModel
+@model HomeChoreTracker.Portal.Pages.Finance.CreateExpenseModel
 @{
 	Layout = "~/Pages/Shared/_Layout.cshtml";
 }
@@ -20,8 +20,8 @@
 <div class="row">
 	<div class="col-lg-12">
 		<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Statistics</a>
-		<a class="btn btn-secondary btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
+		<a class="btn btn-secondary btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
 		<a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
 		<a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
 
@@ -30,40 +30,47 @@
 				<form method="post" asp-action="Index">
 					<div class="form-group">
 						<label for="Title">Title</label>
-						<input type="text" class="form-control" id="Title" name="CreateNewIncome.Title" asp-for="CreateNewIncome.Title">
-						<span asp-validation-for="CreateNewIncome.Title" class="text-danger"></span>
+						<input type="text" class="form-control" id="Title" name="CreateNewExpense.Title" asp-for="CreateNewExpense.Title">
+						<span asp-validation-for="CreateNewExpense.Title" class="text-danger"></span>
 					</div>
 					<div class="form-group">
 						<label for="Amount">Amount</label>
-						<input type="number" class="form-control" id="Amount" name="CreateNewIncome.Amount" asp-for="CreateNewIncome.Amount" step="0.01" min="0.01" required>
-						<span asp-validation-for="CreateNewIncome.Amount" class="text-danger"></span>
+						<input type="number" class="form-control" id="Amount" name="CreateNewExpense.Amount" asp-for="CreateNewExpense.Amount" step="0.01" min="0.01" required>
+						<span asp-validation-for="CreateNewExpense.Amount" class="text-danger"></span>
 					</div>
 
 
 					<div class="form-group">
 						<label for="Description">Description</label>
-						<input type="text" class="form-control" id="Description" name="CreateNewIncome.Description" asp-for="CreateNewIncome.Description">
+						<input type="text" class="form-control" id="Description" name="CreateNewExpense.Description" asp-for="CreateNewExpense.Description">
 					</div>
 
 					<div class="form-group">
 						<label for="Time">Time</label>
-						<input type="datetime-local" class="form-control" id="Time" name="CreateNewIncome.Time" asp-for="CreateNewIncome.Time" required>
-						<span asp-validation-for="CreateNewIncome.Time" class="text-danger"></span>
+						<input type="datetime-local" class="form-control" id="Time" name="CreateNewExpense.Time" asp-for="CreateNewExpense.Time" required>
+						<span asp-validation-for="CreateNewExpense.Time" class="text-danger"></span>
 					</div>
 					<div class="form-group">
 						<label for="Type">Income Type</label>
-						<select class="form-control" id="Type" name="CreateNewIncome.Type" asp-for="CreateNewIncome.Type" required>
-							@foreach (var type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.IncomeType)))
+						<select class="form-control" id="Type" name="CreateNewExpense.Type" asp-for="CreateNewExpense.Type" required>
+							@foreach (var type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.ExpenseType)))
 							{
 								<option value="@((int)type)">@type</option>
 							}
 						</select>
-						<span asp-validation-for="CreateNewIncome.Type" class="text-danger"></span>
+						<span asp-validation-for="CreateNewExpense.Type" class="text-danger"></span>
 					</div>
 
 					<div class="form-group">
+						<label for="Subscription">Subscription (write month count)</label>
+						<input type="number" class="form-control" id="SubscriptionDuration" name="CreateNewExpense.SubscriptionDuration" asp-for="CreateNewExpense.SubscriptionDuration" min="0" step="1" value="0" required>
+						<span asp-validation-for="CreateNewExpense.SubscriptionDuration" class="text-danger"></span>
+					</div>
+
+
+					<div class="form-group">
 						<label for="HomeId">Select Home</label>
-						<select class="form-control" id="HomeId" name="CreateNewIncome.HomeId" asp-for="CreateNewIncome.HomeId">
+						<select class="form-control" id="HomeId" name="CreateNewExpense.HomeId" asp-for="CreateNewExpense.HomeId">
 							<option value=""></option>
 							@foreach (var home in Model.Homes)
 							{

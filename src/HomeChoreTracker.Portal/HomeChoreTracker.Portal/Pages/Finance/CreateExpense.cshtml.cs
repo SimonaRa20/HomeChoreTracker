@@ -1,27 +1,26 @@
 using HomeChoreTracker.Portal.Models.Finance;
 using HomeChoreTracker.Portal.Models.Home;
-using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Finance
 {
-    public class CreateIncomeModel : PageModel
+    public class CreateExpenseModel : PageModel
     {
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly IConfiguration _config;
 
 		[BindProperty]
-		public IncomeRequest CreateNewIncome { get; set; }
+		public ExpenseRequest CreateNewExpense { get; set; }
 
 		public List<HomeResponse> Homes { get; set; }
 
-		public CreateIncomeModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		public CreateExpenseModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
 		{
 			_httpClientFactory = httpClientFactory;
 			_config = configuration;
-			CreateNewIncome = new IncomeRequest();
+			CreateNewExpense = new ExpenseRequest();
 		}
 
 		public async Task<IActionResult> OnGetAsync()
@@ -62,9 +61,9 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				using (var httpClient = _httpClientFactory.CreateClient())
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-					var apiUrl = _config["ApiUrl"] + "/Finance/income";
+					var apiUrl = _config["ApiUrl"] + "/Finance/expense";
 
-					var response = await httpClient.PostAsJsonAsync(apiUrl, CreateNewIncome);
+					var response = await httpClient.PostAsJsonAsync(apiUrl, CreateNewExpense);
 
 					if (response.IsSuccessStatusCode)
 					{

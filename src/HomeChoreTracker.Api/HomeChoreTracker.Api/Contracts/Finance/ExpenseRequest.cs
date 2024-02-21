@@ -9,6 +9,7 @@ namespace HomeChoreTracker.Api.Contracts.Finance
 		public string? Description { get; set; }
 		public DateTime Time { get; set; }
 		public ExpenseType Type { get; set; }
+		public int? SubscriptionDuration { get; set; }
 		public int? HomeId { get; set; }
 	}
 }

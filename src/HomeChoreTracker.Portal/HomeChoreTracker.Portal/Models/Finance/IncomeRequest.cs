@@ -1,6 +1,6 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using HomeChoreTracker.Portal.Constants;
 
-namespace HomeChoreTracker.Api.Contracts.Finance
+namespace HomeChoreTracker.Portal.Models.Finance
 {
 	public class IncomeRequest
 	{
@@ -9,7 +9,6 @@ namespace HomeChoreTracker.Api.Contracts.Finance
 		public string? Description { get; set; }
 		public DateTime Time { get; set; }
 		public IncomeType Type { get; set; }
-
 		public int? HomeId { get; set; }
 	}
 }

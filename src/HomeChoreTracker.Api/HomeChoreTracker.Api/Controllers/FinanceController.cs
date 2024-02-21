@@ -40,7 +40,6 @@ namespace HomeChoreTracker.Api.Controllers
 				Description = incomeRequest.Description,
 				Time = incomeRequest.Time,
 				Type = incomeRequest.Type,
-				SubscriptionDuration = incomeRequest.SubscriptionDuration,
 				UserId = userId,
 			};
 
@@ -60,7 +59,7 @@ namespace HomeChoreTracker.Api.Controllers
 				Description = incomeRequest.Description,
 				Time = incomeRequest.Time,
 				Type = incomeRequest.Type,
-				SubscriptionDuration = incomeRequest.SubscriptionDuration
+				HomeId = incomeRequest.HomeId,
 			};
 
 			await _incomeRepository.Update(income);
@@ -121,6 +120,8 @@ namespace HomeChoreTracker.Api.Controllers
 				Description = expenseRequest.Description,
 				Time = expenseRequest.Time,
 				Type = expenseRequest.Type,
+				SubscriptionDuration = expenseRequest.SubscriptionDuration,
+				HomeId = expenseRequest.HomeId,
 				UserId = userId,
 			};
 
@@ -140,7 +141,8 @@ namespace HomeChoreTracker.Api.Controllers
 				Amount = expenseRequest.Amount,
 				Description = expenseRequest.Description,
 				Time = expenseRequest.Time,
-				Type = expenseRequest.Type
+				Type = expenseRequest.Type,
+				SubscriptionDuration = expenseRequest.SubscriptionDuration
 			};
 
 			await _expenseRepository.Update(expense);
