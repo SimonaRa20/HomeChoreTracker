@@ -8,7 +8,7 @@ namespace HomeChoreTracker.Api.Contracts.Finance
         public decimal Amount { get; set; }
         public string? Description { get; set; }
         public DateTime Time { get; set; }
-        public string Type { get; set; }
+        public IncomeType Type { get; set; }
         public string? Home { get; set; }
     }
 }

@@ -122,7 +122,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                             amount = incomeDetails.Amount,
                             description = descriptionText,
                             time = incomeDetails.Time,
-                            type = incomeDetails.Type,
+                            type = incomeDetails.Type.ToString(),
                             home = incomeDetails.Home,
                         });
                     }
@@ -162,7 +162,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                             amount = expenseDetails.Amount,
                             description = descriptionText,
                             time = expenseDetails.Time,
-                            type = expenseDetails.Type,
+                            type = expenseDetails.Type.ToString(),
                             subscriptionDuration = expenseDetails.SubscriptionDuration,
                             home = expenseDetails.Home,
                         });

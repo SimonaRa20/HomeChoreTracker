@@ -26,7 +26,7 @@ namespace HomeChoreTracker.Api.Repositories
 				Amount = expense.Amount,
 				Description = expense?.Description ?? "-",
 				Time = expense.Time,
-				Type = expense.Type.ToString(),
+				Type = expense.Type,
 				SubscriptionDuration = expense.SubscriptionDuration ?? 0,
 				Home = home?.Title ?? "-"
             };
