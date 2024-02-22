@@ -9,6 +9,6 @@ namespace HomeChoreTracker.Portal.Models.Finance
         public string? Description { get; set; }
         public DateTime Time { get; set; }
         public IncomeType Type { get; set; }
-        public string? Home { get; set; }
+        public int? HomeId { get; set; }
     }
 }

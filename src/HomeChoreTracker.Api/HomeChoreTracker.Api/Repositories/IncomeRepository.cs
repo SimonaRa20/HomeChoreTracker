@@ -18,7 +18,6 @@ namespace HomeChoreTracker.Api.Repositories
 		public async Task<IncomeResponse> GetIncomeById(int id)
 		{
 			Income income = await _dbContext.Incomes.FindAsync(id);
-			Home home = await _dbContext.Homes.FindAsync(income.HomeId);
 
 			IncomeResponse incomeResponse = new IncomeResponse
 			{
@@ -27,7 +26,7 @@ namespace HomeChoreTracker.Api.Repositories
 				Description	= income?.Description ?? "-",
 				Time = income.Time,
 				Type = income.Type,
-				Home = home?.Title ?? "-"
+				HomeId =income.HomeId
             };
 
 			return incomeResponse;

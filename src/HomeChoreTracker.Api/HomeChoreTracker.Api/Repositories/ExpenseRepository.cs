@@ -18,7 +18,6 @@ namespace HomeChoreTracker.Api.Repositories
 		public async Task<ExpenseResponse> GetExpenseById(int id)
 		{
 			Expense expense = await _dbContext.Expenses.FindAsync(id);
-			Home home = await _dbContext.Homes.FindAsync(expense.HomeId);
 
 			ExpenseResponse expenseResponse = new ExpenseResponse
 			{
@@ -28,7 +27,7 @@ namespace HomeChoreTracker.Api.Repositories
 				Time = expense.Time,
 				Type = expense.Type,
 				SubscriptionDuration = expense.SubscriptionDuration ?? 0,
-				Home = home?.Title ?? "-"
+				HomeId = expense.HomeId
             };
 
 			return expenseResponse;

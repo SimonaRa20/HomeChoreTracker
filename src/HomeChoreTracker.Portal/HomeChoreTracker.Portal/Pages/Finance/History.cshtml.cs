@@ -17,6 +17,9 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 		private readonly IConfiguration _config;
 
 		public List<TransferHistoryItem> TransferHistory { get; set; }
+
+        public List<HomeResponse> Homes { get; set; }
+
         [BindProperty]
         public string DeleteItemType { get; set; }
 
@@ -105,6 +108,20 @@ namespace HomeChoreTracker.Portal.Pages.Finance
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+                var apiUrlHome = $"{_config["ApiUrl"]}/Home";
+
+				var responseHomes = await httpClient.GetAsync(apiUrlHome);
+
+				if (responseHomes.IsSuccessStatusCode)
+				{
+					Homes = await responseHomes.Content.ReadFromJsonAsync<List<HomeResponse>>();
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomes.ReasonPhrase}");
+				}
+
+
                 var apiUrl = $"{_config["ApiUrl"]}/Finance/income/{id}";
                 var response = await httpClient.GetAsync(apiUrl);
 
@@ -112,7 +129,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                 if (response.IsSuccessStatusCode)
                 {
                     incomeDetails = await response.Content.ReadFromJsonAsync<IncomeResponse>();
-
+                    var home = Homes.FirstOrDefault(x => x.Id.Equals(incomeDetails.HomeId));
                     if (incomeDetails != null)
                     {
                         string descriptionText = incomeDetails.Description ?? "-";
@@ -123,7 +140,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                             description = descriptionText,
                             time = incomeDetails.Time,
                             type = incomeDetails.Type.ToString(),
-                            home = incomeDetails.Home,
+                            home = home?.Title ?? "-",
                         });
                     }
                     else
@@ -145,15 +162,28 @@ namespace HomeChoreTracker.Portal.Pages.Finance
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
+				var apiUrlHome = $"{_config["ApiUrl"]}/Home";
+
+				var responseHomes = await httpClient.GetAsync(apiUrlHome);
+
+				if (responseHomes.IsSuccessStatusCode)
+				{
+					Homes = await responseHomes.Content.ReadFromJsonAsync<List<HomeResponse>>();
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomes.ReasonPhrase}");
+				}
+
+				var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
                 var response = await httpClient.GetAsync(apiUrl);
 
                 var expenseDetails = new ExpenseResponse();
                 if (response.IsSuccessStatusCode)
                 {
                     expenseDetails = await response.Content.ReadFromJsonAsync<ExpenseResponse>();
-
-                    if (expenseDetails != null)
+					var home = Homes.FirstOrDefault(x => x.Id.Equals(expenseDetails.HomeId));
+					if (expenseDetails != null)
                     {
                         string descriptionText = expenseDetails.Description ?? "-";
                         return new JsonResult(new
@@ -164,7 +194,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                             time = expenseDetails.Time,
                             type = expenseDetails.Type.ToString(),
                             subscriptionDuration = expenseDetails.SubscriptionDuration,
-                            home = expenseDetails.Home,
+                            home = home?.Title ?? "-",
                         });
                     }
                     else
