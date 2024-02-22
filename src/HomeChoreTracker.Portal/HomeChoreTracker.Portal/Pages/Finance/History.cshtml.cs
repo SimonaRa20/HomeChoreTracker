@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
+using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Finance;
 using HomeChoreTracker.Portal.Models.Home;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
@@ -93,6 +94,87 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                     await OnGetAsync();
                     ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
                     return Page();
+                }
+            }
+        }
+
+        public async Task<IActionResult> OnGetIncomeDetailAsync(int id)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/Finance/income/{id}";
+                var response = await httpClient.GetAsync(apiUrl);
+
+                var incomeDetails = new IncomeResponse();
+                if (response.IsSuccessStatusCode)
+                {
+                    incomeDetails = await response.Content.ReadFromJsonAsync<IncomeResponse>();
+
+                    if (incomeDetails != null)
+                    {
+                        string descriptionText = incomeDetails.Description ?? "-";
+                        return new JsonResult(new
+                        {
+                            title = incomeDetails.Title,
+                            amount = incomeDetails.Amount,
+                            description = descriptionText,
+                            time = incomeDetails.Time,
+                            type = incomeDetails.Type,
+                            home = incomeDetails.Home,
+                        });
+                    }
+                    else
+                    {
+                        return NotFound("Chore details not found.");
+                    }
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
+                }
+            }
+        }
+
+        public async Task<IActionResult> OnGetExpenseDetailAsync(int id)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
+                var response = await httpClient.GetAsync(apiUrl);
+
+                var expenseDetails = new ExpenseResponse();
+                if (response.IsSuccessStatusCode)
+                {
+                    expenseDetails = await response.Content.ReadFromJsonAsync<ExpenseResponse>();
+
+                    if (expenseDetails != null)
+                    {
+                        string descriptionText = expenseDetails.Description ?? "-";
+                        return new JsonResult(new
+                        {
+                            title = expenseDetails.Title,
+                            amount = expenseDetails.Amount,
+                            description = descriptionText,
+                            time = expenseDetails.Time,
+                            type = expenseDetails.Type,
+                            subscriptionDuration = expenseDetails.SubscriptionDuration,
+                            home = expenseDetails.Home,
+                        });
+                    }
+                    else
+                    {
+                        return NotFound("Chore details not found.");
+                    }
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
             }
         }

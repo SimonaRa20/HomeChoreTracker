@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Models;
+﻿using HomeChoreTracker.Api.Contracts.Finance;
+using HomeChoreTracker.Api.Models;
 
 namespace HomeChoreTracker.Api.Interfaces
 {
@@ -10,6 +11,6 @@ namespace HomeChoreTracker.Api.Interfaces
 		Task Update(Income income);
 		Task Delete(int id);
 		Task<decimal> GetCurrentMonthTotalIncome();
-		Task<Income> GetIncomeById(int id);
+		Task<IncomeResponse> GetIncomeById(int id);
 	}
 }

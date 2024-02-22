@@ -268,6 +268,7 @@ namespace HomeChoreTracker.Api.Controllers
 			{
 				return NotFound($"Expense with ID {id} not found");
 			}
+
 			return Ok(expense);
 		}
 

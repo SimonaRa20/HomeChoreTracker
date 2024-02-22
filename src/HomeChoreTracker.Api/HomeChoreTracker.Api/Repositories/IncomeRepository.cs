@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Database;
+﻿using HomeChoreTracker.Api.Contracts.Finance;
+using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +15,22 @@ namespace HomeChoreTracker.Api.Repositories
 			_dbContext = dbContext;
 		}
 
-		public async Task<Income> GetIncomeById(int id)
+		public async Task<IncomeResponse> GetIncomeById(int id)
 		{
-			return await _dbContext.Incomes.FindAsync(id);
+			Income income = await _dbContext.Incomes.FindAsync(id);
+			Home home = await _dbContext.Homes.FindAsync(income.HomeId);
+
+			IncomeResponse incomeResponse = new IncomeResponse
+			{
+				Title = income.Title,
+				Amount = income.Amount,
+				Description	= income?.Description ?? "-",
+				Time = income.Time,
+				Type = income.Type.ToString(),
+				Home = home?.Title ?? "-"
+            };
+
+			return incomeResponse;
 		}
 
 		public async Task<List<Income>> GetAll()
