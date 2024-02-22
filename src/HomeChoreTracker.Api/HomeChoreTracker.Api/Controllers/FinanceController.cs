@@ -247,6 +247,7 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> UpdateExpense(int id, ExpenseRequest expenseRequest)
 		{
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 			var expense = new Expense
 			{
 				Id = id,
@@ -255,7 +256,9 @@ namespace HomeChoreTracker.Api.Controllers
 				Description = expenseRequest.Description,
 				Time = expenseRequest.Time,
 				Type = expenseRequest.Type,
-				SubscriptionDuration = expenseRequest.SubscriptionDuration
+				SubscriptionDuration = expenseRequest.SubscriptionDuration,
+				HomeId = expenseRequest.HomeId,
+				UserId = userId,
 			};
 
 			await _expenseRepository.Update(expense);

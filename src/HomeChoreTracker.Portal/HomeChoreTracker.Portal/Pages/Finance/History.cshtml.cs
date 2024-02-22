@@ -155,6 +155,66 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			}
 		}
 
+		public async Task<IActionResult> OnPostEditExpenseAsync(int id)
+		{
+			ClearFieldErrors(key => key == "Title");
+			ClearFieldErrors(key => key == "DeleteItemType");
+			if (!ModelState.IsValid)
+			{
+				await OnGetAsync(); // Refresh the data
+				return Page();
+			}
+
+			try
+			{
+				var token = User.FindFirstValue("Token");
+				using (var httpClient = _httpClientFactory.CreateClient())
+				{
+					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+					var apiUrlHome = $"{_config["ApiUrl"]}/Home";
+
+					var responseHomes = await httpClient.GetAsync(apiUrlHome);
+
+					if (responseHomes.IsSuccessStatusCode)
+					{
+						Homes = await responseHomes.Content.ReadFromJsonAsync<List<HomeResponse>>();
+					}
+					else
+					{
+						ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomes.ReasonPhrase}");
+					}
+
+					var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
+
+					// Update EditHomeChore with form values
+					EditExpense.Title = Request.Form["EditExpenseTitle"];
+					EditExpense.Amount = decimal.Parse(Request.Form["EditExpenseAmount"]);
+					EditExpense.Description = Request.Form["EditExpenseDescription"];
+					EditExpense.Time = DateTime.Parse(Request.Form["EditExpenseTime"]);
+					EditExpense.Type = Enum.Parse<ExpenseType>(Request.Form["EditExpenseType"]);
+					EditExpense.SubscriptionDuration = int.Parse(Request.Form["EditExpenseSubscriptionDuration"]);
+					EditExpense.HomeId = int.Parse(Request.Form["EditExpenseHome"]);
+					var response = await httpClient.PutAsJsonAsync(apiUrl, EditExpense);
+
+					if (response.IsSuccessStatusCode)
+					{
+						return RedirectToPage();
+					}
+					else
+					{
+						ModelState.AddModelError(string.Empty, $"Failed to update chore: {response.StatusCode}");
+						return Page();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+				await OnGetAsync(); // Refresh the data
+				return Page();
+			}
+		}
 
 
 		public async Task<IActionResult> OnPostDeleteAsync(int id)

@@ -78,6 +78,12 @@
 												<i class='fa fa-pencil-alt'></i>
 											</button>
 										}
+										else
+										{
+											<button class='btn btn-sm' onclick="DisplayEditExpenseModal('@transfer.Data.Id')">
+												<i class='fa fa-pencil-alt'></i>
+											</button>
+										}
 
 										
 
@@ -258,6 +264,75 @@
 
 
 
+<div class="modal fade" id="editExpenseModal" tabindex="-1" role="dialog" aria-labelledby="editExpenseModalLabel"
+	 aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="editExpenseModalLabel">Edit expense</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form method="post" asp-page-handler="EditExpense">
+					<input type="hidden" id="editExpenseId" name="id" value="" />
+					<div class="form-group" method="post">
+						<label for="editExpenseTitle">Title</label>
+						<input asp-for="EditExpense.Title" name="EditExpenseTitle" type="text" class="form-control" id="editExpenseTitle" required>
+					</div>
+					<div class="form-group" method="post">
+						<label for="editExpenseAmount">Amount</label>
+						<input asp-for="EditExpense.Amount" name="EditExpenseAmount" type="number" class="form-control" id="editExpenseAmount" required>
+					</div>
+					<div class="form-group" method="post">
+						<label for="editExpenseDescription">Description</label>
+						<input asp-for="EditExpense.Description" name="EditExpenseDescription" type="text" class="form-control" id="editExpenseDescription" required>
+					</div>
+					<div class="form-group" method="post">
+						<label for="editExpenseTime">Time</label>
+						<input asp-for="EditExpense.Time" name="EditExpenseTime" type="datetime" class="form-control" id="editExpenseTime" required>
+					</div>
+					<div class="form-group">
+						<label for="editExpenseType">Expense Type</label>
+						<select class="form-control" id="editExpenseType" name="EditExpenseType" asp-for="EditExpense.Type" required>
+							<option value="0">Shopping</option>
+							<option value="1">Rent</option>
+							<option value="2">Food</option>
+							<option value="3">Transport</option>
+							<option value="4">Utilities</option>
+							<option value="5">Entertainment</option>
+							<option value="6">DinnerOut</option>
+							<option value="7">Travel</option>
+							<option value="8">Health</option>
+							<option value="8">Education</option>
+							<option value="8">Subscription</option>
+							<option value="8">Other</option>
+							<option value="8">Transaction</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="editExpenseHome">Home</label>
+						<select class="form-control" id="editExpenseHome" name="EditExpenseHome" required>
+							<option value="">Select a home</option>
+							@foreach (var home in Model.Homes)
+							{
+								<option value="@home.Id">@home.Title</option>
+							}
+						</select>
+					</div>
+					<div class="form-group" method="post">
+						<label for="editExpenseSubscriptionDuration">Subscription Duration (count of month)</label>
+						<input asp-for="EditExpense.SubscriptionDuration" name="EditExpenseSubscriptionDuration" type="number" class="form-control" id="editExpenseSubscriptionDuration" required>
+					</div>
+					<button type="submit" class="btn btn-primary">Save changes</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
 
 
 <script>
@@ -348,4 +423,39 @@
 		});
 	}
 
+
+	function DisplayEditExpenseModal(choreId) {
+		$('#editExpenseId').val(choreId);
+		$.ajax({
+			url: '/Finance/History?handler=ExpenseDetail&id=' + choreId,
+			type: 'GET',
+			success: function (data) {
+				console.log('Received data:', data);
+				if (data && data.title) {
+					$('#editExpenseTitle').val(data.title);
+					$('#editExpenseDescription').val(data.description);
+					$('#editExpenseAmount').val(data.amount);
+					$('#editExpenseTime').val(data.time);
+					$('#editExpenseSubscriptionDuration').val(data.subscriptionDuration);
+
+					var expenseTypeText = data.type;
+					$('#editIncomeType option').filter(function () {
+						return $(this).text() === expenseTypeText;
+					}).prop('selected', true);
+
+					// Pre-select the correct home
+					$('#editExpenseHome option').filter(function () {
+						return $(this).val() == data.homeId; // Compare with the home ID
+					}).prop('selected', true);
+
+					$('#editExpenseModal').modal('show');
+				} else {
+					console.error('Invalid data format:', data);
+				}
+			},
+			error: function (error) {
+				console.error('Error fetching expense details:', error);
+			}
+		});
+	}
 </script>
