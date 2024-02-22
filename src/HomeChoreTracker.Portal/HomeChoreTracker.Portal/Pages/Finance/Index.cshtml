@@ -3,28 +3,60 @@
 @{
 }
 <div class="row">
-	<div class="col-lg-12">
-		<a class="btn btn-secondary btn-sm mb-2" href="~/Finance">
-			<i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics
-		</a>
+    <div class="col-lg-12">
+        <div class="d-flex flex-wrap">
+            <!-- Wrap the buttons and card in a flex container -->
+            <a class="btn btn-secondary btn-sm mb-2 mr-2" href="~/Finance">
+                <!-- Add mr-2 class to create space between buttons -->
+                <i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics
+            </a>
 
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome">
-			<i class="fa fa-plus-circle mr-2"
-			   aria-hidden="true"></i>Create income
-		</a>
+            <a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateIncome">
+                <!-- Add mr-2 class to create space between buttons -->
+                <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income
+            </a>
 
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense">
-			<i class="fa fa-plus-circle mr-2"
-			   aria-hidden="true"></i>Create expense
-		</a>
+            <a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateExpense">
+                <!-- Add mr-2 class to create space between buttons -->
+                <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense
+            </a>
 
-		<a class="btn btn-light btn-sm mb-2" asp-page="./Create">
-			<i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report
-		</a>
+            <a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./Create">
+                <!-- Add mr-2 class to create space between buttons -->
+                <i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report
+            </a>
 
-		<a class="btn btn-light btn-sm mb-2" asp-page="./History">
-			<i class="fa fa-history mr-2" aria-hidden="true"></i>History
-		</a>
+            <a class="btn btn-light btn-sm mb-2" asp-page="./History">
+                <i class="fa fa-history mr-2" aria-hidden="true"></i>History
+            </a>
+        </div>
+    </div>
+ </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card mb-4 border-left-primary">
+                <div class="card-body">
+                    <h7>Current month total balance</h7>
+                    <h3>@Model.CurrentMonthTotalBalance Eur</h3>
+                </div>
+            </div>
+        </div>
 
-	</div>
+    <div class="col-lg-4">
+        <div class="card mb-4 border-left-success">
+            <div class="card-body">
+                <h7>Current month total income</h7>
+                <h3>@Model.CurrentMonthTotalIncome Eur</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4 border-left-danger">
+            <div class="card-body">
+                <h7>Current month total expense</h7>
+                <h3>@Model.CurrentMonthTotalExpense Eur</h3>
+            </div>
+        </div>
+    </div>
 </div>

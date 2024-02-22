@@ -28,12 +28,15 @@
 
         <div class="card mb-4 py-3 mt-2 border-left-primary">
             <div class="card-body">
+                @if (Model.TransferHistory != null && Model.TransferHistory.Any())
+                {
                 <table class="table">
                     <thead>
                         <tr class="text-center">
                             <th>Title</th>
                             <th>Date</th>
                             <th>Amount</th>
+                            <th>Type</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -53,6 +56,7 @@
                                         @(transfer.Data.Amount.ToString("0.00"))
                                     }
                                 </td>
+                                <td>@transfer.Type</td>
                                 <td>
                                     <button class='btn btn-sm' onclick="DisplayDetailModal('@transfer.Data.Id')">
                                         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
@@ -62,15 +66,75 @@
                                         <i class='fa fa-pencil-alt'></i>
                                     </button>
 
-                                    <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@transfer.Data.Id"><i class='fa fa-trash'></i></a>
+                                    <a class='btn btn-sm btnDelete' data-toggle="modal" data-target="#DeleteModal-@transfer.Data.Id" data-title="@transfer.Data.Title" data-type="@transfer.Type">
+                                        <i class='fa fa-trash'></i>
+                                    </a>
+                                    <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@transfer.Data.Id">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Delete Confirmation</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to delete this '<span class="delete-item-title"></span>' <span class="delete-item-type"></span>?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    <form method="post" asp-page-handler="Delete" asp-route-id="@transfer.Data.Id" id="deleteForm">
+                                                        <input type="hidden" name="DeleteItemType" value="@transfer.Type" />
+                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                    </form>
 
-                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+                <div>
+                    <ul class="pagination">
+                        @if (Model.ShowPrevious)
+                        {
+                            <li class="page-item">
+                                    <a asp-page="/Finance/History" asp-route-currentpage="@(Model.CurrentPage -1)"
+                                   class="page-link">Previous</a>
+                            </li>
+                        }
+                        @if (Model.ShowNext)
+                        {
+                            <li class="page-item">
+                                    <a asp-page="/Finance/History" asp-route-currentpage="@(Model.CurrentPage + 1)"
+                                   class="page-link">Next</a>
+                            </li>
+                        }
+                    </ul>
+                    </div>
+                }
+                else
+                {
+                    <p>No incomes or expenses found.</p>
+                }
             </div>
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $('.btnDelete').click(function () {
+            var title = $(this).data('title');
+            var type = $(this).data('type').toLowerCase();
+            $('.delete-item-title').text(title);
+            $('.delete-item-type').text(type);
+
+            // Set the DeleteItemType value in the form before showing the modal
+            $('#deleteForm input[name="DeleteItemType"]').val(type);
+        });
+    });
+</script>

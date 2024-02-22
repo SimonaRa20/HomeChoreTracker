@@ -78,7 +78,24 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(income);
 		}
 
-		[HttpDelete("income/{id}")]
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteFinanceById(int id, string type)
+        {
+			if(type.Equals("income"))
+			{
+                await _incomeRepository.Delete(id);
+                return Ok($"Expense with ID {id} deleted successfully");
+            }
+			else
+			{
+                await _expenseRepository.Delete(id);
+                return Ok($"Expense with ID {id} deleted successfully");
+            }
+        }
+
+
+        [HttpDelete("income/{id}")]
 		[Authorize]
 		public async Task<IActionResult> DeleteIncomeById(int id)
 		{
@@ -94,21 +111,114 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(totalExpense);
 		}
 
-		[HttpGet("transferHistory")]
-		[Authorize]
-		public async Task<IActionResult> GetTransferHistory()
-		{
-			var incomes = await _incomeRepository.GetAll();
-			var expenses = await _expenseRepository.GetAll();
+        [HttpGet("transferHistory/skip{skip}/take{take}")]
+        [Authorize]
+        public async Task<IActionResult> GetTransferHistory(int skip = 0, int take = 5)
+        {
+            var incomes = await _incomeRepository.GetAll();
+            var expenses = await _expenseRepository.GetAll();
 
-			var transferHistory = new List<object>();
-			transferHistory.AddRange(incomes.Select(i => new { Type = "Income", Data = i }));
-			transferHistory.AddRange(expenses.Select(e => new { Type = "Expense", Data = e }));
+            var transferHistory = new List<TransferHistoryItem>();
 
-			return Ok(transferHistory);
-		}
+            foreach (var income in incomes)
+            {
+                transferHistory.Add(new TransferHistoryItem
+                {
+                    Type = "Income",
+                    Data = new TransferData
+                    {
+                        Id = income.Id,
+                        Title = income.Title,
+                        Amount = income.Amount,
+                        Description = income.Description,
+                        Time = income.Time,
+                        Type = (int)income.Type,
+                        UserId = income.UserId
+                    }
+                });
+            }
 
-		[HttpPost("expense")]
+            foreach (var expense in expenses)
+            {
+                transferHistory.Add(new TransferHistoryItem
+                {
+                    Type = "Expense",
+                    Data = new TransferData
+                    {
+                        Id = expense.Id,
+                        Title = expense.Title,
+                        Amount = expense.Amount,
+                        Description = expense.Description,
+                        Time = expense.Time,
+                        Type = (int)expense.Type,
+                        SubscriptionDuration = expense.SubscriptionDuration,
+                        UserId = expense.UserId
+                    }
+                });
+            }
+
+            // Order transfer history by time in ascending order
+            transferHistory = transferHistory.OrderByDescending(item => item.Data.Time).ToList();
+
+			transferHistory = transferHistory.Skip(skip).Take(take).ToList();
+
+            return Ok(transferHistory);
+        }
+
+        [HttpGet("transferHistory")]
+        [Authorize]
+        public async Task<IActionResult> GetTransferHistory()
+        {
+            var incomes = await _incomeRepository.GetAll();
+            var expenses = await _expenseRepository.GetAll();
+
+            var transferHistory = new List<TransferHistoryItem>();
+
+            foreach (var income in incomes)
+            {
+                transferHistory.Add(new TransferHistoryItem
+                {
+                    Type = "Income",
+                    Data = new TransferData
+                    {
+                        Id = income.Id,
+                        Title = income.Title,
+                        Amount = income.Amount,
+                        Description = income.Description,
+                        Time = income.Time,
+                        Type = (int)income.Type,
+                        UserId = income.UserId
+                    }
+                });
+            }
+
+            foreach (var expense in expenses)
+            {
+                transferHistory.Add(new TransferHistoryItem
+                {
+                    Type = "Expense",
+                    Data = new TransferData
+                    {
+                        Id = expense.Id,
+                        Title = expense.Title,
+                        Amount = expense.Amount,
+                        Description = expense.Description,
+                        Time = expense.Time,
+                        Type = (int)expense.Type,
+                        SubscriptionDuration = expense.SubscriptionDuration,
+                        UserId = expense.UserId
+                    }
+                });
+            }
+
+            // Order transfer history by time in ascending order
+            transferHistory = transferHistory.OrderByDescending(item => item.Data.Time).ToList();
+
+            return Ok(transferHistory);
+        }
+
+
+        [HttpPost("expense")]
 		[Authorize]
 		public async Task<IActionResult> AddExpense(ExpenseRequest expenseRequest)
 		{
