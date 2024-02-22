@@ -340,6 +340,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                             type = expenseDetails.Type.ToString(),
                             subscriptionDuration = expenseDetails.SubscriptionDuration,
                             home = home?.Title ?? "-",
+							homeId = home?.Id
                         });
                     }
                     else
