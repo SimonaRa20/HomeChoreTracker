@@ -74,5 +74,20 @@ namespace HomeChoreTracker.Api.Repositories
 			}
 			await Save();
 		}
+
+		public async Task<decimal> GetTotalIncomeForMonth(DateTime month)
+		{
+			// Get the start and end dates of the month
+			DateTime startDate = new DateTime(month.Year, month.Month, 1);
+			DateTime endDate = startDate.AddMonths(1).AddDays(-1);
+
+			// Query the database for total income within the specified month
+			decimal totalIncome = await _dbContext.Incomes
+				.Where(i => i.Time >= startDate && i.Time <= endDate)
+				.SumAsync(i => i.Amount);
+
+			return totalIncome;
+		}
+
 	}
 }

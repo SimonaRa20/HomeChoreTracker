@@ -296,5 +296,32 @@ namespace HomeChoreTracker.Api.Controllers
 
 			return Ok(totalBalance);
 		}
+
+		[HttpGet("monthlySummary")]
+		[Authorize]
+		public async Task<IActionResult> GetMonthlySummary()
+		{
+			DateTime currentDate = DateTime.UtcNow;
+			DateTime startDate = currentDate.AddMonths(-12).Date;
+			List<MonthlySummary> monthlySummaries = new List<MonthlySummary>();
+
+			while (startDate < currentDate)
+			{
+				DateTime endDate = new DateTime(startDate.Year, startDate.Month, DateTime.DaysInMonth(startDate.Year, startDate.Month)).Date;
+				decimal totalIncome = await _incomeRepository.GetTotalIncomeForMonth(startDate);
+				decimal totalExpense = await _expenseRepository.GetTotalExpenseForMonth(startDate);
+				MonthlySummary summary = new MonthlySummary
+				{
+					MonthYear = startDate.ToString("yyyy-MM"),
+					TotalIncome = totalIncome,
+					TotalExpense = totalExpense
+				};
+
+				monthlySummaries.Add(summary);
+				startDate = startDate.AddMonths(1);
+			}
+
+			return Ok(monthlySummaries);
+		}
 	}
 }

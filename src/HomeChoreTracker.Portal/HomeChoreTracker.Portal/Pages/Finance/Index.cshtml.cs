@@ -14,7 +14,9 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 		public double CurrentMonthTotalIncome { get; set; }
         public double CurrentMonthTotalExpense { get; set; }
 
-        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration config)
+		public List<MonthlySummary> MonthlySummaries { get; set; }
+
+		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration config)
 		{
 			_httpClientFactory = httpClientFactory;
 			_config = config;
@@ -36,8 +38,12 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                 var apiUrlExpense = $"{_config["ApiUrl"]}/Finance/totalExpense";
                 var responseExpense= await httpClient.GetAsync(apiUrlExpense);
 
-                if (responseBalance.IsSuccessStatusCode && responseIncome.IsSuccessStatusCode && responseExpense.IsSuccessStatusCode)
+				var apiUrl = $"{_config["ApiUrl"]}/Finance/monthlySummary";
+				var response = await httpClient.GetAsync(apiUrl);
+
+				if (response.IsSuccessStatusCode && responseBalance.IsSuccessStatusCode && responseIncome.IsSuccessStatusCode && responseExpense.IsSuccessStatusCode)
 				{
+					MonthlySummaries = await response.Content.ReadFromJsonAsync<List<MonthlySummary>>();
 					CurrentMonthTotalBalance = await responseBalance.Content.ReadFromJsonAsync<double>();
                     CurrentMonthTotalIncome = await responseIncome.Content.ReadFromJsonAsync<double>();
                     CurrentMonthTotalExpense = await responseExpense.Content.ReadFromJsonAsync<double>();
