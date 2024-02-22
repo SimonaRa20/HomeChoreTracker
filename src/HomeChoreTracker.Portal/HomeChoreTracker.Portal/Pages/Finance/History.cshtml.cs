@@ -44,7 +44,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			_config = config;
             EditExpense = new ExpenseRequest();
             EditIncome = new IncomeRequest();
-            Homes = new List<HomeResponse>();
         }
 
 		public async Task<IActionResult> OnGetAsync()
@@ -54,7 +53,20 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			{
 				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                int pageSize = PageSize;
+				var apiUrlHome = $"{_config["ApiUrl"]}/Home";
+
+				var responseHomes = await httpClient.GetAsync(apiUrlHome);
+
+				if (responseHomes.IsSuccessStatusCode)
+				{
+					Homes = await responseHomes.Content.ReadFromJsonAsync<List<HomeResponse>>();
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomes.ReasonPhrase}");
+				}
+
+				int pageSize = PageSize;
                 int skip = (CurrentPage - 1) * pageSize;
 
                 var apiUrl = $"{_config["ApiUrl"]}/Finance/transferHistory/skip{skip}/take{pageSize}";
@@ -99,6 +111,20 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				using (var httpClient = _httpClientFactory.CreateClient())
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+					var apiUrlHome = $"{_config["ApiUrl"]}/Home";
+
+					var responseHomes = await httpClient.GetAsync(apiUrlHome);
+
+					if (responseHomes.IsSuccessStatusCode)
+					{
+						Homes = await responseHomes.Content.ReadFromJsonAsync<List<HomeResponse>>();
+					}
+					else
+					{
+						ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomes.ReasonPhrase}");
+					}
+
 					var apiUrl = $"{_config["ApiUrl"]}/Finance/income/{id}";
 
 					// Update EditHomeChore with form values
@@ -107,7 +133,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					EditIncome.Description = Request.Form["EditIncomeDescription"];
 					EditIncome.Time = DateTime.Parse(Request.Form["EditIncomeTime"]);
 					EditIncome.Type = Enum.Parse<IncomeType>(Request.Form["EditIncomeType"]);
-					EditIncome.HomeId = null; 
+					EditIncome.HomeId = int.Parse(Request.Form["EditIncomeHome"]);
 					var response = await httpClient.PutAsJsonAsync(apiUrl, EditIncome);
 
 					if (response.IsSuccessStatusCode)
@@ -198,6 +224,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 							time = incomeDetails.Time,
 							type = incomeDetails.Type.ToString(),
 							home = home?.Title ?? "-", // Include home title in the response
+							homeId = home?.Id,
 						});
 					}
 					else
@@ -281,33 +308,29 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                    var apiUrlHome = $"{_config["ApiUrl"]}/Home";
-
-				var responseHomes = await httpClient.GetAsync(apiUrlHome);
-
-				if (responseHomes.IsSuccessStatusCode)
-				{
-					Homes = await responseHomes.Content.ReadFromJsonAsync<List<HomeResponse>>();
-				}
-				else
-				{
-					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomes.ReasonPhrase}");
-				}
-
 					var apiUrl = $"{_config["ApiUrl"]}/Finance/income/{id}";
 
-					EditIncome.Title = Request.Form["EditIncomeTitle"];
-
-
-					var response = await httpClient.PutAsJsonAsync(apiUrl, EditIncome);
+					var response = await httpClient.GetAsync(apiUrl);
 
 					if (response.IsSuccessStatusCode)
 					{
-						return RedirectToPage();
+						EditIncome = await response.Content.ReadFromJsonAsync<IncomeRequest>();
+						// Fetch homes
+						var homesResponse = await httpClient.GetAsync($"{_config["ApiUrl"]}/Home");
+						if (homesResponse.IsSuccessStatusCode)
+						{
+							Homes = await homesResponse.Content.ReadFromJsonAsync<List<HomeResponse>>();
+						}
+						else
+						{
+							ModelState.AddModelError(string.Empty, $"Failed to retrieve homes: {homesResponse.ReasonPhrase}");
+						}
+
+						return Page();
 					}
 					else
 					{
-						ModelState.AddModelError(string.Empty, $"Failed to update chore: {response.StatusCode}");
+						ModelState.AddModelError(string.Empty, $"Failed to retrieve income: {response.ReasonPhrase}");
 						return Page();
 					}
 				}
@@ -319,6 +342,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				return Page();
 			}
 		}
+
 
 		private void ClearFieldErrors(Func<string, bool> predicate)
 		{

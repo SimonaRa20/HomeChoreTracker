@@ -61,6 +61,7 @@ namespace HomeChoreTracker.Api.Controllers
 				Description = incomeRequest.Description,
 				Time = incomeRequest.Time,
 				Type = incomeRequest.Type,
+				HomeId = incomeRequest?.HomeId,
 				UserId = userId
 			};
 

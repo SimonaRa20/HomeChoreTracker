@@ -237,6 +237,18 @@
 							<option value="8">Other</option>
 						</select>
 					</div>
+
+					<div class="form-group">
+						<label for="editIncomeHome">Home</label>
+						<select class="form-control" id="editIncomeHome" name="EditIncomeHome" required>
+							<option value="">Select a home</option>
+							@foreach (var home in Model.Homes)
+							{
+								<option value="@home.Id">@home.Title</option>
+							}
+						</select>
+					</div>
+
 					<button type="submit" class="btn btn-primary">Save changes</button>
 				</form>
 			</div>
@@ -301,6 +313,7 @@
 			}
 		});
 	}
+
 	function DisplayEditIncomeModal(choreId) {
 		$('#editIncomeId').val(choreId);
 		$.ajax({
@@ -319,13 +332,18 @@
 						return $(this).text() === incomeTypeText;
 					}).prop('selected', true);
 
+					// Pre-select the correct home
+					$('#editIncomeHome option').filter(function () {
+						return $(this).val() == data.homeId; // Compare with the home ID
+					}).prop('selected', true);
+
 					$('#editIncomeModal').modal('show');
 				} else {
 					console.error('Invalid data format:', data);
 				}
 			},
 			error: function (error) {
-				console.error('Error fetching chore details:', error);
+				console.error('Error fetching income details:', error);
 			}
 		});
 	}

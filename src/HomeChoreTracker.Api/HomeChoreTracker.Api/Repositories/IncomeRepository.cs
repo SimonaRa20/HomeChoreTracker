@@ -74,7 +74,5 @@ namespace HomeChoreTracker.Api.Repositories
 			}
 			await Save();
 		}
-
-		
 	}
 }
