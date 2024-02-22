@@ -40,6 +40,7 @@ namespace HomeChoreTracker.Api.Controllers
 				Description = incomeRequest.Description,
 				Time = incomeRequest.Time,
 				Type = incomeRequest.Type,
+				HomeId = incomeRequest.HomeId,
 				UserId = userId,
 			};
 
@@ -51,6 +52,7 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> UpdateIncome(int id, IncomeRequest incomeRequest)
 		{
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 			var income = new Income
 			{
 				Id = id,
@@ -59,7 +61,7 @@ namespace HomeChoreTracker.Api.Controllers
 				Description = incomeRequest.Description,
 				Time = incomeRequest.Time,
 				Type = incomeRequest.Type,
-				HomeId = incomeRequest.HomeId,
+				UserId = userId
 			};
 
 			await _incomeRepository.Update(income);

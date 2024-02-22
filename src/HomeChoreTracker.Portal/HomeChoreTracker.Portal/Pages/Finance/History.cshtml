@@ -71,9 +71,15 @@
 											</button>
 										}
 
-										<button class='btn btn-sm' onclick="DisplayEditModal('@transfer.Data.Id')">
-											<i class='fa fa-pencil-alt'></i>
-										</button>
+
+										@if (transfer.Type == "Income")
+										{
+											<button class='btn btn-sm' onclick="DisplayEditIncomeModal('@transfer.Data.Id')">
+												<i class='fa fa-pencil-alt'></i>
+											</button>
+										}
+
+										
 
 										<a class='btn btn-sm btnDelete' data-toggle="modal" data-target="#DeleteModal-@transfer.Data.Id" data-title="@transfer.Data.Title" data-type="@transfer.Type">
 											<i class='fa fa-trash'></i>
@@ -187,6 +193,61 @@
 	</div>
 </div>
 
+
+<div class="modal fade" id="editIncomeModal" tabindex="-1" role="dialog" aria-labelledby="editIncomeModalLabel"
+	 aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="editIncomeModalLabel">Edit income</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form method="post" asp-page-handler="EditIncome">
+					<input type="hidden" id="editIncomeId" name="id" value="" />
+					<div class="form-group" method="post">
+						<label for="editIncomeTitle">Title</label>
+						<input asp-for="EditIncome.Title" name="EditIncomeTitle" type="text" class="form-control" id="editIncomeTitle" required>
+					</div>
+					<div class="form-group" method="post">
+						<label for="editIncomeAmount">Amount</label>
+						<input asp-for="EditIncome.Amount" name="EditIncomeAmount" type="number" class="form-control" id="editIncomeAmount" required>
+					</div>
+					<div class="form-group" method="post">
+						<label for="editIncomeDescription">Description</label>
+						<input asp-for="EditIncome.Description" name="EditIncomeDescription" type="text" class="form-control" id="editIncomeDescription" required>
+					</div>
+					<div class="form-group" method="post">
+						<label for="editIncomeTime">Time</label>
+						<input asp-for="EditIncome.Time" name="EditIncomeTime" type="datetime" class="form-control" id="editIncomeTime" required>
+					</div>
+					<div class="form-group">
+						<label for="editIncomeType">Income Type</label>
+						<select class="form-control" id="editIncomeType" name="EditIncomeType" asp-for="EditIncome.Type" required>
+							<option value="0">Salary</option>
+							<option value="1">Bonus</option>
+							<option value="2">Investment</option>
+							<option value="3">Rental</option>
+							<option value="4">Freelance</option>
+							<option value="5">Gift</option>
+							<option value="6">Pension</option>
+							<option value="7">DailyAllowance</option>
+							<option value="8">Other</option>
+						</select>
+					</div>
+					<button type="submit" class="btn btn-primary">Save changes</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
 <script>
 	$(document).ready(function () {
 		$('.btnDelete').click(function () {
@@ -237,6 +298,34 @@
 			},
 			error: function (error) {
 				console.error('Error fetching expense details:', error);
+			}
+		});
+	}
+	function DisplayEditIncomeModal(choreId) {
+		$('#editIncomeId').val(choreId);
+		$.ajax({
+			url: '/Finance/History?handler=IncomeDetail&id=' + choreId,
+			type: 'GET',
+			success: function (data) {
+				console.log('Received data:', data);
+				if (data && data.title) {
+					$('#editIncomeTitle').val(data.title);
+					$('#editIncomeDescription').val(data.description);
+					$('#editIncomeAmount').val(data.amount);
+					$('#editIncomeTime').val(data.time);
+
+					var incomeTypeText = data.type;
+					$('#editIncomeType option').filter(function () {
+						return $(this).text() === incomeTypeText;
+					}).prop('selected', true);
+
+					$('#editIncomeModal').modal('show');
+				} else {
+					console.error('Invalid data format:', data);
+				}
+			},
+			error: function (error) {
+				console.error('Error fetching chore details:', error);
 			}
 		});
 	}
