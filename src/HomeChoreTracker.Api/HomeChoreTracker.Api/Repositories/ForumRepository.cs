@@ -75,6 +75,15 @@ namespace HomeChoreTracker.Api.Repositories
 			return adviceResponses;
 		}
 
+		public async Task<Advice> GetAdviceById(int id)
+		{
+			return await _dbContext.Advices.FindAsync(id);
+		}
 
+		public async Task UpdateAdvice(Advice advice)
+		{
+			_dbContext.Advices.Update(advice);
+			await _dbContext.SaveChangesAsync();
+		}
 	}
 }

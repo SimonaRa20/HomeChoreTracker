@@ -9,5 +9,7 @@ namespace HomeChoreTracker.Api.Interfaces
 		Task Delete(int id);
 		Task<bool> HasPermission(int id, int userId);
 		Task<List<AdviceResponse>> GetAll(int userId);
+		Task<Advice> GetAdviceById(int id);
+		Task UpdateAdvice(Advice advice);
 	}
 }
