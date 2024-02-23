@@ -1,61 +1,92 @@
 using HomeChoreTracker.Portal.Models.Finance;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using HomeChoreTracker.Portal.Constants;
 using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Finance
 {
     public class IndexModel : PageModel
     {
-		private readonly IHttpClientFactory _httpClientFactory;
-		private readonly IConfiguration _config;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _config;
 
-		public double CurrentMonthTotalBalance { get; set; }
-		public double CurrentMonthTotalIncome { get; set; }
+        public double CurrentMonthTotalBalance { get; set; }
+        public double CurrentMonthTotalIncome { get; set; }
         public double CurrentMonthTotalExpense { get; set; }
+        public List<MonthlySummary> MonthlySummaries { get; set; }
+        public Dictionary<ExpenseType, int> ExpenseCategories { get; set; }
+        public Dictionary<IncomeType, int> IncomeCategories { get; set; }
 
-		public List<MonthlySummary> MonthlySummaries { get; set; }
+        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration config)
+        {
+            _httpClientFactory = httpClientFactory;
+            _config = config;
+        }
 
-		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration config)
-		{
-			_httpClientFactory = httpClientFactory;
-			_config = config;
-		}
+        public async Task<IActionResult> OnGetAsync()
+        {
+            try
+            {
+                var token = User.FindFirstValue("Token");
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-		public async Task<IActionResult> OnGetAsync()
-		{
-			var token = User.FindFirstValue("Token");
-			using (var httpClient = _httpClientFactory.CreateClient())
-			{
-				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                await GetFinancialSummary(httpClient);
+                await GetMonthlySummaries(httpClient);
+                await GetExpenseCategories(httpClient);
+                await GetIncomeCategories(httpClient);
 
-				var apiUrlBalance = $"{_config["ApiUrl"]}/Finance/totalBalance";
-				var responseBalance = await httpClient.GetAsync(apiUrlBalance);
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {ex.Message}");
+                return Page();
+            }
+        }
 
-                var apiIncome = $"{_config["ApiUrl"]}/Finance/totalIncome";
-                var responseIncome = await httpClient.GetAsync(apiIncome);
+        private async Task GetFinancialSummary(HttpClient httpClient)
+        {
+            var apiUrlBalance = $"{_config["ApiUrl"]}/Finance/totalBalance";
+            var apiUrlIncome = $"{_config["ApiUrl"]}/Finance/totalIncome";
+            var apiUrlExpense = $"{_config["ApiUrl"]}/Finance/totalExpense";
 
-                var apiUrlExpense = $"{_config["ApiUrl"]}/Finance/totalExpense";
-                var responseExpense= await httpClient.GetAsync(apiUrlExpense);
+            CurrentMonthTotalBalance = await GetApiResponse<double>(httpClient, apiUrlBalance);
+            CurrentMonthTotalIncome = await GetApiResponse<double>(httpClient, apiUrlIncome);
+            CurrentMonthTotalExpense = await GetApiResponse<double>(httpClient, apiUrlExpense);
+        }
 
-				var apiUrl = $"{_config["ApiUrl"]}/Finance/monthlySummary";
-				var response = await httpClient.GetAsync(apiUrl);
+        private async Task GetMonthlySummaries(HttpClient httpClient)
+        {
+            var apiUrl = $"{_config["ApiUrl"]}/Finance/monthlySummary";
+            MonthlySummaries = await GetApiResponse<List<MonthlySummary>>(httpClient, apiUrl);
+        }
 
-				if (response.IsSuccessStatusCode && responseBalance.IsSuccessStatusCode && responseIncome.IsSuccessStatusCode && responseExpense.IsSuccessStatusCode)
-				{
-					MonthlySummaries = await response.Content.ReadFromJsonAsync<List<MonthlySummary>>();
-					CurrentMonthTotalBalance = await responseBalance.Content.ReadFromJsonAsync<double>();
-                    CurrentMonthTotalIncome = await responseIncome.Content.ReadFromJsonAsync<double>();
-                    CurrentMonthTotalExpense = await responseExpense.Content.ReadFromJsonAsync<double>();
+        private async Task GetExpenseCategories(HttpClient httpClient)
+        {
+            var apiUrl = $"{_config["ApiUrl"]}/Finance/expenseCategories";
+            ExpenseCategories = await GetApiResponse<Dictionary<ExpenseType, int>>(httpClient, apiUrl);
+        }
 
-                    return Page();
-				}
-				else
-				{
-					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseBalance.ReasonPhrase}");
-					return Page();
-				}
-			}
-		}
-	}
+        private async Task GetIncomeCategories(HttpClient httpClient)
+        {
+            var apiUrl = $"{_config["ApiUrl"]}/Finance/incomeCategories";
+            IncomeCategories = await GetApiResponse<Dictionary<IncomeType, int>>(httpClient, apiUrl);
+        }
+
+        private async Task<T> GetApiResponse<T>(HttpClient httpClient, string apiUrl)
+        {
+            var response = await httpClient.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode(); // Throw if not a success code
+
+            return await response.Content.ReadFromJsonAsync<T>();
+        }
+    }
 }

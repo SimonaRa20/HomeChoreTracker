@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Contracts.Finance;
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -323,5 +324,37 @@ namespace HomeChoreTracker.Api.Controllers
 
 			return Ok(monthlySummaries);
 		}
-	}
+
+        [HttpGet("expenseCategories")]
+        [Authorize]
+        public async Task<IActionResult> GetExpenseCategories()
+        {
+            var categories = Enum.GetValues(typeof(ExpenseType)).Cast<ExpenseType>();
+            var categoryCounts = new Dictionary<ExpenseType, int>();
+
+            foreach (var category in categories)
+            {
+                var count = await _expenseRepository.GetExpenseCountByCategory(category);
+                categoryCounts.Add(category, count);
+            }
+
+            return Ok(categoryCounts);
+        }
+
+        [HttpGet("incomeCategories")]
+        [Authorize]
+        public async Task<IActionResult> GetIncomeCategories()
+        {
+            var categories = Enum.GetValues(typeof(IncomeType)).Cast<IncomeType>();
+            var categoryCounts = new Dictionary<IncomeType, int>();
+
+            foreach (var category in categories)
+            {
+                var count = await _incomeRepository.GetIncomeCountByCategory(category);
+                categoryCounts.Add(category, count);
+            }
+
+            return Ok(categoryCounts);
+        }
+    }
 }

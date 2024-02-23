@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Contracts.Finance;
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
@@ -90,5 +91,11 @@ namespace HomeChoreTracker.Api.Repositories
 
 			return totalExpense;
 		}
-	}
+
+        public async Task<int> GetExpenseCountByCategory(ExpenseType category)
+        {
+            return await _dbContext.Expenses
+                .CountAsync(e => e.Type == category);
+        }
+    }
 }

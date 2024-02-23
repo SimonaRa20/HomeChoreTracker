@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Contracts.Finance;
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
@@ -89,5 +90,10 @@ namespace HomeChoreTracker.Api.Repositories
 			return totalIncome;
 		}
 
-	}
+        public async Task<int> GetIncomeCountByCategory(IncomeType category)
+        {
+            return await _dbContext.Incomes
+                .CountAsync(e => e.Type == category);
+        }
+    }
 }

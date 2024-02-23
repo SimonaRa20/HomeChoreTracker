@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Contracts.Finance;
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Models;
 
 namespace HomeChoreTracker.Api.Interfaces
@@ -13,5 +14,6 @@ namespace HomeChoreTracker.Api.Interfaces
 		Task<decimal> GetCurrentMonthTotalExpense();
 		Task<ExpenseResponse> GetExpenseById(int id);
 		Task<decimal> GetTotalExpenseForMonth(DateTime month);
-	}
+		Task<int> GetExpenseCountByCategory(ExpenseType category);
+    }
 }
