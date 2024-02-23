@@ -19,6 +19,7 @@ namespace HomeChoreTracker.Portal
             builder.Services.AddScoped<ClaimsPrincipal>(s => s.GetService<IHttpContextAccessor>()?.HttpContext?.User);
 
             builder.Services.AddTransient<HomesListViewComponent>();
+            builder.Services.AddTransient<PurchaseHomesListViewComponent>();
             builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();

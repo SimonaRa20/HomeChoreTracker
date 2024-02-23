@@ -376,45 +376,36 @@ namespace HomeChoreTracker.Api.Controllers
         {
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 
-            // Retrieve data for the report (in your case, incomes and expenses)
             var incomes = await _incomeRepository.GetIncomesByDateRange(startDate, endDate, userId);
             var expenses = await _expenseRepository.GetExpensesByDateRange(startDate, endDate, userId);
 
-            // Create a memory stream to store the generated PDF
             using (var stream = new MemoryStream())
             {
-                // Initialize PDF writer and document
                 PdfWriter writer = new(stream);
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
 
-                // Add title to the document
                 var title = new Paragraph("Financial Report")
                     .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
                     .SetFontSize(20);
                 document.Add(title);
 
-                // Add date range to the document
                 var dateRange = new Paragraph($"Date Range: {startDate.ToString("MM/dd/yyyy")} - {endDate.ToString("MM/dd/yyyy")}")
                     .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
                     .SetFontSize(14);
                 document.Add(dateRange);
 
-                // Add incomes section to the document
                 var incomesSection = new Paragraph("Incomes");
                 document.Add(incomesSection);
 
                 if (incomes.Count != 0)
                 {
-                    // Add a table to display income details
                     Table incomeTable = new Table(UnitValue.CreatePercentArray(3)).UseAllAvailableWidth();
 
-                    // Add table header
                     incomeTable.AddHeaderCell("Title");
                     incomeTable.AddHeaderCell("Amount");
                     incomeTable.AddHeaderCell("Date");
 
-                    // Add income details to the table
                     foreach (var income in incomes)
                     {
                         incomeTable.AddCell(income.Title);
@@ -432,21 +423,17 @@ namespace HomeChoreTracker.Api.Controllers
                     document.Add(noIncomeItem);
                 }
 
-                // Add expenses section to the document
                 var expensesSection = new Paragraph("Expenses");
                 document.Add(expensesSection);
 
                 if (expenses.Count != 0)
                 {
-                    // Add a table to display expense details
                     Table expenseTable = new Table(UnitValue.CreatePercentArray(3)).UseAllAvailableWidth();
 
-                    // Add table header
                     expenseTable.AddHeaderCell("Title");
                     expenseTable.AddHeaderCell("Amount");
                     expenseTable.AddHeaderCell("Date");
 
-                    // Add expense details to the table
                     foreach (var expense in expenses)
                     {
                         expenseTable.AddCell(expense.Title);
@@ -464,7 +451,6 @@ namespace HomeChoreTracker.Api.Controllers
                     document.Add(noExpenseItem);
                 }
 
-                // Add total income and total expense summary
                 var totalIncome = incomes.Sum(x => x.Amount);
                 var totalExpense = expenses.Sum(x => x.Amount);
 
@@ -473,13 +459,10 @@ namespace HomeChoreTracker.Api.Controllers
                     .SetFontSize(14);
                 document.Add(summary);
 
-                // Close the document
                 document.Close();
 
-                // Get the bytes of the generated PDF
                 var pdfBytes = stream.ToArray();
 
-                // Return the PDF file
                 return File(pdfBytes, "application/pdf", "financial_report.pdf");
             }
         }

@@ -75,6 +75,19 @@
                         </a>
                     </li>
 
+                    <div class="sidebar-heading">Inventory</div>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePurchase"
+                           aria-expanded="true" aria-controls="collapsePurchase">
+                            <i class="fa fa-inbox" aria-hidden="true"></i>
+                            <span>Purchase</span>
+                        </a>
+                        <div id="collapsePurchase" class="collapse" aria-labelledby="headingPurchase" data-parent="#accordionSidebar">
+                            @await Component.InvokeAsync("PurchaseHomesList")
+                        </div>
+                    </li>
+
+
                     <hr class="sidebar-divider d-none d-md-block">
                     <div class="text-center d-none d-md-inline">
                         <button class="rounded-circle border-0" id="sidebarToggle"></button>
