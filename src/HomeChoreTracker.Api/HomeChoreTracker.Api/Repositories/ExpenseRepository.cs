@@ -80,11 +80,9 @@ namespace HomeChoreTracker.Api.Repositories
 
 		public async Task<decimal> GetTotalExpenseForMonth(DateTime month, int userId)
 		{
-			// Get the start and end dates of the month
 			DateTime startDate = new DateTime(month.Year, month.Month, 1);
 			DateTime endDate = startDate.AddMonths(1).AddDays(-1);
 
-			// Query the database for total expense within the specified month
 			decimal totalExpense = await _dbContext.Expenses
 				.Where(e => e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
 				.SumAsync(e => e.Amount);
