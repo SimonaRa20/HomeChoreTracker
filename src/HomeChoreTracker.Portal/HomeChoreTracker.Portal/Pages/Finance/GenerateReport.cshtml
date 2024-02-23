@@ -1,0 +1,116 @@
+﻿@page
+@model HomeChoreTracker.Portal.Pages.Finance.GenerateReportModel
+@{
+	Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+@section HeadContent
+{
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<!-- Add the following lines to include required Bootstrap and jQuery files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+
+
+<div class="row">
+	<div class="col-lg-12">
+		<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+		<a class="btn btn-secondary btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
+	</div>
+</div>
+<div class="card mb-4 py-3 mt-2 border-left-primary">
+    <div class="card-body">
+        <form method="post" asp-action="GenerateReport">
+            <div class="form-group">
+                <label for="StartDate">Start date</label>
+                <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" asp-for="StartDate" required>
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="EndDate">End date</label>
+                <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" asp-for="EndDate" required>
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+
+            <!-- Validation message placeholder -->
+            <div id="dateValidationMessage" class="text-danger"></div>
+
+            <button type="submit" class="btn btn-primary">Generate report</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Get reference to the date input fields
+    const startDateInput = document.getElementById('StartDate');
+    const endDateInput = document.getElementById('EndDate');
+
+    // Add event listener to start date input field
+    startDateInput.addEventListener('input', function () {
+        // Set the minimum value of end date to be equal to the value of start date
+        endDateInput.min = startDateInput.value;
+
+        // If end date is earlier than start date, reset end date value to start date value
+        if (endDateInput.value < startDateInput.value) {
+            endDateInput.value = startDateInput.value;
+        }
+
+        // If start date and end date are the same, add one day to the end date
+        if (startDateInput.value === endDateInput.value) {
+            const endDate = new Date(endDateInput.value);
+            endDate.setDate(endDate.getDate() + 1);
+            const endDateString = endDate.toISOString().slice(0, 16); // Format to YYYY-MM-DDTHH:MM
+            endDateInput.value = endDateString;
+        }
+    });
+
+    // Add event listener to end date input field
+    endDateInput.addEventListener('input', function () {
+        // If end date is earlier than start date, display validation message
+        if (endDateInput.value < startDateInput.value) {
+            document.getElementById('dateValidationMessage').innerText = "End date cannot be earlier than start date";
+        } else {
+            document.getElementById('dateValidationMessage').innerText = "";
+        }
+    });
+</script>
+<script>
+    // Function to get today's date and time in the required format
+    function getTodayISOString() {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = (now.getMonth() + 1).toString().padStart(2, '0'); // Month starts from 0
+        var day = now.getDate().toString().padStart(2, '0');
+        var hours = now.getHours().toString().padStart(2, '0');
+        var minutes = now.getMinutes().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    function getMonthBeforeISOString() {
+        var now = new Date();
+        now.setMonth(now.getMonth() - 1); // Subtract one month
+        var year = now.getFullYear();
+        var month = (now.getMonth() + 1).toString().padStart(2, '0'); // Month starts from 0
+        var day = now.getDate().toString().padStart(2, '0');
+        var hours = now.getHours().toString().padStart(2, '0');
+        var minutes = now.getMinutes().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Set default value for the StartDate field to one month before the current date
+    document.getElementById('StartDate').value = getMonthBeforeISOString();
+
+    // Set default value for the EndDate field to the current date
+    document.getElementById('EndDate').value = getTodayISOString();
+</script>

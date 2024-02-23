@@ -2,9 +2,15 @@
 using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
+using iText.IO.Image;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -25,7 +31,8 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> GetCurrentMonthTotalIncome()
 		{
-			decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalIncome();
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalIncome(userId);
 			return Ok(totalIncome);
 		}
 
@@ -111,7 +118,8 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> GetCurrentMonthTotalExpense()
 		{
-			decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalExpense();
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalExpense(userId);
 			return Ok(totalExpense);
 		}
 
@@ -119,8 +127,9 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetTransferHistory(int skip = 0, int take = 5)
         {
-            var incomes = await _incomeRepository.GetAll();
-            var expenses = await _expenseRepository.GetAll();
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            var incomes = await _incomeRepository.GetAll(userId);
+            var expenses = await _expenseRepository.GetAll(userId);
 
             var transferHistory = new List<TransferHistoryItem>();
 
@@ -173,8 +182,9 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetTransferHistory()
         {
-            var incomes = await _incomeRepository.GetAll();
-            var expenses = await _expenseRepository.GetAll();
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            var incomes = await _incomeRepository.GetAll(userId);
+            var expenses = await _expenseRepository.GetAll(userId);
 
             var transferHistory = new List<TransferHistoryItem>();
 
@@ -291,8 +301,9 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> GetCurrentMonthTotalBalance()
 		{
-			decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalIncome();
-			decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalExpense();
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalIncome(userId);
+			decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalExpense(userId);
 			decimal totalBalance = totalIncome - totalExpense;
 
 			return Ok(totalBalance);
@@ -302,15 +313,16 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> GetMonthlySummary()
 		{
-			DateTime currentDate = DateTime.UtcNow;
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            DateTime currentDate = DateTime.UtcNow;
 			DateTime startDate = currentDate.AddMonths(-12).Date;
 			List<MonthlySummary> monthlySummaries = new List<MonthlySummary>();
 
 			while (startDate < currentDate)
 			{
 				DateTime endDate = new DateTime(startDate.Year, startDate.Month, DateTime.DaysInMonth(startDate.Year, startDate.Month)).Date;
-				decimal totalIncome = await _incomeRepository.GetTotalIncomeForMonth(startDate);
-				decimal totalExpense = await _expenseRepository.GetTotalExpenseForMonth(startDate);
+				decimal totalIncome = await _incomeRepository.GetTotalIncomeForMonth(startDate, userId);
+				decimal totalExpense = await _expenseRepository.GetTotalExpenseForMonth(startDate, userId);
 				MonthlySummary summary = new MonthlySummary
 				{
 					MonthYear = startDate.ToString("yyyy-MM"),
@@ -329,12 +341,13 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetExpenseCategories()
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
             var categories = Enum.GetValues(typeof(ExpenseType)).Cast<ExpenseType>();
             var categoryCounts = new Dictionary<ExpenseType, int>();
 
             foreach (var category in categories)
             {
-                var count = await _expenseRepository.GetExpenseCountByCategory(category);
+                var count = await _expenseRepository.GetExpenseCountByCategory(category, userId);
                 categoryCounts.Add(category, count);
             }
 
@@ -345,16 +358,131 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetIncomeCategories()
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
             var categories = Enum.GetValues(typeof(IncomeType)).Cast<IncomeType>();
             var categoryCounts = new Dictionary<IncomeType, int>();
 
             foreach (var category in categories)
             {
-                var count = await _incomeRepository.GetIncomeCountByCategory(category);
+                var count = await _incomeRepository.GetIncomeCountByCategory(category, userId);
                 categoryCounts.Add(category, count);
             }
 
             return Ok(categoryCounts);
         }
+
+        [HttpGet("generateReport")]
+        public async Task<IActionResult> GenerateFinanceReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+            // Retrieve data for the report (in your case, incomes and expenses)
+            var incomes = await _incomeRepository.GetIncomesByDateRange(startDate, endDate, userId);
+            var expenses = await _expenseRepository.GetExpensesByDateRange(startDate, endDate, userId);
+
+            // Create a memory stream to store the generated PDF
+            using (var stream = new MemoryStream())
+            {
+                // Initialize PDF writer and document
+                PdfWriter writer = new(stream);
+                PdfDocument pdf = new PdfDocument(writer);
+                Document document = new Document(pdf);
+
+                // Add title to the document
+                var title = new Paragraph("Financial Report")
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetFontSize(20);
+                document.Add(title);
+
+                // Add date range to the document
+                var dateRange = new Paragraph($"Date Range: {startDate.ToString("MM/dd/yyyy")} - {endDate.ToString("MM/dd/yyyy")}")
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetFontSize(14);
+                document.Add(dateRange);
+
+                // Add incomes section to the document
+                var incomesSection = new Paragraph("Incomes");
+                document.Add(incomesSection);
+
+                if (incomes.Count != 0)
+                {
+                    // Add a table to display income details
+                    Table incomeTable = new Table(UnitValue.CreatePercentArray(3)).UseAllAvailableWidth();
+
+                    // Add table header
+                    incomeTable.AddHeaderCell("Title");
+                    incomeTable.AddHeaderCell("Amount");
+                    incomeTable.AddHeaderCell("Date");
+
+                    // Add income details to the table
+                    foreach (var income in incomes)
+                    {
+                        incomeTable.AddCell(income.Title);
+                        incomeTable.AddCell(income.Amount.ToString("C"));
+                        incomeTable.AddCell(income.Time.ToString("MM/dd/yyyy"));
+                    }
+
+                    document.Add(incomeTable);
+                }
+                else
+                {
+                    var noIncomeItem = new Paragraph("No income data available")
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT)
+                        .SetFontSize(12);
+                    document.Add(noIncomeItem);
+                }
+
+                // Add expenses section to the document
+                var expensesSection = new Paragraph("Expenses");
+                document.Add(expensesSection);
+
+                if (expenses.Count != 0)
+                {
+                    // Add a table to display expense details
+                    Table expenseTable = new Table(UnitValue.CreatePercentArray(3)).UseAllAvailableWidth();
+
+                    // Add table header
+                    expenseTable.AddHeaderCell("Title");
+                    expenseTable.AddHeaderCell("Amount");
+                    expenseTable.AddHeaderCell("Date");
+
+                    // Add expense details to the table
+                    foreach (var expense in expenses)
+                    {
+                        expenseTable.AddCell(expense.Title);
+                        expenseTable.AddCell(expense.Amount.ToString("C"));
+                        expenseTable.AddCell(expense.Time.ToString("MM/dd/yyyy"));
+                    }
+
+                    document.Add(expenseTable);
+                }
+                else
+                {
+                    var noExpenseItem = new Paragraph("No expense data available")
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT)
+                        .SetFontSize(12);
+                    document.Add(noExpenseItem);
+                }
+
+                // Add total income and total expense summary
+                var totalIncome = incomes.Sum(x => x.Amount);
+                var totalExpense = expenses.Sum(x => x.Amount);
+
+                var summary = new Paragraph($"Total Income: {totalIncome:C} | Total Expense: {totalExpense:C}")
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetFontSize(14);
+                document.Add(summary);
+
+                // Close the document
+                document.Close();
+
+                // Get the bytes of the generated PDF
+                var pdfBytes = stream.ToArray();
+
+                // Return the PDF file
+                return File(pdfBytes, "application/pdf", "financial_report.pdf");
+            }
+        }
+
     }
 }

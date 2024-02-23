@@ -33,9 +33,9 @@ namespace HomeChoreTracker.Api.Repositories
 			return incomeResponse;
 		}
 
-		public async Task<List<Income>> GetAll()
+		public async Task<List<Income>> GetAll(int userId)
 		{
-			return await _dbContext.Incomes.ToListAsync();
+			return await _dbContext.Incomes.Where(x=>x.UserId.Equals(userId)).ToListAsync();
 		}
 
 		public async Task AddIncome(Income income)
@@ -44,14 +44,14 @@ namespace HomeChoreTracker.Api.Repositories
 			await Save();
 		}
 
-		public async Task<decimal> GetCurrentMonthTotalIncome()
+		public async Task<decimal> GetCurrentMonthTotalIncome(int userId)
 		{
 			DateTime currentDate = DateTime.Now;
 			DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
 			DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
 			return await _dbContext.Incomes
-				.Where(i => i.Time >= startOfMonth && i.Time <= endOfMonth)
+				.Where(i => i.UserId.Equals(userId) && i.Time >= startOfMonth && i.Time <= endOfMonth)
 				.SumAsync(i => i.Amount);
 		}
 
@@ -76,7 +76,7 @@ namespace HomeChoreTracker.Api.Repositories
 			await Save();
 		}
 
-		public async Task<decimal> GetTotalIncomeForMonth(DateTime month)
+		public async Task<decimal> GetTotalIncomeForMonth(DateTime month, int userId)
 		{
 			// Get the start and end dates of the month
 			DateTime startDate = new DateTime(month.Year, month.Month, 1);
@@ -84,16 +84,23 @@ namespace HomeChoreTracker.Api.Repositories
 
 			// Query the database for total income within the specified month
 			decimal totalIncome = await _dbContext.Incomes
-				.Where(i => i.Time >= startDate && i.Time <= endDate)
+				.Where(i => i.UserId.Equals(userId) && i.Time >= startDate && i.Time <= endDate)
 				.SumAsync(i => i.Amount);
 
 			return totalIncome;
 		}
 
-        public async Task<int> GetIncomeCountByCategory(IncomeType category)
+        public async Task<int> GetIncomeCountByCategory(IncomeType category, int userId)
+        {
+            return await _dbContext.Incomes.Where(x=>x.UserId.Equals(userId))
+                .CountAsync(e => e.Type == category);
+        }
+
+        public async Task<List<Income>> GetIncomesByDateRange(DateTime startDate, DateTime endDate, int userId)
         {
             return await _dbContext.Incomes
-                .CountAsync(e => e.Type == category);
+                .Where(i => i.UserId.Equals(userId) && i.Time >= startDate && i.Time <= endDate)
+                .ToListAsync();
         }
     }
 }

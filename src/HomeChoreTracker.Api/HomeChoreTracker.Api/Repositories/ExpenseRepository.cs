@@ -35,9 +35,9 @@ namespace HomeChoreTracker.Api.Repositories
 
 		}
 
-		public async Task<List<Expense>> GetAll()
+		public async Task<List<Expense>> GetAll(int userId)
 		{
-			return await _dbContext.Expenses.ToListAsync();
+			return await _dbContext.Expenses.Where(x=>x.UserId.Equals(userId)).ToListAsync();
 		}
 
 		public async Task AddExpense(Expense expense)
@@ -67,18 +67,18 @@ namespace HomeChoreTracker.Api.Repositories
 			await Save();
 		}
 
-		public async Task<decimal> GetCurrentMonthTotalExpense()
+		public async Task<decimal> GetCurrentMonthTotalExpense(int userId)
 		{
 			DateTime currentDate = DateTime.Now;
 			DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
 			DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
 			return await _dbContext.Expenses
-				.Where(e => e.Time >= startOfMonth && e.Time <= endOfMonth)
+				.Where(e => e.UserId.Equals(userId) && e.Time >= startOfMonth && e.Time <= endOfMonth)
 				.SumAsync(e => e.Amount);
 		}
 
-		public async Task<decimal> GetTotalExpenseForMonth(DateTime month)
+		public async Task<decimal> GetTotalExpenseForMonth(DateTime month, int userId)
 		{
 			// Get the start and end dates of the month
 			DateTime startDate = new DateTime(month.Year, month.Month, 1);
@@ -86,16 +86,23 @@ namespace HomeChoreTracker.Api.Repositories
 
 			// Query the database for total expense within the specified month
 			decimal totalExpense = await _dbContext.Expenses
-				.Where(e => e.Time >= startDate && e.Time <= endDate)
+				.Where(e => e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
 				.SumAsync(e => e.Amount);
 
 			return totalExpense;
 		}
 
-        public async Task<int> GetExpenseCountByCategory(ExpenseType category)
+        public async Task<int> GetExpenseCountByCategory(ExpenseType category, int userId)
+        {
+            return await _dbContext.Expenses.Where(x=>x.UserId.Equals(userId))
+                .CountAsync(e => e.Type == category);
+        }
+
+        public async Task<List<Expense>> GetExpensesByDateRange(DateTime startDate, DateTime endDate, int userId)
         {
             return await _dbContext.Expenses
-                .CountAsync(e => e.Type == category);
+                .Where(e => e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
+                .ToListAsync();
         }
     }
 }
