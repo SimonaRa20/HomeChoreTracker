@@ -28,5 +28,80 @@
             <i class="fa fa-plus-circle mr-2"
                aria-hidden="true"></i>Create
         </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card mb-4 py-3">
+            <div class="card-body">
+                @if (Model.Advices != null && Model.Advices.Any())
+                {
+                    @foreach (var advice in Model.Advices)
+                    {
+                        <div class="card mb-3 advice-card @advice.Type.ToString().ToLower()" style="border: 2px solid @(GetTextColor(advice.Type.ToString().ToLower()));">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 style="padding-left: 4px; padding-top: 4px;">@advice.Title</h5>
+                                </div>
+                                <div class="col-auto">
+                                    <h6 style="padding-right: 4px;">@advice.UserName</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-right">
+                                    <p class="border-left-type" style="color: @(GetTextColor(advice.Type.ToString().ToLower())); padding-right: 4px;">#@advice.Type</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <p class="card-text" style="padding-left: 4px;">@advice.Description</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-right">
+                                    <p class="text-right" style="padding-right: 4px;">@advice.Time</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div>
+                        Not found advices in forum
+                    </div>
+                }
+            </div>
         </div>
-        </div>
+    </div>
+</div>
+
+
+
+<style>
+   @functions {
+    string GetTextColor(string type)
+    {
+        switch (type.ToLower())
+        {
+            case "cleaning":
+                return "#4e73df";
+            case "laundry":
+                return "#1cc88a";
+            case "kitchen":
+                return "#36b9cc";
+            case "bathroom":
+                return "#f6c23e";
+            case "bedroom":
+                return "#e74a3b";
+            case "outdoors":
+                return "#858796";
+            case "organize":
+                return "#5a5c69";
+            default:
+                return "black";
+        }
+    }
+}
+</style>
+
