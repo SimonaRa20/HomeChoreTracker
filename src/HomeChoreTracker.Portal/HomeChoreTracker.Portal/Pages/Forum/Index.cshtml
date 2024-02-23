@@ -44,6 +44,20 @@
         </form>
     </div>
 </div>
+<div class="row mb-3">
+    <div class="col-lg-12">
+        <div class="btn-group" role="group" aria-label="Advice Types">
+            <button type="button" class="btn btn-light" onclick="filterAdvices('all')">All</button>
+            <button type="button" class="btn btn-primary" onclick="filterAdvices('cleaning')">Cleaning</button>
+            <button type="button" class="btn btn-success" onclick="filterAdvices('laundry')">Laundry</button>
+            <button type="button" class="btn btn-info" onclick="filterAdvices('kitchen')">Kitchen</button>
+            <button type="button" class="btn btn-warning" onclick="filterAdvices('bathroom')">Bathroom</button>
+            <button type="button" class="btn btn-danger" onclick="filterAdvices('bedroom')">Bedroom</button>
+            <button type="button" class="btn btn-secondary" onclick="filterAdvices('outdoors')">Outdoors</button>
+            <button type="button" class="btn btn-dark" onclick="filterAdvices('organize')">Organize</button>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-lg-12">
         <div class="card mb-4 py-3">
@@ -90,7 +104,16 @@
     </div>
 </div>
 
-
+<script>
+    function filterAdvices(type) {
+        $('.advice-card').hide(); // Hide all advices
+        if (type === 'all') {
+            $('.advice-card').show(); // Show all advices if 'All' button is clicked
+        } else {
+            $('.advice-card.' + type).show(); // Show advices of the selected type
+        }
+    }
+</script>
 
 <style>
    @functions {
@@ -118,4 +141,3 @@
     }
 }
 </style>
-

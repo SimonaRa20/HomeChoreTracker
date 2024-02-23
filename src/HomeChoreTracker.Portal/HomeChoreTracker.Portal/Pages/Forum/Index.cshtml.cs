@@ -25,7 +25,7 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             _config = configuration;
         }
 
-        public async Task<IActionResult> OnGetAsync(string search)
+        public async Task<IActionResult> OnGetAsync(string search, string type)
         {
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
@@ -46,6 +46,12 @@ namespace HomeChoreTracker.Portal.Pages.Forum
                         Advices = Advices.Where(a => a.Title.Contains(search) || a.Description.Contains(search)).ToList();
                     }
 
+                    // Filter advices based on the type
+                    if (!string.IsNullOrEmpty(type))
+                    {
+                        Advices = Advices.Where(a => string.Equals(a.Type.ToString(), type, StringComparison.OrdinalIgnoreCase)).ToList();
+                    }
+
                     return Page();
                 }
                 else
@@ -54,5 +60,7 @@ namespace HomeChoreTracker.Portal.Pages.Forum
                 }
             }
         }
+
+
     }
 }
