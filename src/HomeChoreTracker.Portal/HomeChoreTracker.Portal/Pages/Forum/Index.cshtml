@@ -63,36 +63,72 @@
         <div class="card mb-4 py-3">
             <div class="card-body">
                 @if (Model.Advices != null && Model.Advices.Any())
+{
+    @foreach (var advice in Model.Advices)
+    {
+        <div class="card mb-3 advice-card @advice.Type.ToString().ToLower()" style="border: 2px solid @(GetTextColor(advice.Type.ToString().ToLower()));">
+            <div class="row">
+                <div class="col">
+                    <h5 style="padding-left: 4px; padding-top: 4px;">@advice.Title</h5>
+                </div>
+                <div class="col-auto">
+                    <h6 style="padding-right: 4px;">@advice.UserName</h6>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-right">
+                    <p class="border-left-type" style="color: @(GetTextColor(advice.Type.ToString().ToLower())); padding-right: 4px;">#@advice.Type</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p class="card-text" style="padding-left: 4px;">@advice.Description</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-right">
+                    <p class="text-right" style="padding-right: 4px;">@advice.Time</p>
+                </div>
+            </div>
+            <div class="row">
+                @if(advice.UserId == Model.UserId)
                 {
-                    @foreach (var advice in Model.Advices)
-                    {
-                        <div class="card mb-3 advice-card @advice.Type.ToString().ToLower()" style="border: 2px solid @(GetTextColor(advice.Type.ToString().ToLower()));">
-                            <div class="row">
-                                <div class="col">
-                                    <h5 style="padding-left: 4px; padding-top: 4px;">@advice.Title</h5>
-                                </div>
-                                <div class="col-auto">
-                                    <h6 style="padding-right: 4px;">@advice.UserName</h6>
-                                </div>
+                    <div class="col">
+                        <button class='btn btn-sm' onclick="DisplayEditModal('@advice.Id')">
+                            <i class='fa fa-pencil-alt' style='color: black;'></i>
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@advice.Id"><i class='fa fa-trash'></i></a>
+                    </div>
+                }
+
+                <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@advice.Id">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Delete Confirmation</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
-                            <div class="row">
-                                <div class="col text-right">
-                                    <p class="border-left-type" style="color: @(GetTextColor(advice.Type.ToString().ToLower())); padding-right: 4px;">#@advice.Type</p>
-                                </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete this '@advice.Title' home chore?</p>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <p class="card-text" style="padding-left: 4px;">@advice.Description</p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col text-right">
-                                    <p class="text-right" style="padding-right: 4px;">@advice.Time</p>
-                                </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@advice.Id">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
                             </div>
                         </div>
-                    }
-                }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
                 else
                 {
                     <div>
@@ -104,14 +140,102 @@
     </div>
 </div>
 
+
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Advice</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="editAdviceId" name="id" value="" />
+                    <div class="form-group" method="post">
+                        <label for="editName">Title</label>
+                        <input asp-for="EditAdvice.Title" name="EditName" type="text" class="form-control" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAdviceType">Chore Type</label>
+                        <select class="form-control" id="editAdviceType" name="EditAdviceType" asp-for="EditAdvice.Type" required>
+                            <option value="0">Cleaning</option>
+                            <option value="1">Laundry</option>
+                            <option value="2">Kitchen</option>
+                            <option value="3">Bathroom</option>
+                            <option value="4">Bedroom</option>
+                            <option value="5">Outdoors</option>
+                            <option value="6">Organize</option>
+                        </select>
+                    </div>
+                   
+                    <div class="form-group">
+                        <label for="editDescription">Description</label>
+                        <textarea class="form-control" id="editDescription" name="EditDescription" asp-for="EditAdvice.Description"></textarea>
+                    </div>
+
+                    <div class="form-group">
+						<label for="IsPublic">Show to show this advice</label><br />
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" id="IsPublic" name="EditIsPublic" asp-for="EditAdvice.IsPublic" value="true" checked>
+							<label class="form-check-label" for="IsPublic">Public</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" id="IsPrivate" name="EditIsPublic" asp-for="EditAdvice.IsPublic" value="false">
+							<label class="form-check-label" for="IsPrivate">Private</label>
+						</div>
+					</div>
+
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     function filterAdvices(type) {
-        $('.advice-card').hide(); // Hide all advices
+        $('.advice-card').hide();
         if (type === 'all') {
-            $('.advice-card').show(); // Show all advices if 'All' button is clicked
+            $('.advice-card').show();
         } else {
-            $('.advice-card.' + type).show(); // Show advices of the selected type
+            $('.advice-card.' + type).show();
         }
+    }
+
+     function DisplayEditModal(choreId) {
+        $('#editAdviceId').val(choreId);
+        $.ajax({
+            url: '@Url.Page("/Forum/Index")?handler=Detail&id=' + choreId,
+            type: 'GET',
+            success: function (data) {
+                console.log('Received data:', data);
+                if (data && data.title) {
+                    $('#editName').val(data.title);
+                    $('#editDescription').val(data.description);
+                    var adviceTypeText = data.adviceType
+                        $('#editAdviceType option').filter(function () {
+                        return $(this).text() === adviceTypeText;
+                    }).prop('selected', true);
+
+                    if (data.isPublic) {
+                    $('#IsPublic').prop('checked', true);
+                } else {
+                    $('#IsPrivate').prop('checked', true);
+                }
+                    $('#editModal').modal('show');
+                } else {
+                    console.error('Invalid data format:', data);
+                }
+            },
+            error: function (error) {
+                console.error('Error fetching chore details:', error);
+            }
+        });
     }
 </script>
 

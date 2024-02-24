@@ -51,11 +51,10 @@ namespace HomeChoreTracker.Api.Controllers
 
 		[HttpGet("{id}")]
 		[Authorize]
-		public async Task<IActionResult> GetAdvicePermission(int id)
+		public async Task<IActionResult> GetAdvice(int id)
 		{
-			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-			bool hasPermission = await _forumRepository.HasPermission(id,userId);
-			return Ok(hasPermission);
+			Advice advice = await _forumRepository.GetAdviceById(id);
+			return Ok(advice);
 		}
 
 		[HttpGet]
