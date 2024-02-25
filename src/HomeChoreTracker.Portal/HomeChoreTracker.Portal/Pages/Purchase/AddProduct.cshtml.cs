@@ -51,7 +51,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage($"~/Purchase/{Id}");
+                        return RedirectToPage($"./Purchase/{Id}");
                     }
                     else if (response.StatusCode == HttpStatusCode.BadRequest)
                     {

@@ -56,7 +56,6 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
-                // Check if a product with the same title and product type already exists
                 var existingProduct = await _productRepository.GetProductByTitleAndType(productRequest.Title, productRequest.ProductType, productRequest.HomeId);
                 if (existingProduct != null)
                 {
@@ -123,13 +122,33 @@ namespace HomeChoreTracker.Api.Controllers
         }
 
         [HttpPost("purchase")]
-        public async Task<ActionResult> AddPurchase(Purchase purchase)
+        [Authorize]
+        public async Task<IActionResult> AddPurchase(PurchaseRequest purchaseRequest)
         {
             try
             {
+                var purchase = new Purchase
+                {
+                    HomeId = purchaseRequest.HomeId,
+                    PurchaseDate = purchaseRequest.PurchaseDate,
+                    IsCompleted = false,
+                    Items = new List<ShoppingItem>()
+                };
+
+                foreach (var item in purchaseRequest.Items)
+                {
+                    purchase.Items.Add(new ShoppingItem
+                    {
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        IsCompleted = false
+                    });
+                }
+
                 await _purchaseRepository.AddPurchase(purchase);
                 await _purchaseRepository.Save();
-                return Ok();
+
+                return Ok("Purchase added successfully");
             }
             catch (Exception ex)
             {

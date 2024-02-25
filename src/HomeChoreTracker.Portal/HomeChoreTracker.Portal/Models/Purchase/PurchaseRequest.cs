@@ -1,0 +1,9 @@
+﻿namespace HomeChoreTracker.Portal.Models.Purchase
+{
+    public class PurchaseRequest
+    {
+        public int HomeId { get; set; }
+        public DateTime PurchaseDate { get; set; }
+        public List<ShoppingItemRequest> Items { get; set; }
+    }
+}
