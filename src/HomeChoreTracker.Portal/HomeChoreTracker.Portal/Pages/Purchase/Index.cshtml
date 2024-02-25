@@ -18,3 +18,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
+
+<div class="row">
+    <div class="col-lg-6">
+        <a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Inventory</a>
+        <a class="btn btn-light btn-sm mb-2" asp-page="./AddProduct" asp-route-id="@Model.Id">
+            <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Add product
+            </a>
+        <div class="card mb-4 py-3 border-left-primary mt-2">
+
+            <div class="collapse show">
+                <div class="card-body">
+                    There have to be inventory products
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+﻿@page "{id:int}"
+@model HomeChoreTracker.Portal.Pages.Purchase.AddProductModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Home Members";
+}
+
+@section HeadContent
+{
+    <title>@ViewData["Title"] - Home Chore Tracker</title>
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet" asp-append-version="true">
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+    <!-- Add the following lines to include required Bootstrap and jQuery files -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <a class="btn btn-light btn-sm" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Inventory</a>
+        <a class="btn btn-secondary btn-sm" asp-page="./AddProduct" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Add product</a>
+
+
+		<div class="card mb-4 py-3 mt-2 border-left-primary">
+			<div class="card-body">
+				<form method="post" asp-action="Index">
+					<div class="form-group">
+						<label for="Title">Title</label>
+						<input type="text" class="form-control" id="Name" name="AddProduct.Title" asp-for="AddProduct.Title">
+						<span asp-validation-for="AddProduct.Title" class="text-danger"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="ExpirationDate">Expiration Date</label>
+						<input type="date" class="form-control" id="ExpirationDate" name="AddProduct.ExpirationDate" asp-for="AddProduct.ExpirationDate">
+						<span asp-validation-for="AddProduct.ExpirationDate" class="text-danger"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="Quantity">Quantity</label>
+						<input type="number" class="form-control" id="Amount" name="AddProduct.Quantity" asp-for="AddProduct.Quantity" step="0.01" min="0.01" required>
+						<span asp-validation-for="AddProduct.Quantity" class="text-danger"></span>
+					</div>
+
+
+					<div class="form-group">
+						<label for="QuantityType">Quantity Type</label>
+						<select class="form-control" id="QuantityType" name="AddProduct.QuantityType" asp-for="AddProduct.QuantityType" required>
+							@foreach (var quantityType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.QuantityType)))
+							{
+								<option value="@((int)quantityType)">@quantityType</option>
+							}
+						</select>
+						<span asp-validation-for="AddProduct.QuantityType" class="text-danger"></span>
+					</div>
+
+
+					<div class="form-group">
+						<label for="ProductType">Product Type</label>
+						<input type="search" list="productTypes" class="form-control" id="ProductType" name="AddProduct.ProductType" asp-for="AddProduct.ProductType" placeholder="Pick a product type..." required>
+						<datalist id="productTypes">
+							@foreach (var productType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.ProductType)))
+							{
+								<option value="@productType" />
+							}
+						</datalist>
+						<span asp-validation-for="AddProduct.ProductType" class="text-danger"></span>
+					</div>
+
+
+				
+					<button type="submit" class="btn btn-primary">Create</button>
+				</form>
+			</div>
+		</div>
+</div>
+</div>
