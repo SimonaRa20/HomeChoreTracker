@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Contracts.Inventory;
+﻿using HomeChoreTracker.Api.Contracts.Finance;
+using HomeChoreTracker.Api.Contracts.Inventory;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +26,23 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 var products = await _productRepository.GetAllProducts(id);
-                return Ok(products);
+
+				var homeProducts = new List<ProductResponse>();
+
+				foreach (var product in products)
+				{
+					homeProducts.Add(new ProductResponse
+					{
+						Id = product.Id,
+                        Title = product.Title,
+                        ExpirationDate = product.ExpirationDate,
+                        Quantity = product.Quantity,
+                        QuantityType = product.QuantityType,
+                        ProductType = product.ProductType,
+					});
+				}
+
+				return Ok(homeProducts);
             }
             catch (Exception ex)
             {
@@ -34,11 +51,18 @@ namespace HomeChoreTracker.Api.Controllers
         }
 
         [HttpPost("product")]
-		[Authorize]
-		public async Task<IActionResult> AddProduct(ProductRequest productRequest)
+        [Authorize]
+        public async Task<IActionResult> AddProduct(ProductRequest productRequest)
         {
             try
             {
+                // Check if a product with the same title and product type already exists
+                var existingProduct = await _productRepository.GetProductByTitleAndType(productRequest.Title, productRequest.ProductType, productRequest.HomeId);
+                if (existingProduct != null)
+                {
+                    return BadRequest("Product with the same title and product type already exists.");
+                }
+
                 Product product = new Product
                 {
                     Title = productRequest.Title,
@@ -50,13 +74,39 @@ namespace HomeChoreTracker.Api.Controllers
                 };
                 await _productRepository.AddProduct(product);
                 await _productRepository.Save();
-                return Ok("Income added successfully");
+                return Ok("Product added successfully");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPut("product/updateQuantity")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProductQuantity(UpdateProductQuantityRequest request)
+        {
+            try
+            {
+                var product = await _productRepository.GetProductById(request.ProductId);
+                if (product == null)
+                {
+                    return NotFound("Product not found");
+                }
+
+                product.Quantity = request.NewQuantity;
+                await _productRepository.UpdateProduct(product);
+                await _productRepository.Save();
+
+                return Ok("Product quantity updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
 
         [HttpGet("purchases")]
         public async Task<ActionResult<List<Purchase>>> GetAllPurchases()

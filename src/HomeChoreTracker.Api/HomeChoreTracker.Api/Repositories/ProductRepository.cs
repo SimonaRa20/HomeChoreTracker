@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Database;
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,16 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task Save()
         {
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Product> GetProductByTitleAndType(string title, ProductType productType, int homeId)
+        {
+            return await _dbContext.Products.Where(x => x.HomeId.Equals(homeId) && x.ProductType.Equals(productType) && x.Title.Equals(title)).FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateProduct(Product product)
+        {
+            _dbContext.Products.Update(product);
         }
     }
 }

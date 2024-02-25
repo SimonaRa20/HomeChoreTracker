@@ -2,6 +2,7 @@ using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using HomeChoreTracker.Portal.Models.Purchase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 
@@ -46,17 +47,22 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
                     var apiUrl = _config["ApiUrl"] + "/Inventory/product";
                     AddProduct.HomeId = Id;
 
-					var response = await httpClient.PostAsJsonAsync(apiUrl, AddProduct);
+                    var response = await httpClient.PostAsJsonAsync(apiUrl, AddProduct);
 
                     if (response.IsSuccessStatusCode)
                     {
                         return RedirectToPage($"~/Purchase/{Id}");
                     }
+                    else if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        ModelState.AddModelError(string.Empty, await response.Content.ReadAsStringAsync());
+                    }
                     else
                     {
                         ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
-                        return Page();
                     }
+
+                    return Page();
                 }
             }
             catch (Exception ex)
@@ -65,5 +71,6 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
                 return Page();
             }
         }
+
     }
 }

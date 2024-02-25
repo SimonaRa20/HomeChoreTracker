@@ -70,7 +70,15 @@
 						</datalist>
 						<span asp-validation-for="AddProduct.ProductType" class="text-danger"></span>
 					</div>
-
+					<div class="text-danger">
+						<p>Fault message:</p>
+						@Html.ValidationMessageFor(model => model.AddProduct.Title)
+						@Html.ValidationMessageFor(model => model.AddProduct.ExpirationDate)
+						@Html.ValidationMessageFor(model => model.AddProduct.Quantity)
+						@Html.ValidationMessageFor(model => model.AddProduct.QuantityType)
+						@Html.ValidationMessageFor(model => model.AddProduct.ProductType)
+						@Html.ValidationSummary()
+					</div>
 
 				
 					<button type="submit" class="btn btn-primary">Create</button>
