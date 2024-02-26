@@ -42,12 +42,20 @@
                                         <div class="form-group">
                                             <input type="password" asp-for="UserLoginRequest.Password" class="form-control form-control-user" placeholder="Password" />
                                         </div>
-                                        @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
-                                        {
-                                            <div class="alert alert-danger">
-                                                @ViewData["ErrorMessage"]
-                                            </div>
-                                        }
+                                        <div class="text-danger" style="padding-left: 0; margin-left: 0;">
+                                            @if (!ModelState.IsValid)
+                                            {
+                                                <ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+                                                    @foreach (var modelStateKey in ViewData.ModelState.Keys)
+                                                    {
+                                                        foreach (var error in ViewData.ModelState[modelStateKey].Errors)
+                                                        {
+                                                            <li>@error.ErrorMessage</li>
+                                                        }
+                                                    }
+                                                </ul>
+                                            }
+                                        </div>
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
                                             Login
                                         </button>

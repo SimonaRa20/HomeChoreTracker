@@ -41,27 +41,39 @@
                                 <div class="form-group">
                                     <input type="text" class="form-control form-control-user" id="exampleFirstName" asp-for=UserRegisterRequest.UserName
                                            placeholder="Username" name="UserRegisterRequest.UserName">
-                                    <span asp-validation-for="UserRegisterRequest.UserName" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <input type="email" class="form-control form-control-user" id="exampleInputEmail"
                                            placeholder="Email Address" asp-for=UserRegisterRequest.Email>
-                                    <span asp-validation-for="UserRegisterRequest.Email" class="text-danger"></span>
                                 </div>
                                 
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <input type="password" class="form-control form-control-user"
                                                id="exampleInputPassword" placeholder="Password" asp-for=UserRegisterRequest.Password>
-                                        <span asp-validation-for="UserRegisterRequest.Password" class="text-danger"></span>
                                     </div>
                                     <div class="col-sm-6">
                                         <input type="password" class="form-control form-control-user"
                                                id="exampleRepeatPassword" placeholder="Repeat Password" asp-for=UserRegisterRequest.RepeatPassword>
-                                        <span asp-validation-for="UserRegisterRequest.RepeatPassword" class="text-danger"></span>
                                     </div>
                                 </div>
+
+                                <div class="text-danger" style="padding-left: 0; margin-left: 0;">
+                                    @if (!ModelState.IsValid)
+                                    {
+                                        <ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+                                            @foreach (var modelStateKey in ViewData.ModelState.Keys)
+                                            {
+                                                foreach (var error in ViewData.ModelState[modelStateKey].Errors)
+                                                {
+                                                    <li>@error.ErrorMessage</li>
+                                                }
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+
                                 <button type="submit" class="btn btn-primary btn-user btn-block">
                                     Register Account
                                 </button>

@@ -60,7 +60,8 @@ namespace HomeChoreTracker.Portal.Pages.Auth
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid email or password. Please try again.");
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError(string.Empty, errorMessage);
                     return Page();
                 }
             }

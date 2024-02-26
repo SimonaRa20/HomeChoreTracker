@@ -68,7 +68,8 @@ namespace HomeChoreTracker.Portal.Pages
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
+                        var errorMessage = await response.Content.ReadAsStringAsync();
+                        ModelState.AddModelError(string.Empty, errorMessage);
                     }
                     return Page();
                 }

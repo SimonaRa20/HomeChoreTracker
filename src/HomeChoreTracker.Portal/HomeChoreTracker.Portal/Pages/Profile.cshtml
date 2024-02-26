@@ -21,6 +21,20 @@
                     <label for="Email">Email:</label>
                     <input type="text" class="form-control" id="Email" name="Email" value="@Model.UserProfile.Email" />
                 </div>
+                    <div class="text-danger" style="padding-left: 0; margin-left: 0;">
+                        @if (!ModelState.IsValid)
+                        {
+                            <ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+                                @foreach (var modelStateKey in ViewData.ModelState.Keys)
+                                {
+                                    foreach (var error in ViewData.ModelState[modelStateKey].Errors)
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                }
+                            </ul>
+                        }
+                    </div>
                 <button type="submit" class="btn btn-primary">Update Profile</button>
             </form>
 		</div>

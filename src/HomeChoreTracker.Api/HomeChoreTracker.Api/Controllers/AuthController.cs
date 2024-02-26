@@ -38,22 +38,23 @@ namespace HomeChoreTracker.Api.Controllers
 
             if (user.Email.IsNullOrEmpty() || !user.Email.Contains('@'))
             {
-                errors.Add("Invalid email format.");
+                return new ObjectResult("Invalid email format.")
+                {
+                    StatusCode = (int)HttpStatusCode.UnprocessableEntity
+                };
             }
 
             if (string.IsNullOrWhiteSpace(user.Password) || user.Password.Length < 8)
             {
-                errors.Add("Password should be a minimum of 8 characters.");
+                return new ObjectResult("Password should be a minimum of 8 characters.")
+                {
+                    StatusCode = (int)HttpStatusCode.UnprocessableEntity
+                };
             }
             var checkUser = await _authRepository.GetUserByEmail(user.Email);
             if (checkUser != null)
             {
-                errors.Add("User with the same email already exists.");
-            }
-
-            if (errors.Count > 0)
-            {
-                return new ObjectResult(new { ErrorMessage = string.Join("\n", errors) })
+                return new ObjectResult("User with the same email already exists.")
                 {
                     StatusCode = (int)HttpStatusCode.UnprocessableEntity
                 };
@@ -97,7 +98,7 @@ namespace HomeChoreTracker.Api.Controllers
                 return Created("", userLoginResponse);
             }
 
-            return NotFound(new { ErrorMessage = "Invalid email or password. Please try again." });
+            return NotFound("Invalid email or password. Please try again.");
 
         }
 
@@ -118,7 +119,7 @@ namespace HomeChoreTracker.Api.Controllers
                 return Ok("Password reset link sent successfully.");
             }
 
-            return NotFound("Invalid email. Please try again.");
+            return NotFound("Invalid email. Please try again." );
         }
 
         private void SendPasswordResetEmail(string email, string resetLink)

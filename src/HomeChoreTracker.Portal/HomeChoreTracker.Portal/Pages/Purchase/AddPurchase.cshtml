@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet" asp-append-version="true">
     <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <!-- Add the following lines to include required Bootstrap and jQuery files -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -45,9 +44,12 @@
                                     }
                                 </select>
                             </div>
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
                                 <label for="quantity">Quantity</label>
                                 <input type="number" class="form-control" name="Purchase.Items[0].Quantity" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <button type="button" class="btn btn-danger remove-item">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -65,18 +67,30 @@
     $(document).ready(function () {
         $('#addShoppingItem').click(function () {
             var newItem = $('.shopping-item').first().clone();
-            // Find the last index used in the form
             var lastIndex = $('#shoppingItems .shopping-item').length - 1;
-            // Increment the index to assign a unique value for each cloned item
             var newIndex = lastIndex + 1;
-            // Update the name attributes of the cloned item
             newItem.find('select').attr('name', 'Purchase.Items[' + newIndex + '].ProductId');
             newItem.find('input').attr('name', 'Purchase.Items[' + newIndex + '].Quantity');
             newItem.find('input').val('');
+            newItem.find('.remove-item').click(function () {
+                if ($('#shoppingItems .shopping-item').length > 1) {
+                    $(this).closest('.shopping-item').remove();
+                } else {
+                    alert("At least one item must remain.");
+                }
+            });
             $('#shoppingItems').append(newItem);
         });
-    });
 
+        // Handling removal of initially loaded items
+        $('.remove-item').click(function () {
+            if ($('#shoppingItems .shopping-item').length > 1) {
+                $(this).closest('.shopping-item').remove();
+            } else {
+                alert("At least one item must remain.");
+            }
+        });
+    });
 
 </script>
 
