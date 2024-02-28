@@ -4,7 +4,6 @@
     Layout = "~/Pages/Shared/_Layout.cshtml";
     ViewData["Title"] = "Home";
 }
-
 @section HeadContent
 {
     <title>@ViewData["Title"] - Home Chore Tracker</title>
@@ -63,72 +62,73 @@
         <div class="card mb-4 py-3">
             <div class="card-body">
                 @if (Model.Advices != null && Model.Advices.Any())
-{
-    @foreach (var advice in Model.Advices)
-    {
-        <div class="card mb-3 advice-card @advice.Type.ToString().ToLower()" style="border: 2px solid @(GetTextColor(advice.Type.ToString().ToLower()));">
-            <div class="row">
-                <div class="col">
-                    <h5 style="padding-left: 4px; padding-top: 4px;">@advice.Title</h5>
-                </div>
-                <div class="col-auto">
-                    <h6 style="padding-right: 4px;">@advice.UserName</h6>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col text-right">
-                    <p class="border-left-type" style="color: @(GetTextColor(advice.Type.ToString().ToLower())); padding-right: 4px;">#@advice.Type</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <p class="card-text" style="padding-left: 4px;">@advice.Description</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col text-right">
-                    <p class="text-right" style="padding-right: 4px;">@advice.Time</p>
-                </div>
-            </div>
-            <div class="row">
-                @if(advice.UserId == Model.UserId)
                 {
-                    <div class="col">
-                        <button class='btn btn-sm' onclick="DisplayEditModal('@advice.Id')">
-                            <i class='fa fa-pencil-alt' style='color: black;'></i>
-                        </button>
-                    </div>
-                    <div class="col-auto">
-                        <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@advice.Id"><i class='fa fa-trash'></i></a>
-                    </div>
-                }
+                    @foreach (var advice in Model.Advices)
+                    {
+                        <div class="card mb-3 advice-card @advice.Type.ToString().ToLower()" style="border: 2px solid @(GetTextColor(advice.Type.ToString().ToLower()));">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 style="padding-left: 4px; padding-top: 4px;">@advice.Title</h5>
+                                </div>
+                                <div class="col-auto">
+                                    <h6 style="padding-right: 4px;">@advice.UserName</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-right">
+                                    <p class="border-left-type" style="color: @(GetTextColor(advice.Type.ToString().ToLower())); padding-right: 4px;">#@advice.Type</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <p class="card-text" style="padding-left: 4px; max-height: 80px; overflow: hidden;">@advice.Description</p>
+                                    @if (@advice.Description.Length > 300)
+                                    {
+                                        <button class="btn btn-light custom-btn" style="border-radius:20px; border: 1px solid grey; padding:5px 10px; font-size:12px" onclick="toggleDescription(this)">Continue Reading</button>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-right">
+                                    <p class="text-right" style="padding-right: 4px;">@advice.Time</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @if(advice.UserId == Model.UserId)
+                                {
+                                    <div class="col text-right">
+                                        <button class='btn btn-sm' onclick="DisplayEditModal('@advice.Id')">
+                                            <i class='fa fa-pencil-alt' style='color: black;'></i>
+                                        </button>
+                                        <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@advice.Id"><i class='fa fa-trash'></i></a>
+                                    </div>
+                                }
 
-                <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@advice.Id">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Delete Confirmation</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to delete this '@advice.Title' home chore?</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <form method="post" asp-page-handler="Delete" asp-route-id="@advice.Id">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
+                                <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@advice.Id">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete Confirmation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this '@advice.Title' home chore?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                <form method="post" asp-page-handler="Delete" asp-route-id="@advice.Id">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-}
-
+                    }
+                }
                 else
                 {
                     <div>
@@ -139,8 +139,6 @@
         </div>
     </div>
 </div>
-
-
 
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
      aria-hidden="true">
@@ -178,16 +176,16 @@
                     </div>
 
                     <div class="form-group">
-						<label for="IsPublic">Show to show this advice</label><br />
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" id="IsPublic" name="EditIsPublic" asp-for="EditAdvice.IsPublic" value="true" checked>
-							<label class="form-check-label" for="IsPublic">Public</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" id="IsPrivate" name="EditIsPublic" asp-for="EditAdvice.IsPublic" value="false">
-							<label class="form-check-label" for="IsPrivate">Private</label>
-						</div>
-					</div>
+                        <label for="IsPublic">Show to show this advice</label><br />
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="IsPublic" name="EditIsPublic" asp-for="EditAdvice.IsPublic" value="true" checked>
+                            <label class="form-check-label" for="IsPublic">Public</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="IsPrivate" name="EditIsPublic" asp-for="EditAdvice.IsPublic" value="false">
+                            <label class="form-check-label" for="IsPrivate">Private</label>
+                        </div>
+                    </div>
 
                     <button type="submit" class="btn btn-primary">Save changes</button>
                 </form>
@@ -195,7 +193,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
     function filterAdvices(type) {
@@ -207,7 +204,7 @@
         }
     }
 
-     function DisplayEditModal(choreId) {
+    function DisplayEditModal(choreId) {
         $('#editAdviceId').val(choreId);
         $.ajax({
             url: '@Url.Page("/Forum/Index")?handler=Detail&id=' + choreId,
@@ -218,15 +215,15 @@
                     $('#editName').val(data.title);
                     $('#editDescription').val(data.description);
                     var adviceTypeText = data.adviceType
-                        $('#editAdviceType option').filter(function () {
+                    $('#editAdviceType option').filter(function () {
                         return $(this).text() === adviceTypeText;
                     }).prop('selected', true);
 
                     if (data.isPublic) {
-                    $('#IsPublic').prop('checked', true);
-                } else {
-                    $('#IsPrivate').prop('checked', true);
-                }
+                        $('#IsPublic').prop('checked', true);
+                    } else {
+                        $('#IsPrivate').prop('checked', true);
+                    }
                     $('#editModal').modal('show');
                 } else {
                     console.error('Invalid data format:', data);
@@ -237,31 +234,51 @@
             }
         });
     }
+
+function toggleDescription(button) {
+    var description = $(button).prev();
+    var fullDescription = description.data('full-description');
+    if (!fullDescription) {
+        fullDescription = description.text();
+        description.data('full-description', fullDescription);
+    }
+    
+    if (description.css('max-height') === 'none') {
+        description.text(fullDescription.substring(0, 300));
+        description.css('max-height', '80px');
+        $(button).text('Continue Reading');
+    } else {
+        description.text(fullDescription);
+        description.css('max-height', 'none');
+        $(button).text('Show Less');
+    }
+}
+
 </script>
 
 <style>
-   @functions {
-    string GetTextColor(string type)
-    {
-        switch (type.ToLower())
+    @functions {
+        string GetTextColor(string type)
         {
-            case "cleaning":
-                return "#4e73df";
-            case "laundry":
-                return "#1cc88a";
-            case "kitchen":
-                return "#36b9cc";
-            case "bathroom":
-                return "#f6c23e";
-            case "bedroom":
-                return "#e74a3b";
-            case "outdoors":
-                return "#858796";
-            case "organize":
-                return "#5a5c69";
-            default:
-                return "black";
+            switch (type.ToLower())
+            {
+                case "cleaning":
+                    return "#4e73df";
+                case "laundry":
+                    return "#1cc88a";
+                case "kitchen":
+                    return "#36b9cc";
+                case "bathroom":
+                    return "#f6c23e";
+                case "bedroom":
+                    return "#e74a3b";
+                case "outdoors":
+                    return "#858796";
+                case "organize":
+                    return "#5a5c69";
+                default:
+                    return "black";
+            }
         }
     }
-}
 </style>
