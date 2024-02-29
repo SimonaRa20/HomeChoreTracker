@@ -1,14 +1,13 @@
 ﻿using HomeChoreTracker.Api.Constants;
 
-namespace HomeChoreTracker.Api.Contracts.Inventory
+namespace HomeChoreTracker.Api.Contracts.Purchase
 {
-    public class ProductRequest
+    public class ShoppingItemRequest
     {
         public string Title { get; set; }
-        public DateTime? ExpirationDate { get; set; }
         public decimal Quantity { get; set; }
         public QuantityType QuantityType { get; set; }
         public ProductType ProductType { get; set; }
-        public int HomeId { get; set; }
+        public bool IsCompleted { get; set; }
     }
 }

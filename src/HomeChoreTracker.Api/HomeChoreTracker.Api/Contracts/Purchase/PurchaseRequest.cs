@@ -1,4 +1,4 @@
-﻿namespace HomeChoreTracker.Api.Contracts.Inventory
+﻿namespace HomeChoreTracker.Api.Contracts.Purchase
 {
     public class PurchaseRequest
     {

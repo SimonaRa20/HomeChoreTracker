@@ -88,7 +88,6 @@ namespace HomeChoreTracker.Api
 			builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
 			builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 			builder.Services.AddScoped<IForumRepository, ForumRepository>();
-			builder.Services.AddScoped<IProductRepository, ProductRepository>();
 			builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
 			var app = builder.Build();

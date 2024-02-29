@@ -1,8 +1,13 @@
-﻿namespace HomeChoreTracker.Portal.Models.Purchase
+﻿using HomeChoreTracker.Portal.Constants;
+
+namespace HomeChoreTracker.Portal.Models.Purchase
 {
     public class ShoppingItemRequest
     {
-        public int ProductId { get; set; }
+        public string Title { get; set; }
         public decimal Quantity { get; set; }
+        public QuantityType QuantityType { get; set; }
+        public ProductType ProductType { get; set; }
+        public bool IsCompleted { get; set; }
     }
 }
