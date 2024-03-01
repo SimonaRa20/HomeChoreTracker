@@ -36,10 +36,9 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-		public async Task<Purchase> GetByIdPurchase(int homeId, int purchaseId)
+		public async Task<Purchase> GetByIdPurchase(int purchaseId)
 		{
-			return await _dbContext.Purchases.Where(x=>x.Id.Equals(purchaseId)).Include(p => p.Items)
-				.Where(p => p.HomeId == homeId).FirstOrDefaultAsync();
+			return await _dbContext.Purchases.Where(x=>x.Id.Equals(purchaseId)).Include(p => p.Items).FirstOrDefaultAsync();
 		}
 	}
 }

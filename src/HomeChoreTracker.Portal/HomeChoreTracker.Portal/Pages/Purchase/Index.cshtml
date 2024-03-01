@@ -1,26 +1,26 @@
 ﻿@page "{id}"
 @model HomeChoreTracker.Portal.Pages.Purchase.IndexModel
 @{
-    Layout = "~/Pages/Shared/_Layout.cshtml";
+	Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 @section HeadContent
 {
-    <title>@ViewData["Title"] - Home Chore Tracker</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet" asp-append-version="true">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
 
 <div class="row">
-    <div class="col-lg-12">
-        <a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Inventory</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./AddPurchase" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
+	<div class="col-lg-12">
+		<a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Inventory</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./AddPurchase" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
 
 		<div class="card mb-4 py-3 border-left-primary">
 
@@ -39,6 +39,7 @@
 								<th>Date</th>
 								<th>Items count</th>
 								<th>Is Complete</th>
+								<th>Manage</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -50,6 +51,9 @@
 										@purchase.Items.Count
 									</td>
 									<td>@(purchase.IsCompleted ? "Yes" : "No")</td>
+									<td>
+										<button class="btn btn-sm btn-primary" onclick="DisplayPurchaseDetailModal('@purchase.Id')">View Details</button>
+									</td>
 								</tr>
 							}
 						</tbody>
@@ -61,6 +65,153 @@
 				}
 			</div>
 		</div>
-    </div>
+	</div>
 </div>
 
+<div class="modal fade" id="purchaseDetailModal" tabindex="-1" role="dialog" aria-labelledby="purchaseDetailModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="purchaseDetailModalLabel">Purchase Details</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="purchaseDetailContent"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function DisplayPurchaseDetailModal(purchaseId) {
+		$.ajax({
+			url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,
+			type: 'GET',
+			success: function (data) {
+				$('#purchaseDetailModalLabel').text("Purchase Details");
+				var purchaseDate = new Date(data.purchaseDate);
+				var formattedDate = (purchaseDate.getMonth() + 1) + '/' + purchaseDate.getDate() + '/' + purchaseDate.getFullYear();
+				var content = "<p><strong>Date:</strong> " + formattedDate + "</p>"; // Adjust this line
+				content += "<p><strong>Items:</strong></p><ul>";
+				data.items.forEach(function (item) {
+					content += "<li>" + item.title + " - Quantity: " + item.quantity + " " + getQuantityTypeString(item.quantityType) + " - Type: " + getProductTypeString(item.productType) + "</li>";
+				});
+				content += "</ul>";
+				$('#purchaseDetailContent').html(content);
+				$('#purchaseDetailModal').modal('show');
+			},
+			error: function (error) {
+				console.error('Error fetching purchase details:', error);
+			}
+		});
+	}
+
+	function getQuantityTypeString(quantityType) {
+		switch (quantityType) {
+			case 0:
+				return "Grams";
+			case 1:
+				return "Kilograms";
+			case 2:
+				return "Liters";
+			case 3:
+				return "Milliliters";
+			case 4:
+				return "Pieces";
+			default:
+				return "Unknown";
+		}
+	}
+
+	function getProductTypeString(productType) {
+		switch (productType) {
+			case 0:
+				return "Dairy";
+			case 1:
+				return "Fruits";
+			case 2:
+				return "Vegetables";
+			case 3:
+				return "Meat";
+			case 4:
+				return "Poultry";
+			case 5:
+				return "Seafood";
+			case 6:
+				return "Grains";
+			case 7:
+				return "BakingSupplies";
+			case 8:
+				return "CannedGoods";
+			case 9:
+				return "Snacks";
+			case 10:
+				return "Beverages";
+			case 11:
+				return "Condiments";
+			case 12:
+				return "FrozenFoods";
+			case 13:
+				return "Spices";
+			case 14:
+				return "Herbs";
+			case 15:
+				return "BabyFood";
+			case 16:
+				return "CleaningSupplies";
+			case 17:
+				return "LaundrySupplies";
+			case 18:
+				return "PersonalCareProducts";
+			case 19:
+				return "PaperProducts";
+			case 20:
+				return "PetSupplies";
+			case 21:
+				return "GardeningSupplies";
+			case 22:
+				return "Tools";
+			case 23:
+				return "Batteries";
+			case 24:
+				return "LightBulbs";
+			case 25:
+				return "Stationery";
+			case 26:
+				return "HomeDecor";
+			case 27:
+				return "StorageContainers";
+			case 28:
+				return "Electronics";
+			case 29:
+				return "OfficeSupplies";
+			case 30:
+				return "MedicalSupplies";
+			case 31:
+				return "Books";
+			case 32:
+				return "Toys";
+			case 33:
+				return "Clothing";
+			case 34:
+				return "Shoes";
+			case 35:
+				return "Accessories";
+			case 36:
+				return "Kitchenware";
+			case 37:
+				return "Cookware";
+			case 38:
+				return "Appliances";
+			case 39:
+				return "Furniture";
+			default:
+				return "Unknown";
+		}
+	}
+</script>

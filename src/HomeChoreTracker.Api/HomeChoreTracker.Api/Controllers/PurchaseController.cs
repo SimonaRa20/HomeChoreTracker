@@ -41,7 +41,8 @@ namespace HomeChoreTracker.Api.Controllers
                         QuantityType = item.QuantityType,
                         ProductType = item.ProductType,
                         IsCompleted = false,
-                        PurchaseId = purchase.Id
+                        PurchaseId = purchase.Id,
+                        HomeId = purchase.HomeId,
                     });
                 }
 
@@ -66,11 +67,11 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(purchases);
         }
 
-		[HttpGet("{homeId}/{purchaseId}")]
+		[HttpGet("purchase/{purchaseId}")]
 		[Authorize]
-		public async Task<IActionResult> GetPurchase(int homeId, int purchaseId)
+		public async Task<IActionResult> GetPurchase(int purchaseId)
 		{
-			Purchase purchase = await _purchaseRepository.GetByIdPurchase(homeId, purchaseId);
+			Purchase purchase = await _purchaseRepository.GetByIdPurchase(purchaseId);
 
 			return Ok(purchase);
 		}

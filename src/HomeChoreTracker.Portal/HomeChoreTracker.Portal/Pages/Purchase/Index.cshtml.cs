@@ -25,7 +25,6 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
             _httpClientFactory = httpClientFactory;
             _config = configuration;
         }
-
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Id = id;
@@ -47,6 +46,29 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
                 {
                     ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {response.ReasonPhrase}");
                     return Page();
+                }
+            }
+        }
+
+        public async Task<IActionResult> OnGetPurchaseDetailAsync(int purchaseId)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/Purchase/purchase/{purchaseId}";
+
+                var response = await httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var purchase = await response.Content.ReadFromJsonAsync<Models.Purchase.Purchase>();
+                    return new JsonResult(purchase);
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve purchase data: {response.ReasonPhrase}");
                 }
             }
         }

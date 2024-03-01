@@ -35,7 +35,7 @@
                         <label>Shopping Items</label>
                         <div class="shopping-item">
                             <input type="text" class="form-control mb-2" name="Items[0].Title" placeholder="Title" asp-for="PurchaseRequest.Items[0].Title" required>
-                            <input type="number" class="form-control mb-2" name="Items[0].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[0].Quantity" min="0.01">
+                            <input type="number" class="form-control mb-2" name="Items[0].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[0].Quantity" step="0.01" min="0.01">
                             <select class="form-control mb-2" name="Items[0].QuantityType" asp-for="PurchaseRequest.Items[0].QuantityType">
                                 @foreach (HomeChoreTracker.Portal.Constants.QuantityType type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.QuantityType)))
                                 {
@@ -69,7 +69,7 @@
         var itemCount = document.querySelectorAll('.shopping-item').length;
         var newItemHtml = '<div class="shopping-item">' +
             '<input type="text" class="form-control mb-2" name="Items[' + itemCount + '].Title" placeholder="Title" asp-for="PurchaseRequest.Items[' + itemCount + '].Title" required>' +
-            '<input type="number" class="form-control mb-2" name="Items[' + itemCount + '].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[' + itemCount + '].Quantity" min="0.01">' +
+            '<input type="number" class="form-control mb-2" name="Items[' + itemCount + '].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[' + itemCount + '].Quantity" step="0.01" min="0.01">' +
             '<select class="form-control mb-2" name="Items[' + itemCount + '].QuantityType" asp-for="PurchaseRequest.Items[' + itemCount + '].QuantityType">';
 
         // Dynamically generate options for QuantityType dropdown
