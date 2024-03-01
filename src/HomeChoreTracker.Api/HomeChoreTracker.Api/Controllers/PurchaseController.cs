@@ -75,5 +75,38 @@ namespace HomeChoreTracker.Api.Controllers
 
 			return Ok(purchase);
 		}
-	}
+
+        [HttpPost("UpdateShoppingItems")]
+        [Authorize]
+        public async Task<IActionResult> UpdateShoppingItems(List<ShoppingItemUpdateRequest> itemsToUpdate)
+        {
+            try
+            {
+                foreach (var item in itemsToUpdate)
+                {
+                    // Retrieve the shopping item from the database
+                    var shoppingItem = await _purchaseRepository.GetShoppingItemById(item.Id);
+                    if (shoppingItem == null)
+                    {
+                        return NotFound($"Shopping item with ID {item.Id} not found.");
+                    }
+
+                    // Update the IsCompleted property
+                    shoppingItem.IsCompleted = item.IsCompleted;
+
+                    // Update the shopping item in the database
+                    _purchaseRepository.UpdateShoppingItem(shoppingItem);
+                }
+
+                // Save changes to the database
+                await _purchaseRepository.Save();
+
+                return Ok("Shopping items updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+    }
 }

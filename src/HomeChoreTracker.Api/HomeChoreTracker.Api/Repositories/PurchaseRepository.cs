@@ -40,5 +40,15 @@ namespace HomeChoreTracker.Api.Repositories
 		{
 			return await _dbContext.Purchases.Where(x=>x.Id.Equals(purchaseId)).Include(p => p.Items).FirstOrDefaultAsync();
 		}
-	}
+
+        public async Task<ShoppingItem> GetShoppingItemById(int id)
+        {
+            return await _dbContext.ShoppingItems.FindAsync(id);
+        }
+
+        public async Task UpdateShoppingItem(ShoppingItem shoppingItem)
+        {
+            _dbContext.ShoppingItems.Update(shoppingItem);
+        }
+    }
 }

@@ -3,9 +3,11 @@ using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using HomeChoreTracker.Portal.Models.Purchase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HomeChoreTracker.Portal.Pages.Purchase
@@ -72,5 +74,41 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
                 }
             }
         }
+
+        public async Task<IActionResult> OnPostUpdateShoppingItemsAsync()
+        {
+            var token = User.FindFirstValue("Token");
+            var itemsToUpdateJson = HttpContext.Request.Form["itemsToUpdate"];
+
+            if (!string.IsNullOrEmpty(itemsToUpdateJson))
+            {
+                // Deserialize the JSON string to a list of ShoppingItemUpdateRequest
+                var itemsToUpdate = JsonConvert.DeserializeObject<List<ShoppingItemUpdateRequest>>(itemsToUpdateJson);
+
+                using (var httpClient = _httpClientFactory.CreateClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                    var apiUrl = $"{_config["ApiUrl"]}/Purchase/UpdateShoppingItems";
+
+                    var response = await httpClient.PostAsJsonAsync(apiUrl, itemsToUpdate);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToPage("/Index", new { id = Id }); // Redirect to the current page after update
+                    }
+                    else
+                    {
+                        return BadRequest($"Failed to update shopping items: {response.ReasonPhrase}");
+                    }
+                }
+            }
+            else
+            {
+                return BadRequest("No data received from the form.");
+            }
+        }
+
+
     }
 }
