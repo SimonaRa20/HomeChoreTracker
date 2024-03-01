@@ -41,7 +41,7 @@ namespace HomeChoreTracker.Api.Controllers
                         QuantityType = item.QuantityType,
                         ProductType = item.ProductType,
                         IsCompleted = false,
-                        HomeId = purchase.HomeId,
+                        PurchaseId = purchase.Id
                     });
                 }
 
@@ -55,5 +55,24 @@ namespace HomeChoreTracker.Api.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    }
+
+        [HttpGet("{homeId}")]
+        [Authorize]
+        public async Task<IActionResult>GetPurchases(int homeId)
+        {
+            List<Purchase> purchases = await _purchaseRepository.GetAllPurchases(homeId);
+            purchases = purchases.OrderByDescending(item => item.PurchaseDate).ToList();
+
+			return Ok(purchases);
+        }
+
+		[HttpGet("{homeId}/{purchaseId}")]
+		[Authorize]
+		public async Task<IActionResult> GetPurchase(int homeId, int purchaseId)
+		{
+			Purchase purchase = await _purchaseRepository.GetByIdPurchase(homeId, purchaseId);
+
+			return Ok(purchase);
+		}
+	}
 }

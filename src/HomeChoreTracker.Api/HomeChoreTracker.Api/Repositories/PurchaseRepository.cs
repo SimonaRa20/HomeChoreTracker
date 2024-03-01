@@ -14,10 +14,12 @@ namespace HomeChoreTracker.Api.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<Purchase>> GetAllPurchases()
+        public async Task<List<Purchase>> GetAllPurchases(int homeId)
         {
-            return await _dbContext.Purchases.ToListAsync();
-        }
+			return await _dbContext.Purchases.Include(p => p.Items)
+                .Where(p => p.HomeId == homeId)
+                .ToListAsync();
+		}
 
         public async Task AddPurchase(Purchase purchase)
         {
@@ -33,5 +35,11 @@ namespace HomeChoreTracker.Api.Repositories
         {
             await _dbContext.SaveChangesAsync();
         }
-    }
+
+		public async Task<Purchase> GetByIdPurchase(int homeId, int purchaseId)
+		{
+			return await _dbContext.Purchases.Where(x=>x.Id.Equals(purchaseId)).Include(p => p.Items)
+				.Where(p => p.HomeId == homeId).FirstOrDefaultAsync();
+		}
+	}
 }

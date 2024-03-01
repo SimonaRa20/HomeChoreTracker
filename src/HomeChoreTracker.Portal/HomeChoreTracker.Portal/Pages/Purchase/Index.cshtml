@@ -22,7 +22,45 @@
         <a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Inventory</a>
         <a class="btn btn-light btn-sm mb-2" asp-page="./AddPurchase" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
 
+		<div class="card mb-4 py-3 border-left-primary">
 
+			<div class="card-body">
+				<div class="d-sm-flex align-items-center justify-content-between mb-4">
+					<h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+					<div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
+						<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
+					</div>
+				</div>
+				@if (Model.Purchases != null && Model.Purchases.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Items count</th>
+								<th>Is Complete</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var purchase in Model.Purchases)
+							{
+								<tr>
+									<td>@purchase.PurchaseDate.ToString("M/d/yyyy")</td>
+									<td>
+										@purchase.Items.Count
+									</td>
+									<td>@(purchase.IsCompleted ? "Yes" : "No")</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+				else
+				{
+					<p>No home chore bases found.</p>
+				}
+			</div>
+		</div>
     </div>
 </div>
 

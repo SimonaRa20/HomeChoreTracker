@@ -1,6 +1,6 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using HomeChoreTracker.Portal.Constants;
 
-namespace HomeChoreTracker.Api.Models
+namespace HomeChoreTracker.Portal.Models.Purchase
 {
     public class ShoppingItem
     {
