@@ -59,22 +59,22 @@ namespace HomeChoreTracker.Api.Controllers
 
         [HttpGet("{homeId}")]
         [Authorize]
-        public async Task<IActionResult>GetPurchases(int homeId)
+        public async Task<IActionResult> GetPurchases(int homeId)
         {
             List<Purchase> purchases = await _purchaseRepository.GetAllPurchases(homeId);
             purchases = purchases.OrderByDescending(item => item.PurchaseDate).ToList();
 
-			return Ok(purchases);
+            return Ok(purchases);
         }
 
-		[HttpGet("purchase/{purchaseId}")]
-		[Authorize]
-		public async Task<IActionResult> GetPurchase(int purchaseId)
-		{
-			Purchase purchase = await _purchaseRepository.GetByIdPurchase(purchaseId);
+        [HttpGet("purchase/{purchaseId}")]
+        [Authorize]
+        public async Task<IActionResult> GetPurchase(int purchaseId)
+        {
+            Purchase purchase = await _purchaseRepository.GetPurchaseById(purchaseId);
 
-			return Ok(purchase);
-		}
+            return Ok(purchase);
+        }
 
         [HttpPost("UpdateShoppingItems")]
         [Authorize]
@@ -101,6 +101,28 @@ namespace HomeChoreTracker.Api.Controllers
                 // Save changes to the database
                 await _purchaseRepository.Save();
 
+                // Check if all shopping items of the purchase are completed
+                var firstShoppingItem = await _purchaseRepository.GetShoppingItemById(itemsToUpdate[0].Id);
+                var purchaseId = firstShoppingItem?.PurchaseId;
+                if (purchaseId.HasValue)
+                {
+                    var purchase = await _purchaseRepository.GetPurchaseById(purchaseId.Value);
+                    if (purchase != null && purchase.Items.All(item => item.IsCompleted))
+                    {
+                        // Update the IsCompleted property of the purchase
+                        purchase.IsCompleted = true;
+                        _purchaseRepository.UpdatePurchase(purchase);
+                    }
+                    else
+                    {
+                        purchase.IsCompleted = false;
+                        _purchaseRepository.UpdatePurchase(purchase);
+                    }    
+                }
+
+                // Save changes to the database
+                await _purchaseRepository.Save();
+
                 return Ok("Shopping items updated successfully.");
             }
             catch (Exception ex)
@@ -108,5 +130,6 @@ namespace HomeChoreTracker.Api.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
     }
 }

@@ -95,7 +95,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage("/Index", new { id = Id }); // Redirect to the current page after update
+                        return RedirectToPage("/Purchase/Index", new { id = Id });
                     }
                     else
                     {

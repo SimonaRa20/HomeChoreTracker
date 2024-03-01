@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Database;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -28,18 +29,19 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task<Purchase> GetPurchaseById(int id)
         {
-            return await _dbContext.Purchases.FindAsync(id);
+            var purchase = await _dbContext.Purchases
+                .Where(x => x.Id.Equals(id))
+                .Include(p => p.Items)
+                .FirstOrDefaultAsync();
+
+            return purchase;
         }
+
 
         public async Task Save()
         {
             await _dbContext.SaveChangesAsync();
         }
-
-		public async Task<Purchase> GetByIdPurchase(int purchaseId)
-		{
-			return await _dbContext.Purchases.Where(x=>x.Id.Equals(purchaseId)).Include(p => p.Items).FirstOrDefaultAsync();
-		}
 
         public async Task<ShoppingItem> GetShoppingItemById(int id)
         {
@@ -48,7 +50,12 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task UpdateShoppingItem(ShoppingItem shoppingItem)
         {
-            _dbContext.ShoppingItems.Update(shoppingItem);
+            _dbContext.Entry(shoppingItem).State = EntityState.Modified;
+        }
+
+        public async Task UpdatePurchase(Purchase purchase)
+        {
+            _dbContext.Entry(purchase).State = EntityState.Modified;
         }
     }
 }
