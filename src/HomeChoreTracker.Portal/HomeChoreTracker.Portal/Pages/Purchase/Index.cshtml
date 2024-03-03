@@ -1,250 +1,243 @@
 ﻿@page "{id}"
 @model HomeChoreTracker.Portal.Pages.Purchase.IndexModel
 @{
-    Layout = "~/Pages/Shared/_Layout.cshtml";
+	Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 @section HeadContent
 {
-    <title>@ViewData["Title"] - Home Chore Tracker</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet" asp-append-version="true">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <!-- Add the following lines to include required Bootstrap and jQuery files -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<!-- Add the following lines to include required Bootstrap and jQuery files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
 <div class="row">
-    <div class="col-lg-12">
-        <a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Purchases</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./AddPurchase" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
+	<div class="col-lg-12">
+		<a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Purchases</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./AddPurchase" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
 
-        <div class="card mb-4 py-3 border-left-primary">
+		<div class="card mb-4 py-3 border-left-primary">
 
-            <div class="card-body">
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
-                    <div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
-                        <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
-                    </div>
-                </div>
-                @if (Model.Purchases != null && Model.Purchases.Any())
-                {
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Items count</th>
-                                <th>Is Complete</th>
-                                <th>Manage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var purchase in Model.Purchases)
-                            {
-                                <tr>
-                                    <td>@purchase.PurchaseDate.ToString("M/d/yyyy")</td>
-                                    <td>
-                                        @purchase.Items.Count
-                                    </td>
-                                    <td>@(purchase.IsCompleted ? "Yes" : "No")</td>
-                                    <td>
-                                        <button class='btn btn-sm' onclick="DisplayPurchaseDetailModal('@purchase.Id')">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <p>No home chore bases found.</p>
-                }
-            </div>
-        </div>
-    </div>
+			<div class="card-body">
+				<div class="d-sm-flex align-items-center justify-content-between mb-4">
+					<h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+					<div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
+						<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
+					</div>
+				</div>
+				@if (Model.Purchases != null && Model.Purchases.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Items count</th>
+								<th>Is Complete</th>
+								<th>Manage</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var purchase in Model.Purchases)
+							{
+								<tr>
+									<td>@purchase.PurchaseDate.ToString("M/d/yyyy")</td>
+									<td>
+										@purchase.Items.Count
+									</td>
+									<td>@(purchase.IsCompleted ? "Yes" : "No")</td>
+									<td>
+										<button class='btn btn-sm' onclick="DisplayPurchaseDetailModal('@purchase.Id')">
+											<i class="fa fa-check" aria-hidden="true"></i>
+										</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+				else
+				{
+					<p>No home chore bases found.</p>
+				}
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade" id="purchaseDetailModal" tabindex="-1" role="dialog" aria-labelledby="purchaseDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="purchaseDetailModalLabel">Purchase Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="purchaseDetailContent"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="purchaseDetailModalLabel">Purchase Details</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="purchaseDetailContent"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <form id="updateShoppingItemsForm" method="post" asp-page-handler="UpdateShoppingItems">
-    <input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
+	<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
 </form>
 
 <script>
-    function DisplayPurchaseDetailModal(purchaseId) {
-        $.ajax({
-            url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,
-            type: 'GET',
-            success: function (data) {
-                $('#purchaseDetailModalLabel').text("Purchase Details");
-                var purchaseDate = new Date(data.purchaseDate);
-                var formattedDate = (purchaseDate.getMonth() + 1) + '/' + purchaseDate.getDate() + '/' + purchaseDate.getFullYear();
-                var content = "<p><strong>Date:</strong> " + formattedDate + "</p>"; // Adjust this line
-                content += "<p><strong>Items:</strong> ";
-                content += "<ul style='list-style-type: none; padding-left: 0;'>"; // Added inline styling
-                data.items.forEach(function (item) {
-                    content += "<li style='display: inline-block; margin-right: 10px;'>"; // Added inline styling
-                    content += "<input type='checkbox' id='item_" + item.id + "' " + (item.isCompleted ? "checked" : "") + "> ";
-                    content += item.title + " | Quantity: " + item.quantity + " " + getQuantityTypeString(item.quantityType) + " | " + getProductTypeString(item.productType) + "</li>";
-                });
-                content += "</ul>";
-                content += "</p>";
-                $('#purchaseDetailContent').html(content);
-                $('#purchaseDetailModal').modal('show');
-            },
-            error: function (error) {
-                console.error('Error fetching purchase details:', error);
-            }
-        });
-    }
+	function DisplayPurchaseDetailModal(purchaseId) {
+		$.ajax({
+			url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,
+			type: 'GET',
+			success: function (data) {
+				$('#purchaseDetailModalLabel').text("Purchase Details");
+				var purchaseDate = new Date(data.purchaseDate);
+				var formattedDate = (purchaseDate.getMonth() + 1) + '/' + purchaseDate.getDate() + '/' + purchaseDate.getFullYear();
+				var content = "<p><strong>Date:</strong> " + formattedDate + "</p>";
+				content += "<p><strong>Items:</strong> ";
+				content += "<ul style='list-style-type: none; padding-left: 0;'>";
+				data.items.forEach(function (item) {
+					content += "<li style='display: inline-block; margin-right: 10px;'>";
+					content += "<input type='checkbox' id='item_" + item.id + "' " + (item.isCompleted ? "checked" : "") + "> ";
+					content += item.title + " | Quantity: " + item.quantity + " " + getQuantityTypeString(item.quantityType) + " | " + getProductTypeString(item.productType) + "</li>";
+				});
+				content += "</ul>";
+				content += "</p>";
+				$('#purchaseDetailContent').html(content);
+				$('#purchaseDetailModal').modal('show');
+			},
+			error: function (error) {
+				console.error('Error fetching purchase details:', error);
+			}
+		});
+	}
 
-    function getQuantityTypeString(quantityType) {
-        switch (quantityType) {
-            case 0:
-                return "Grams";
-            case 1:
-                return "Kilograms";
-            case 2:
-                return "Liters";
-            case 3:
-                return "Milliliters";
-            case 4:
-                return "Pieces";
-            default:
-                return "Unknown";
-        }
-    }
+	function getQuantityTypeString(quantityType) {
+		switch (quantityType) {
+			case 0:
+				return "Grams";
+			case 1:
+				return "Kilograms";
+			case 2:
+				return "Liters";
+			case 3:
+				return "Milliliters";
+			case 4:
+				return "Pieces";
+			default:
+				return "Unknown";
+		}
+	}
 
-    function getProductTypeString(productType) {
-        switch (productType) {
-            case 0:
-                return "Dairy";
-            case 1:
-                return "Fruits";
-            case 2:
-                return "Vegetables";
-            case 3:
-                return "Meat";
-            case 4:
-                return "Poultry";
-            case 5:
-                return "Seafood";
-            case 6:
-                return "Grains";
-            case 7:
-                return "BakingSupplies";
-            case 8:
-                return "CannedGoods";
-            case 9:
-                return "FrozenFoods";
-            case 10:
-                return "Snacks";
-            case 11:
-                return "Condiments";
-            case 12:
-                return "Sauces";
-            case 13:
-                return "Spices";
-            case 14:
-                return "Others";
-            default:
-                return "Unknown";
-        }
-    }
+	function getProductTypeString(productType) {
+		switch (productType) {
+			case 0:
+				return "Dairy";
+			case 1:
+				return "Fruits";
+			case 2:
+				return "Vegetables";
+			case 3:
+				return "Meat";
+			case 4:
+				return "Poultry";
+			case 5:
+				return "Seafood";
+			case 6:
+				return "Grains";
+			case 7:
+				return "BakingSupplies";
+			case 8:
+				return "CannedGoods";
+			case 9:
+				return "FrozenFoods";
+			case 10:
+				return "Snacks";
+			case 11:
+				return "Condiments";
+			case 12:
+				return "Sauces";
+			case 13:
+				return "Spices";
+			case 14:
+				return "Others";
+			default:
+				return "Unknown";
+		}
+	}
 
-    $(document).ready(function () {
-        $('#saveChangesBtn').click(function () {
-            var itemsToUpdate = [];
-            $('input[type=checkbox]').each(function () {
-                var itemId = parseInt($(this).attr('id').split('_')[1]);
-                var isCompleted = $(this).prop('checked');
-                itemsToUpdate.push({ id: itemId, isCompleted: isCompleted });
-            });
+	$(document).ready(function () {
+		$('#saveChangesBtn').click(function () {
+			var itemsToUpdate = [];
+			$('input[type=checkbox]').each(function () {
+				var itemId = parseInt($(this).attr('id').split('_')[1]);
+				var isCompleted = $(this).prop('checked');
+				itemsToUpdate.push({ id: itemId, isCompleted: isCompleted });
+			});
 
-            // Create a hidden input field with JSON data
-            var hiddenInput = $('<input>').attr({
-                type: 'hidden',
-                name: 'itemsToUpdate',
-                value: JSON.stringify(itemsToUpdate)
-            });
+			var hiddenInput = $('<input>').attr({
+				type: 'hidden',
+				name: 'itemsToUpdate',
+				value: JSON.stringify(itemsToUpdate)
+			});
 
-            // Append the hidden input field to the form
-            $('#updateShoppingItemsForm').append(hiddenInput);
+			$('#updateShoppingItemsForm').append(hiddenInput);
 
-            // Submit the form
-            $('#updateShoppingItemsForm').submit();
-        });
-    });
+			$('#updateShoppingItemsForm').submit();
+		});
+	});
 
 </script>
 
 <style>
-    ul {
-        list-style-type: none;
-    }
+	ul {
+		list-style-type: none;
+	}
 
-    /* Style for circular checkboxes */
-    input[type=checkbox] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #ccc;
-        outline: none;
-        cursor: pointer;
-        position: relative;
-        vertical-align: middle; /* Add this line to align checkboxes vertically */
-        margin-bottom: 3px; /* Adjust this value to fine-tune the alignment */
-    }
+	input[type=checkbox] {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		border-radius: 50%;
+		width: 20px;
+		height: 20px;
+		border: 2px solid #ccc;
+		outline: none;
+		cursor: pointer;
+		position: relative;
+		vertical-align: middle;
+		margin-bottom: 3px;
+	}
 
-        /* Style for checked circular checkboxes */
-        input[type=checkbox]:checked {
-            background-color: #007bff; /* Change this to your desired color for the check mark */
-            border-color: #007bff;
-        }
+	input[type=checkbox]:checked {
+		background-color: #007bff;
+		border-color: #007bff;
+	}
 
-            /* Style for check mark inside circular checkboxes */
-            input[type=checkbox]:checked::before {
-                content: '\2713'; /* Unicode check mark symbol */
-                display: block;
-                width: 100%;
-                text-align: center;
-                color: white; /* Change this to your desired color for the check mark */
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
+	input[type=checkbox]:checked::before {
+		content: '\2713';
+		display: block;
+		width: 100%;
+		text-align: center;
+		color: white;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
 
-    /* Style for aligning text with checkbox */
-    li {
-        display: inline-block; /* Add this line to make list items inline */
-        margin-right: 10px; /* Adjust margin as needed */
-        vertical-align: middle; /* Add this line to align text vertically */
-    }
+	li {
+		display: inline-block;
+		margin-right: 10px;
+		vertical-align: middle;
+	}
 </style>
