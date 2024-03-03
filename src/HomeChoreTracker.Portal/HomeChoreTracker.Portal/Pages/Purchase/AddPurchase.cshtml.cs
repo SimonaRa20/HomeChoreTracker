@@ -53,7 +53,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage("/Index");
+                        return RedirectToPage("/Purchase/Index", new { id = Id });
                     }
                     else
                     {
