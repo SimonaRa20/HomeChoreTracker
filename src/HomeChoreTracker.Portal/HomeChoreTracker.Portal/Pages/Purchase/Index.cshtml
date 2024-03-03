@@ -205,4 +205,46 @@
     ul {
         list-style-type: none;
     }
+
+    /* Style for circular checkboxes */
+    input[type=checkbox] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ccc;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle; /* Add this line to align checkboxes vertically */
+        margin-bottom: 3px; /* Adjust this value to fine-tune the alignment */
+    }
+
+        /* Style for checked circular checkboxes */
+        input[type=checkbox]:checked {
+            background-color: #007bff; /* Change this to your desired color for the check mark */
+            border-color: #007bff;
+        }
+
+            /* Style for check mark inside circular checkboxes */
+            input[type=checkbox]:checked::before {
+                content: '\2713'; /* Unicode check mark symbol */
+                display: block;
+                width: 100%;
+                text-align: center;
+                color: white; /* Change this to your desired color for the check mark */
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+    /* Style for aligning text with checkbox */
+    li {
+        display: inline-block; /* Add this line to make list items inline */
+        margin-right: 10px; /* Adjust margin as needed */
+        vertical-align: middle; /* Add this line to align text vertically */
+    }
 </style>
