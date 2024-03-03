@@ -47,27 +47,9 @@
                 {
                     <hr class="sidebar-divider">
                     <div class="sidebar-heading">Homes actions</div>
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-                           aria-expanded="true" aria-controls="collapsePages">
-                            <i class="fa fa-home" aria-hidden="true"></i>
-                            <span>Homes</span>
-                        </a>
-                        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                            @await Component.InvokeAsync("HomesList")
-                        </div>
-                    </li>
+                    @await Component.InvokeAsync("HomesList")
 
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePurchase"
-                           aria-expanded="true" aria-controls="collapsePurchase">
-                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                            <span>Shopping</span>
-                        </a>
-                        <div id="collapsePurchase" class="collapse" aria-labelledby="headingPurchase" data-parent="#accordionSidebar">
-                            @await Component.InvokeAsync("PurchaseHomesList")
-                        </div>
-                    </li>
+                    @await Component.InvokeAsync("PurchaseHomesList")
 
                     <li class="nav-item">
                         <a class="nav-link" href="~/Homes">

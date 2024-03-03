@@ -1,8 +1,27 @@
-﻿@model List<HomeChoreTracker.Portal.Models.Home.HomeResponse>
-
-<div class="bg-white py-2 collapse-inner rounded">
-    @foreach (var home in Model)
-    {
-        <a class="collapse-item" href="~/Purchase/@home.Id">@home.Title</a>
-    }
-</div>
+﻿
+@model List<HomeChoreTracker.Portal.Models.Home.HomeResponse>
+<li class="nav-item">
+	@if (Model.Count == 1)
+	{
+		<a class="nav-link" href="~/Purchase/@Model[0].Id">
+			<i class="fa fa-home" aria-hidden="true"></i>
+			<span>Shopping</span>
+		</a>
+	}
+	else
+	{
+		<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePurchase"
+		   aria-expanded="true" aria-controls="collapsePurchase">
+			<i class="fa fa-home" aria-hidden="true"></i>
+			<span>Shopping</span>
+		</a>
+		<div id="collapsePurchase" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+			<div class="bg-white py-2 collapse-inner rounded">
+				@foreach (var home in Model)
+				{
+					<a class="collapse-item" href="~/Purchase/@home.Id">@home.Title</a>
+				}
+			</div>
+		</div>
+	}
+</li>
