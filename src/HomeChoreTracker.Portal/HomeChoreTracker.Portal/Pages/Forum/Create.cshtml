@@ -43,10 +43,12 @@
 					
 					<div class="form-group">
 						<label for="Description">Description</label>
-						<input type="text" class="form-control" id="Description" name="CreateAdvice.Description" asp-for="CreateAdvice.Description">
+						<textarea class="form-control" id="Description" name="CreateAdvice.Description" asp-for="CreateAdvice.Description"></textarea>
+						<span asp-validation-for="CreateAdvice.Description" class="text-danger"></span>
 					</div>
 					<div class="form-group">
-						<label for="IsPublic">Show to show this advice</label><br />
+						<label for="IsPublic">Visibility this advice
+						</label><br />
 						<div class="form-check form-check-inline">
 							<input class="form-check-input" type="radio" id="IsPublic" name="CreateAdvice.IsPublic" value="true" checked>
 							<label class="form-check-label" for="IsPublic">Public</label>
