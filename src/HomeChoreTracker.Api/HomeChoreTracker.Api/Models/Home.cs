@@ -6,5 +6,6 @@
         public string Title { get; set; }
 
         public List<Purchase> Purchases { get; set; }
+        public List<HomeChoreTask> Tasks { get; set; }
     }
 }

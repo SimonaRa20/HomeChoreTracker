@@ -20,6 +20,10 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<Advice> Advices { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<ShoppingItem> ShoppingItems { get; set; }
+        public DbSet<HomeChoreTask> HomeChoreTasks { get; set; }
+        public DbSet<PointsHistory> PointsHistory { get; set; }
+        public DbSet<TaskApproval> TaskApprovals { get; set; }
+        public DbSet<TaskAssignment> TaskAssignments { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
