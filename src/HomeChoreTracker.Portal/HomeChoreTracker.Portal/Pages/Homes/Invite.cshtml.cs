@@ -55,15 +55,11 @@ namespace HomeChoreTracker.Portal.Pages.Homes
                         return RedirectToPage("/Auth/Login");
                     }
                 }
-                else if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    // Invitation not found
-                    ModelState.AddModelError(string.Empty, "Invitation not found.");
-                }
                 else
                 {
-                    // Handle other errors if needed
-                    ModelState.AddModelError(string.Empty, "An error occurred while processing your request.");
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                    return Page();
                 }
 
             }

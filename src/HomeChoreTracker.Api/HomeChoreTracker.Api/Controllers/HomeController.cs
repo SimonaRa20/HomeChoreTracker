@@ -67,7 +67,7 @@ namespace HomeChoreTracker.Api.Controllers
 			string invitationToken = await _homeRepository.InviteUserToHome(userId, inviteUserRequest.HomeId, inviteUserRequest.InviteeEmail);
 
 			// Construct invitation link
-			string invitationLink = $"{_config["AppUrl"]}/Home/Invite?token={HttpUtility.UrlEncode(invitationToken)}";
+			string invitationLink = $"{_config["AppUrl"]}/Homes/Invite?token={HttpUtility.UrlEncode(invitationToken)}";
 
 			// Send invitation email
 			SendInvitationEmail(inviteUserRequest.InviteeEmail, invitationLink, sender);
@@ -119,13 +119,25 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<ActionResult> InvitationAnswer([FromBody] InvitationAnswerRequest invitation)
 		{
 			var existingInvitation = await _homeRepository.GetInvitationByToken(invitation.Token);
-			var user = await _authRepository.GetUserByEmail(existingInvitation.InviteeEmail);
+
 			if (existingInvitation == null)
 			{
-				return NotFound("Invitation not found.");
+				return NotFound("This invitation not found. Check your email link. Or ask your friend new invitation.");
 			}
+			
+			if(existingInvitation.ExpirationDate < DateTime.UtcNow)
+			{
+                return BadRequest("This invitation expiration date finished. Ask your friend new invitation.");
+            }
 
-			if (invitation.IsAccept)
+			var user = await _authRepository.GetUserByEmail(existingInvitation.InviteeEmail);
+
+            if (user == null)
+            {
+                return BadRequest("First, create an account with the email address to which you received this invitation, and then try to confirm the invitation.");
+            }
+
+            if (invitation.IsAccept)
 			{
 				var userHome = new UserHomes
 				{
