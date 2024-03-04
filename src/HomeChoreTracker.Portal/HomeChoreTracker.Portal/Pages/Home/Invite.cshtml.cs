@@ -3,46 +3,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 
-namespace HomeChoreTracker.Portal.Pages.Homes
+namespace HomeChoreTracker.Portal.Pages.Home
 {
-    public class InviteToHomeModel : PageModel
+    public class InviteModel : PageModel
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly IConfiguration _config;
+
+		[BindProperty]
+		public int Id { get; set; }
 
 		[BindProperty]
 		public InviteUserRequest InviteUserRequest { get; set; }
 
-		public List<HomeResponse> Homes { get; set; }
-
-		public InviteToHomeModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		public InviteModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
 		{
 			_httpClientFactory = httpClientFactory;
 			_config = configuration;
 		}
 
-		public async Task<IActionResult> OnGetAsync()
+		public void OnGet(int id)
 		{
-			var token = User.FindFirstValue("Token");
-			using (var httpClient = _httpClientFactory.CreateClient())
-			{
-				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-				var apiUrl = $"{_config["ApiUrl"]}/Home";
-
-				var response = await httpClient.GetAsync(apiUrl);
-
-				if (response.IsSuccessStatusCode)
-				{
-					Homes = await response.Content.ReadFromJsonAsync<List<HomeResponse>>();
-					return Page();
-				}
-				else
-				{
-					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {response.ReasonPhrase}");
-					return Page();
-				}
-			}
+			Id = id;
 		}
 
 
@@ -50,7 +32,7 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 		{
 			if (!ModelState.IsValid)
 			{
-				await OnGetAsync();
+				OnGet(Id);
 				return Page();
 			}
 
@@ -61,7 +43,7 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 					var apiUrl = _config["ApiUrl"] + "/Home/GenerateInvitation";
-
+					InviteUserRequest.HomeId = Id;
 					var response = await httpClient.PostAsJsonAsync(apiUrl, InviteUserRequest);
 
 					if (response.IsSuccessStatusCode)
@@ -71,7 +53,7 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 					}
 					else
 					{
-						await OnGetAsync();
+						OnGet(Id);
 						ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
 						return Page();
 					}
@@ -79,11 +61,10 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 			}
 			catch (Exception ex)
 			{
-				await OnGetAsync();
+				OnGet(Id);
 				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
 				return Page();
 			}
 		}
-
 	}
 }
