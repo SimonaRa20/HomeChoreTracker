@@ -133,7 +133,15 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					EditIncome.Description = Request.Form["EditIncomeDescription"];
 					EditIncome.Time = DateTime.Parse(Request.Form["EditIncomeTime"]);
 					EditIncome.Type = Enum.Parse<IncomeType>(Request.Form["EditIncomeType"]);
-					EditIncome.HomeId = int.Parse(Request.Form["EditIncomeHome"]);
+
+					if (!string.IsNullOrEmpty(Request.Form["EditIncomeHome"]))
+					{
+						if (int.TryParse(Request.Form["EditIncomeHome"], out int editIncomeHomeId))
+						{
+							EditIncome.HomeId = editIncomeHomeId;
+						}
+					}
+
 					var response = await httpClient.PutAsJsonAsync(apiUrl, EditIncome);
 
 					if (response.IsSuccessStatusCode)
@@ -194,7 +202,13 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					EditExpense.Time = DateTime.Parse(Request.Form["EditExpenseTime"]);
 					EditExpense.Type = Enum.Parse<ExpenseType>(Request.Form["EditExpenseType"]);
 					EditExpense.SubscriptionDuration = int.Parse(Request.Form["EditExpenseSubscriptionDuration"]);
-					EditExpense.HomeId = int.Parse(Request.Form["EditExpenseHome"]);
+					if (!string.IsNullOrEmpty(Request.Form["EditExpenseHome"]))
+					{
+						if (int.TryParse(Request.Form["EditExpenseHome"], out int editExpenseHomeId))
+						{
+							EditExpense.HomeId = editExpenseHomeId;
+						}
+					}
 					var response = await httpClient.PutAsJsonAsync(apiUrl, EditExpense);
 
 					if (response.IsSuccessStatusCode)

@@ -1,0 +1,76 @@
+﻿@page
+@model HomeChoreTracker.Portal.Pages.Finance.CreateExpenseFromImageModel
+@{
+}
+@section HeadContent
+{
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<!-- Add the following lines to include required Bootstrap and jQuery files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+
+<div class="row">
+	<div class="col-lg-12">
+		<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+		<a class="btn btn-secondary btn-sm mb-2" asp-page="./CreateExpenseFromImage"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
+
+		<div class="card mb-4 py-3 mt-2 border-left-primary">
+			<div class="card-body">
+				<form method="post" asp-action="Index" enctype="multipart/form-data">
+
+					<div class="form-group">
+						<label for="Type">Expense Type</label>
+						<select class="form-control" id="Type" name="CreateNewExpense.Type" asp-for="CreateNewExpense.Type" required>
+							@foreach (var type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.ExpenseType)))
+							{
+								<option value="@((int)type)">@type</option>
+							}
+						</select>
+						<span asp-validation-for="CreateNewExpense.Type" class="text-danger"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="HomeId">Select Home</label>
+						<select class="form-control" id="HomeId" name="CreateNewExpense.HomeId" asp-for="CreateNewExpense.HomeId">
+							<option value=""></option>
+							@foreach (var home in Model.Homes)
+							{
+								<option value="@home.Id">@home.Title</option>
+							}
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="ExpenseImage">Expense Image</label>
+						<input type="file" class="form-control-file" accept="image/*" id="ExpenseImage" name="ExpenseImage" asp-for="CreateNewExpense.ExpenseImage">
+					</div>
+					<div class="text-danger" style="padding-left: 0; margin-left: 0;">
+						@if (!ModelState.IsValid)
+						{
+							<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+								@foreach (var modelStateKey in ViewData.ModelState.Keys)
+								{
+									foreach (var error in ViewData.ModelState[modelStateKey].Errors)
+									{
+										<li>@error.ErrorMessage</li>
+									}
+								}
+							</ul>
+						}
+					</div>
+					<button type="submit" class="btn btn-primary">Create</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

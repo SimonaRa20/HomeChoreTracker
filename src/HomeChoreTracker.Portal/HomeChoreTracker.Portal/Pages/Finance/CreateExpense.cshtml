@@ -22,6 +22,7 @@
 		<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
 		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
 		<a class="btn btn-secondary btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpenseFromImage"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image</a>
 		<a class="btn btn-light btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
 		<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
 
@@ -51,7 +52,7 @@
 						<span asp-validation-for="CreateNewExpense.Time" class="text-danger"></span>
 					</div>
 					<div class="form-group">
-						<label for="Type">Income Type</label>
+						<label for="Type">Expense Type</label>
 						<select class="form-control" id="Type" name="CreateNewExpense.Type" asp-for="CreateNewExpense.Type" required>
 							@foreach (var type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.ExpenseType)))
 							{

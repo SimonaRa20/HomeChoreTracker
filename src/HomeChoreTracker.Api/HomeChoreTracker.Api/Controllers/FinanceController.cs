@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using DocumentFormat.OpenXml.ExtendedProperties;
+using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
@@ -8,7 +9,10 @@ using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Globalization;
 using System.Security.Claims;
 
 
@@ -231,8 +235,131 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok(transferHistory);
         }
 
+		[HttpPost("expenseimage")]
+		[Authorize]
+		public async Task<IActionResult> AddExpenseFromImage([FromForm]ExpenseImageRequest expenseRequest)
+		{
+			try
+			{
+				using (var memoryStream = new MemoryStream())
+				{
+					await expenseRequest.ExpenseImage.CopyToAsync(memoryStream);
 
-        [HttpPost("expense")]
+					string result = await ExtractTextFromImage(memoryStream.ToArray(), "eng", "helloworld");
+
+					Rootobject parsedResult = JsonConvert.DeserializeObject<Rootobject>(result);
+
+					if (parsedResult.OCRExitCode != 1)
+					{
+						return BadRequest($"OCR API error: {result}. Please try later.");
+					}
+
+
+					string extractedText = parsedResult.ParsedResults[0].ParsedText;
+
+					string title = ParseTitle(extractedText);
+					decimal amount = ParseAmount(extractedText);
+
+					var expense = new Expense
+					{
+						Title = title,
+						Amount = amount,
+						Description = extractedText,
+						Time = DateTime.Now,
+						Type = expenseRequest.Type,
+						HomeId = expenseRequest.HomeId,
+						UserId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value)
+					};
+
+					await _expenseRepository.AddExpense(expense);
+
+					return Ok("Expense added successfully");
+				}
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"An error occurred: {ex.Message}");
+			}
+		}
+
+		private string ParseTitle(string extractedText)
+		{
+			string[] lines = extractedText.Split('\n');
+			string shopTitle = lines[0].Trim();
+			return shopTitle;
+		}
+
+		private decimal ParseAmount(string extractedText)
+		{
+			string[] lines = extractedText.Split('\n');
+			foreach (string line in lines)
+			{
+				if (line.Trim().StartsWith("MOKETI"))
+				{
+					string[] tokens = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (string token in tokens)
+					{
+						string cleanedToken = token.Replace(",", ".").Trim();
+						if (decimal.TryParse(cleanedToken, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
+						{
+							return value;
+						}
+					}
+				}
+				if (line.Trim().StartsWith("SUMA"))
+				{
+					string[] tokens = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (string token in tokens)
+					{
+						string cleanedToken = token.Replace(",", ".").Trim();
+						if (decimal.TryParse(cleanedToken, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
+						{
+							return value;
+						}
+					}
+				}
+				if (line.Trim().StartsWith("Mokéti"))
+				{
+					string[] tokens = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (string token in tokens)
+					{
+						string cleanedToken = token.Replace(",", ".").Trim();
+						if (decimal.TryParse(cleanedToken, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
+						{
+							return value;
+						}
+					}
+				}
+			}
+			return 0;
+		}
+
+
+		private async Task<string> ExtractTextFromImage(byte[] imageData, string language, string apiKey)
+		{
+			using (var httpClient = new HttpClient())
+			{
+				using (var form = new MultipartFormDataContent())
+				{
+					form.Add(new StringContent(apiKey), "apikey");
+					form.Add(new StringContent(language), "language");
+					form.Add(new StringContent("2"), "ocrengine");
+					form.Add(new StringContent("true"), "scale");
+					form.Add(new StringContent("true"), "istable");
+
+					form.Add(new ByteArrayContent(imageData), "image", "image.jpg");
+
+					var response = await httpClient.PostAsync("https://api.ocr.space/Parse/Image", form);
+
+					response.EnsureSuccessStatusCode();
+
+					return response.Content.ReadAsStringAsync().Result;
+				}
+			}
+		}
+
+
+		[HttpPost("expense")]
 		[Authorize]
 		public async Task<IActionResult> AddExpense(ExpenseRequest expenseRequest)
 		{
