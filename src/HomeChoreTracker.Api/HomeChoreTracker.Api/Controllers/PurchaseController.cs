@@ -4,6 +4,7 @@ using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -131,5 +132,71 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-    }
+		[HttpPost("UpdatePurchase/{purchaseId}")]
+		[Authorize]
+		public async Task<IActionResult> UpdatePurchase(int purchaseId, List<ShoppingPurchaseUpdate> itemsToUpdate)
+		{
+			try
+			{
+				var purchase = await _purchaseRepository.GetPurchaseById(purchaseId);
+				if (purchase == null)
+				{
+					return NotFound($"Purchase with ID {purchaseId} not found.");
+				}
+
+				foreach (var update in itemsToUpdate)
+				{
+					if (!int.TryParse(update.Id, out int itemId))
+					{
+						return BadRequest($"Invalid item ID: {update.Id}");
+					}
+
+					if (update.Id == "0")
+					{
+						purchase.Items.Add(new ShoppingItem
+						{
+							Title = update.Title,
+							Quantity = update.Quantity,
+							QuantityType = update.QuantityType,
+							ProductType = update.ProductType,
+							IsCompleted = false
+						});
+					}
+					else
+					{
+						var existingItem = purchase.Items.FirstOrDefault(item => item.Id == itemId);
+						if (existingItem != null)
+						{
+							existingItem.Title = update.Title;
+							existingItem.Quantity = update.Quantity;
+							existingItem.QuantityType = update.QuantityType;
+							existingItem.ProductType = update.ProductType;
+						}
+						else
+						{
+							// Handle if the item is not found
+							return NotFound($"Item with ID {itemId} not found in the purchase.");
+						}
+					}
+				}
+
+				var itemIdsToUpdate = itemsToUpdate.Select(item => int.Parse(item.Id));
+				var itemsToRemove = purchase.Items.Where(item => !itemIdsToUpdate.Contains(item.Id)).ToList();
+				foreach (var itemToRemove in itemsToRemove)
+				{
+					purchase.Items.Remove(itemToRemove);
+				}
+
+				_purchaseRepository.UpdatePurchase(purchase);
+				await _purchaseRepository.Save();
+
+				return Ok("Purchase updated successfully.");
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
+		}
+
+	}
 }

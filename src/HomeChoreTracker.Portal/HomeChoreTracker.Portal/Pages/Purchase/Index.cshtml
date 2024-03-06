@@ -54,6 +54,10 @@
 										<button class='btn btn-sm' onclick="DisplayPurchaseDetailModal('@purchase.Id')">
 											<i class="fa fa-check" aria-hidden="true"></i>
 										</button>
+
+										<button class='btn btn-sm' onclick="DisplayPurchaseEditModal('@purchase.Id')">
+											<i class="fa fa-edit" aria-hidden="true"></i>
+										</button>
 									</td>
 								</tr>
 							}
@@ -89,11 +93,128 @@
 	</div>
 </div>
 
+<div class="modal fade" id="purchaseEditModal" tabindex="-1" role="dialog" aria-labelledby="purchaseEditModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="purchaseEditModalLabel">Update Purchase Items</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="purchaseEditContent"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="saveChangesEditBtn">Save Changes</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <form id="updateShoppingItemsForm" method="post" asp-page-handler="UpdateShoppingItems">
 	<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
 </form>
 
+
+<form id="updateShoppingPurchaseForm" method="post" asp-page-handler="UpdateShoppingPurchase">
+	<input type="hidden" id="purchaseIdInput" name="purchaseId" />
+	<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
+</form>
+
+
 <script>
+
+	var currentPurchaseId;
+
+	function DisplayPurchaseEditModal(purchaseId) {
+		currentPurchaseId = purchaseId;
+		$.ajax({
+			url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,
+			type: 'GET',
+			success: function (data) {
+				$('#purchaseIdInput').val(purchaseId);
+				$('#purchaseEditModalLabel').text("Update Purchase Items");
+				var purchaseDate = new Date(data.purchaseDate);
+				var formattedDate = (purchaseDate.getMonth() + 1) + '/' + purchaseDate.getDate() + '/' + purchaseDate.getFullYear();
+				var content = "<form id='updateItemsForm'>";
+				content += "<input type='hidden' id='purchaseId' value='" + purchaseId + "'>";
+				content += "<p><strong>Date:</strong> " + formattedDate + "</p>";
+				content += "<p><strong>Items:</strong> ";
+				content += "<ul id='itemsList' style='list-style-type: none; padding-left: 0;'>";
+				data.items.forEach(function (item) {
+					content += "<li style='margin-bottom: 10px;' id='item_" + item.id + "'>";
+					content += "<input type='text' class='form-control' id='title_" + item.id + "' value='" + item.title + "'>";
+					content += "<input type='number' class='form-control' id='quantity_" + item.id + "' value='" + item.quantity + "'>";
+					content += "<select class='form-control' id='quantityType_" + item.id + "'><option value='0'>Grams</option><option value='1'>Kilograms</option><option value='2'>Liters</option><option value='3'>Milliliters</option><option value='4'>Pieces</option></select>";
+					content += "<select class='form-control' id='productType_" + item.id + "'><option value='0'>Dairy</option><option value='1'>Fruits</option><option value='2'>Vegetables</option><option value='3'>Meat</option><option value='4'>Poultry</option><option value='5'>Seafood</option><option value='6'>Grains</option><option value='7'>Baking Supplies</option><option value='8'>Canned Goods</option><option value='9'>Frozen Foods</option><option value='10'>Snacks</option><option value='11'>Condiments</option><option value='12'>Sauces</option><option value='13'>Spices</option><option value='14'>Others</option></select>";
+					content += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + item.id + "'>Remove</button>";
+					content += "</li>";
+				});
+				content += "</ul>";
+				content += "<button type='button' class='btn btn-success btn-sm add-item'>Add Item</button>";
+				content += "</p>";
+				content += "</form>";
+				$('#purchaseEditContent').html(content);
+				$('#purchaseEditModal').modal('show');
+			},
+			error: function (error) {
+				console.error('Error fetching purchase details:', error);
+			}
+		});
+	}
+	$(document).on('click', '.remove-item', function () {
+		var itemId = $(this).data('id');
+		$('#item_' + itemId).remove();
+	});
+
+	$(document).on('click', '.add-item', function () {
+		var newItemId = 0; // Generate unique ID for the new item
+		var newItemHtml = "<li style='margin-bottom: 10px;' id='item_" + newItemId + "'>";
+		newItemHtml += "<input type='text' class='form-control' id='title_" + newItemId + "' value=''>";
+		newItemHtml += "<input type='number' class='form-control' id='quantity_" + newItemId + "' value=''>";
+		newItemHtml += "<select class='form-control' id='quantityType_" + newItemId + "'><option value='0'>Grams</option><option value='1'>Kilograms</option><option value='2'>Liters</option><option value='3'>Milliliters</option><option value='4'>Pieces</option></select>";
+		newItemHtml += "<select class='form-control' id='productType_" + newItemId + "'><option value='0'>Dairy</option><option value='1'>Fruits</option><option value='2'>Vegetables</option><option value='3'>Meat</option><option value='4'>Poultry</option><option value='5'>Seafood</option><option value='6'>Grains</option><option value='7'>Baking Supplies</option><option value='8'>Canned Goods</option><option value='9'>Frozen Foods</option><option value='10'>Snacks</option><option value='11'>Condiments</option><option value='12'>Sauces</option><option value='13'>Spices</option><option value='14'>Others</option></select>";
+		newItemHtml += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + newItemId + "'>Remove</button>";
+		newItemHtml += "</li>";
+
+		$('#itemsList').append(newItemHtml);
+	});
+
+
+
+
+	$(document).ready(function () {
+		$('#saveChangesEditBtn').click(function () {
+			var itemsToUpdate = [];
+			$('#updateItemsForm li').each(function () {
+				var itemId = $(this).find('input[type="text"]').attr('id').split('_')[1];
+				var title = $(this).find('input[type="text"]').val();
+				var quantity = $(this).find('input[type="number"]').val();
+				var quantityType = $(this).find('select[name="quantityType"]').val();
+				var productType = $(this).find('select[name="productType"]').val();
+				itemsToUpdate.push({ id: itemId, title: title, quantity: quantity, quantityType: quantityType, productType: productType });
+			});
+
+			console.log(itemsToUpdate);
+
+			// Set the purchase ID in the form data
+			$('#purchaseId').val(currentPurchaseId);
+
+			var hiddenInput = $('<input>').attr({
+				type: 'hidden',
+				name: 'itemsToUpdate',
+				value: JSON.stringify(itemsToUpdate)
+			});
+
+			$('#updateShoppingPurchaseForm').append(hiddenInput);
+
+			$('#updateShoppingPurchaseForm').submit();
+		});
+	});
+
+
 	function DisplayPurchaseDetailModal(purchaseId) {
 		$.ajax({
 			url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,

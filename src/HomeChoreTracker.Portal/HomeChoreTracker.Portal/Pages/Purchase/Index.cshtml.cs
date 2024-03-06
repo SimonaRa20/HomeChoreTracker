@@ -52,7 +52,9 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
             }
         }
 
-        public async Task<IActionResult> OnGetPurchaseDetailAsync(int purchaseId)
+       
+
+		public async Task<IActionResult> OnGetPurchaseDetailAsync(int purchaseId)
         {
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
@@ -109,6 +111,40 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
             }
         }
 
+		public async Task<IActionResult> OnPostUpdateShoppingPurchaseAsync()
+		{
+			var token = User.FindFirstValue("Token");
+			var itemsToUpdateJson = HttpContext.Request.Form["itemsToUpdate"];
 
-    }
+			if (!string.IsNullOrEmpty(itemsToUpdateJson))
+			{
+				// Deserialize the JSON string to a list of ShoppingItemUpdateRequest
+				var itemsToUpdate = JsonConvert.DeserializeObject<List<ShoppingPurchaseUpdate>>(itemsToUpdateJson);
+
+				using (var httpClient = _httpClientFactory.CreateClient())
+				{
+					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+					int purchaseId = int.Parse(HttpContext.Request.Form["purchaseId"]); // need to set correct id purchase
+
+					var apiUrl = $"{_config["ApiUrl"]}/Purchase/UpdatePurchase/{purchaseId}";
+
+					var response = await httpClient.PostAsJsonAsync(apiUrl, itemsToUpdate);
+
+					if (response.IsSuccessStatusCode)
+					{
+						return RedirectToPage("/Purchase/Index", new { id = Id });
+					}
+					else
+					{
+						return BadRequest($"Failed to update shopping items: {response.ReasonPhrase}");
+					}
+				}
+			}
+			else
+			{
+				return BadRequest("No data received from the form.");
+			}
+		}
+	}
 }
