@@ -57,5 +57,9 @@ namespace HomeChoreTracker.Api.Repositories
         {
             _dbContext.Entry(purchase).State = EntityState.Modified;
         }
-    }
+		public async Task DeletePurchase(Purchase purchase)
+		{
+			_dbContext.Purchases.Remove(purchase);
+		}
+	}
 }

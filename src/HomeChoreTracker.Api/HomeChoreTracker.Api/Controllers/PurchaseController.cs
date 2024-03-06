@@ -197,6 +197,28 @@ namespace HomeChoreTracker.Api.Controllers
 				return StatusCode(500, ex.Message);
 			}
 		}
+		[HttpDelete("{purchaseId}")]
+		[Authorize]
+		public async Task<IActionResult> DeletePurchase(int purchaseId)
+		{
+			try
+			{
+				var purchase = await _purchaseRepository.GetPurchaseById(purchaseId);
+				if (purchase == null)
+				{
+					return NotFound($"Purchase with ID {purchaseId} not found.");
+				}
+
+				_purchaseRepository.DeletePurchase(purchase);
+				await _purchaseRepository.Save();
+
+				return Ok("Purchase deleted successfully.");
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
+		}
 
 	}
 }

@@ -20,7 +20,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
         public List<Models.Purchase.Purchase> Purchases { get; set; }
 
         [BindProperty]
-        public int Id { get; set; }
+        public int SelectedHomeId { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -29,13 +29,13 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
         }
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Id = id;
+            SelectedHomeId = id;
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var apiUrl = $"{_config["ApiUrl"]}/Purchase/{Id}";
+                var apiUrl = $"{_config["ApiUrl"]}/Purchase/{SelectedHomeId}";
 
                 var response = await httpClient.GetAsync(apiUrl);
 
@@ -97,7 +97,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage("/Purchase/Index", new { id = Id });
+                        return RedirectToPage("/Purchase/Index", new { id = SelectedHomeId });
                     }
                     else
                     {
@@ -133,7 +133,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
 					if (response.IsSuccessStatusCode)
 					{
-						return RedirectToPage("/Purchase/Index", new { id = Id });
+						return RedirectToPage("/Purchase/Index", new { id = SelectedHomeId });
 					}
 					else
 					{
@@ -146,5 +146,28 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 				return BadRequest("No data received from the form.");
 			}
 		}
+
+		public async Task<IActionResult> OnPostDeleteAsync(int purchaseId, int selectedHomeId) // Change parameter name to 'id'
+		{
+			var token = User.FindFirstValue("Token");
+			using (var httpClient = _httpClientFactory.CreateClient())
+			{
+				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+				var apiUrl = $"{_config["ApiUrl"]}/Purchase/{purchaseId}"; // Use 'id' here
+
+				var response = await httpClient.DeleteAsync(apiUrl);
+
+				if (response.IsSuccessStatusCode)
+				{
+					return RedirectToPage("/Purchase/Index", new { id = selectedHomeId });
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
+					return RedirectToPage("/Purchase/Index", new { id = selectedHomeId });
+				}
+			}
+		}
+
 	}
 }
