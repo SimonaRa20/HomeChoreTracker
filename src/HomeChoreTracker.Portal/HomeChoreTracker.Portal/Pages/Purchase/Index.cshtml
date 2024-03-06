@@ -176,12 +176,22 @@
 
 	function getProductTypeOptions(selectedType) {
 		var options = "";
-		var productTypes = ["Dairy", "Fruits", "Vegetables", "Meat", "Poultry", "Seafood", "Grains", "Baking Supplies", "Canned Goods", "Frozen Foods", "Snacks", "Condiments", "Sauces", "Spices", "Others"];
+		var productTypes = [
+			"Dairy", "Fruits", "Vegetables", "Meat", "Poultry", "Seafood", "Grains", "BakingSupplies",
+			"CannedGoods", "Snacks", "Beverages", "Condiments", "FrozenFoods", "Spices", "Herbs", "BabyFood",
+			"CleaningSupplies", "LaundrySupplies", "PersonalCareProducts", "PaperProducts", "PetSupplies",
+			"GardeningSupplies", "Tools", "Batteries", "LightBulbs", "Stationery", "HomeDecor", "StorageContainers",
+			"Electronics", "OfficeSupplies", "MedicalSupplies", "Books", "Toys", "Clothing", "Shoes", "Accessories",
+			"Kitchenware", "Cookware", "Appliances", "Furniture"
+		]; 
+
 		for (var i = 0; i < productTypes.length; i++) {
 			options += "<option value='" + i + "' " + (i == selectedType ? "selected" : "") + ">" + productTypes[i] + "</option>";
 		}
 		return options;
 	}
+
+
 
 	$(document).on('click', '.remove-item', function () {
 		var itemId = $(this).data('id');
@@ -194,7 +204,48 @@
 		newItemHtml += "<input type='text' class='form-control' id='title_" + newItemId + "' value=''>";
 		newItemHtml += "<input type='number' class='form-control' id='quantity_" + newItemId + "' value=''>";
 		newItemHtml += "<select class='form-control' id='quantityType_" + newItemId + "'><option value='0'>Grams</option><option value='1'>Kilograms</option><option value='2'>Liters</option><option value='3'>Milliliters</option><option value='4'>Pieces</option></select>";
-		newItemHtml += "<select class='form-control' id='productType_" + newItemId + "'><option value='0'>Dairy</option><option value='1'>Fruits</option><option value='2'>Vegetables</option><option value='3'>Meat</option><option value='4'>Poultry</option><option value='5'>Seafood</option><option value='6'>Grains</option><option value='7'>Baking Supplies</option><option value='8'>Canned Goods</option><option value='9'>Frozen Foods</option><option value='10'>Snacks</option><option value='11'>Condiments</option><option value='12'>Sauces</option><option value='13'>Spices</option><option value='14'>Others</option></select>";
+		newItemHtml += "<select class='form-control' id='productType_" + newItemId + "'>";
+		newItemHtml += "<option value='0'>Dairy</option>";
+		newItemHtml += "<option value='1'>Fruits</option>";
+		newItemHtml += "<option value='2'>Vegetables</option>";
+		newItemHtml += "<option value='3'>Meat</option>";
+		newItemHtml += "<option value='4'>Poultry</option>";
+		newItemHtml += "<option value='5'>Seafood</option>";
+		newItemHtml += "<option value='6'>Grains</option>";
+		newItemHtml += "<option value='7'>Baking Supplies</option>";
+		newItemHtml += "<option value='8'>Canned Goods</option>";
+		newItemHtml += "<option value='9'>Snacks</option>";
+		newItemHtml += "<option value='10'>Beverages</option>";
+		newItemHtml += "<option value='11'>Condiments</option>";
+		newItemHtml += "<option value='12'>Frozen Foods</option>";
+		newItemHtml += "<option value='13'>Spices</option>";
+		newItemHtml += "<option value='14'>Herbs</option>";
+		newItemHtml += "<option value='15'>Baby Food</option>"; newItemHtml += "<option value='13'>Spices</option>";
+		newItemHtml += "<option value='16'>Cleaning Supplies</option>";
+		newItemHtml += "<option value='17'>Laundry Supplies</option>";
+		newItemHtml += "<option value='18'>Personal Care Products</option>";
+		newItemHtml += "<option value='19'>Paper Products</option>";
+		newItemHtml += "<option value='20'>Pet Supplies</option>";
+		newItemHtml += "<option value='21'>Gardening Supplies</option>";
+		newItemHtml += "<option value='22'>Tools</option>";
+		newItemHtml += "<option value='23'>Batteries</option>";
+		newItemHtml += "<option value='24'>Light Bulbs</option>";
+		newItemHtml += "<option value='25'>Stationery</option>";
+		newItemHtml += "<option value='26'>Home Decor</option>";
+		newItemHtml += "<option value='27'>Storage Containers</option>";
+		newItemHtml += "<option value='28'>Electronics</option>";
+		newItemHtml += "<option value='29'>Office Supplies</option>";
+		newItemHtml += "<option value='30'>Medical Supplies</option>";
+		newItemHtml += "<option value='31'>Books</option>";
+		newItemHtml += "<option value='32'>Toys</option>";
+		newItemHtml += "<option value='33'>Clothing</option>";
+		newItemHtml += "<option value='34'>Shoes</option>";
+		newItemHtml += "<option value='35'>Accessories</option>";
+		newItemHtml += "<option value='36'>Kitchenware</option>";
+		newItemHtml += "<option value='37'>Cookware</option>";
+		newItemHtml += "<option value='38'>Appliances</option>";
+		newItemHtml += "<option value='39'>Furniture</option>";
+		newItemHtml += "</select>";
 		newItemHtml += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + newItemId + "'>Remove</button>";
 		newItemHtml += "</li>";
 
