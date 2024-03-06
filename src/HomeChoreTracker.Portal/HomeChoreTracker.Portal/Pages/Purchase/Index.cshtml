@@ -147,8 +147,8 @@
 					content += "<li style='margin-bottom: 10px;' id='item_" + item.id + "'>";
 					content += "<input type='text' class='form-control' id='title_" + item.id + "' value='" + item.title + "'>";
 					content += "<input type='number' class='form-control' id='quantity_" + item.id + "' value='" + item.quantity + "'>";
-					content += "<select class='form-control' id='quantityType_" + item.id + "'><option value='0'>Grams</option><option value='1'>Kilograms</option><option value='2'>Liters</option><option value='3'>Milliliters</option><option value='4'>Pieces</option></select>";
-					content += "<select class='form-control' id='productType_" + item.id + "'><option value='0'>Dairy</option><option value='1'>Fruits</option><option value='2'>Vegetables</option><option value='3'>Meat</option><option value='4'>Poultry</option><option value='5'>Seafood</option><option value='6'>Grains</option><option value='7'>Baking Supplies</option><option value='8'>Canned Goods</option><option value='9'>Frozen Foods</option><option value='10'>Snacks</option><option value='11'>Condiments</option><option value='12'>Sauces</option><option value='13'>Spices</option><option value='14'>Others</option></select>";
+					content += "<select class='form-control' id='quantityType_" + item.id + "'>" + getQuantityTypeOptions(item.quantityType) + "</select>";
+					content += "<select class='form-control' id='productType_" + item.id + "'>" + getProductTypeOptions(item.productType) + "</select>";
 					content += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + item.id + "'>Remove</button>";
 					content += "</li>";
 				});
@@ -164,6 +164,25 @@
 			}
 		});
 	}
+
+	function getQuantityTypeOptions(selectedType) {
+		var options = "";
+		var quantityTypes = ["Grams", "Kilograms", "Liters", "Milliliters", "Pieces"];
+		for (var i = 0; i < quantityTypes.length; i++) {
+			options += "<option value='" + i + "' " + (i == selectedType ? "selected" : "") + ">" + quantityTypes[i] + "</option>";
+		}
+		return options;
+	}
+
+	function getProductTypeOptions(selectedType) {
+		var options = "";
+		var productTypes = ["Dairy", "Fruits", "Vegetables", "Meat", "Poultry", "Seafood", "Grains", "Baking Supplies", "Canned Goods", "Frozen Foods", "Snacks", "Condiments", "Sauces", "Spices", "Others"];
+		for (var i = 0; i < productTypes.length; i++) {
+			options += "<option value='" + i + "' " + (i == selectedType ? "selected" : "") + ">" + productTypes[i] + "</option>";
+		}
+		return options;
+	}
+
 	$(document).on('click', '.remove-item', function () {
 		var itemId = $(this).data('id');
 		$('#item_' + itemId).remove();
@@ -192,8 +211,9 @@
 				var itemId = $(this).find('input[type="text"]').attr('id').split('_')[1];
 				var title = $(this).find('input[type="text"]').val();
 				var quantity = $(this).find('input[type="number"]').val();
-				var quantityType = $(this).find('select[name="quantityType"]').val();
-				var productType = $(this).find('select[name="productType"]').val();
+				var quantityType = $(this).find('select[id^="quantityType_"]').val();
+				var productType = $(this).find('select[id^="productType_"]').val();
+
 				itemsToUpdate.push({ id: itemId, title: title, quantity: quantity, quantityType: quantityType, productType: productType });
 			});
 
@@ -241,7 +261,6 @@
 			}
 		});
 	}
-
 	function getQuantityTypeString(quantityType) {
 		switch (quantityType) {
 			case 0:
