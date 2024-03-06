@@ -56,7 +56,7 @@
 										</button>
 
 										<button class='btn btn-sm' onclick="DisplayPurchaseEditModal('@purchase.Id')">
-											<i class="fa fa-edit" aria-hidden="true"></i>
+											<i class='fa fa-pencil-alt'></i>
 										</button>
 									</td>
 								</tr>
@@ -105,6 +105,7 @@
 			<div class="modal-body">
 				<div id="purchaseEditContent"></div>
 			</div>
+			<div id="errorMessage" style="color: red; text-align: center;"></div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 				<button type="button" class="btn btn-primary" id="saveChangesEditBtn">Save Changes</button>
@@ -280,11 +281,28 @@
 			});
 
 			$('#updateShoppingPurchaseForm').append(hiddenInput);
+			if (!validateForm()) {
+				return false;
+			}
 
 			$('#updateShoppingPurchaseForm').submit();
 		});
 	});
 
+	function validateForm() {
+		var isValid = true;
+		$('#updateItemsForm li').each(function () {
+			var title = $(this).find('input[type="text"]').val();
+			var quantity = $(this).find('input[type="number"]').val();
+			if (title.trim() === '' || quantity.trim() === '') {
+				// Display error message
+				$('#errorMessage').text('Please enter both title and quantity for all items.');
+				isValid = false;
+				return false; // Stop the loop
+			}
+		});
+		return isValid;
+	}
 
 	function DisplayPurchaseDetailModal(purchaseId) {
 		$.ajax({
