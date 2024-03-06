@@ -148,9 +148,8 @@ namespace HomeChoreTracker.Api.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception
                 Console.WriteLine($"Error sending email: {ex.Message}");
-                throw; // Rethrow the exception to propagate it
+                throw;
             }
         }
 

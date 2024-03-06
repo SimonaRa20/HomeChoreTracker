@@ -34,12 +34,8 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize(Roles = Role.User)]
 		public async Task<IActionResult> CreateHome([FromBody] HomeRequest homeRequest)
 		{
-			// Get the user ID from your authentication system
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-
-			// Call the repository method to create the home
 			await _homeRepository.CreateHome(homeRequest, userId);
-
 			return Ok($"Home created successfully");
 		}
 
@@ -63,13 +59,10 @@ namespace HomeChoreTracker.Api.Controllers
 			var user = await _authRepository.GetUserByEmail(inviteUserRequest.InviteeEmail);
 			User sender = await _authRepository.GetUserById(userId);
 
-			// Generate invitation token
 			string invitationToken = await _homeRepository.InviteUserToHome(userId, inviteUserRequest.HomeId, inviteUserRequest.InviteeEmail);
 
-			// Construct invitation link
 			string invitationLink = $"{_config["AppUrl"]}/Homes/Invite?token={HttpUtility.UrlEncode(invitationToken)}";
 
-			// Send invitation email
 			SendInvitationEmail(inviteUserRequest.InviteeEmail, invitationLink, sender);
 
 			return Ok("Invitation sent successfully.");
@@ -108,9 +101,8 @@ namespace HomeChoreTracker.Api.Controllers
 			}
 			catch (Exception ex)
 			{
-				// Log the exception
 				Console.WriteLine($"Error sending email: {ex.Message}");
-				throw; // Rethrow the exception to propagate it
+				throw;
 			}
 		}
 
@@ -167,7 +159,7 @@ namespace HomeChoreTracker.Api.Controllers
 
 			if (!isMember)
 			{
-				return Forbid(); // User is not a member of the home, forbid access
+				return Forbid();
 			}
 
 			var members = await _homeRepository.GetHomeMembers(homeId);

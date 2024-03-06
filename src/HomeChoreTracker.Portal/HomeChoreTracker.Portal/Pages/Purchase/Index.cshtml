@@ -218,15 +218,13 @@
 		return options;
 	}
 
-
-
 	$(document).on('click', '.remove-item', function () {
 		var itemId = $(this).data('id');
 		$('#item_' + itemId).remove();
 	});
 
 	$(document).on('click', '.add-item', function () {
-		var newItemId = 0; // Generate unique ID for the new item
+		var newItemId = 0;
 		var newItemHtml = "<li style='margin-bottom: 10px;' id='item_" + newItemId + "'>";
 		newItemHtml += "<input type='text' class='form-control' id='title_" + newItemId + "' value=''>";
 		newItemHtml += "<input type='number' class='form-control' id='quantity_" + newItemId + "' value=''>";
@@ -279,9 +277,6 @@
 		$('#itemsList').append(newItemHtml);
 	});
 
-
-
-
 	$(document).ready(function () {
 		$('#saveChangesEditBtn').click(function () {
 			var itemsToUpdate = [];
@@ -295,9 +290,6 @@
 				itemsToUpdate.push({ id: itemId, title: title, quantity: quantity, quantityType: quantityType, productType: productType });
 			});
 
-			console.log(itemsToUpdate);
-
-			// Set the purchase ID in the form data
 			$('#purchaseId').val(currentPurchaseId);
 
 			var hiddenInput = $('<input>').attr({
@@ -321,10 +313,9 @@
 			var title = $(this).find('input[type="text"]').val();
 			var quantity = $(this).find('input[type="number"]').val();
 			if (title.trim() === '' || quantity.trim() === '') {
-				// Display error message
 				$('#errorMessage').text('Please enter both title and quantity for all items.');
 				isValid = false;
-				return false; // Stop the loop
+				return false;
 			}
 		});
 		return isValid;

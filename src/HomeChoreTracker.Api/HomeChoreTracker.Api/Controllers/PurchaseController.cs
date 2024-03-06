@@ -85,24 +85,18 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 foreach (var item in itemsToUpdate)
                 {
-                    // Retrieve the shopping item from the database
                     var shoppingItem = await _purchaseRepository.GetShoppingItemById(item.Id);
                     if (shoppingItem == null)
                     {
                         return NotFound($"Shopping item with ID {item.Id} not found.");
                     }
 
-                    // Update the IsCompleted property
                     shoppingItem.IsCompleted = item.IsCompleted;
-
-                    // Update the shopping item in the database
                     _purchaseRepository.UpdateShoppingItem(shoppingItem);
                 }
 
-                // Save changes to the database
                 await _purchaseRepository.Save();
 
-                // Check if all shopping items of the purchase are completed
                 var firstShoppingItem = await _purchaseRepository.GetShoppingItemById(itemsToUpdate[0].Id);
                 var purchaseId = firstShoppingItem?.PurchaseId;
                 if (purchaseId.HasValue)
@@ -110,7 +104,6 @@ namespace HomeChoreTracker.Api.Controllers
                     var purchase = await _purchaseRepository.GetPurchaseById(purchaseId.Value);
                     if (purchase != null && purchase.Items.All(item => item.IsCompleted))
                     {
-                        // Update the IsCompleted property of the purchase
                         purchase.IsCompleted = true;
                         _purchaseRepository.UpdatePurchase(purchase);
                     }
@@ -121,7 +114,6 @@ namespace HomeChoreTracker.Api.Controllers
                     }    
                 }
 
-                // Save changes to the database
                 await _purchaseRepository.Save();
 
                 return Ok("Shopping items updated successfully.");
@@ -174,7 +166,6 @@ namespace HomeChoreTracker.Api.Controllers
 						}
 						else
 						{
-							// Handle if the item is not found
 							return NotFound($"Item with ID {itemId} not found in the purchase.");
 						}
 					}
@@ -219,6 +210,5 @@ namespace HomeChoreTracker.Api.Controllers
 				return StatusCode(500, ex.Message);
 			}
 		}
-
 	}
 }

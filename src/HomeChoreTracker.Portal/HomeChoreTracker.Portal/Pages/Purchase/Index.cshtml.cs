@@ -84,7 +84,6 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
             if (!string.IsNullOrEmpty(itemsToUpdateJson))
             {
-                // Deserialize the JSON string to a list of ShoppingItemUpdateRequest
                 var itemsToUpdate = JsonConvert.DeserializeObject<List<ShoppingItemUpdateRequest>>(itemsToUpdateJson);
 
                 using (var httpClient = _httpClientFactory.CreateClient())
@@ -118,14 +117,13 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
 			if (!string.IsNullOrEmpty(itemsToUpdateJson))
 			{
-				// Deserialize the JSON string to a list of ShoppingItemUpdateRequest
 				var itemsToUpdate = JsonConvert.DeserializeObject<List<ShoppingPurchaseUpdate>>(itemsToUpdateJson);
 
 				using (var httpClient = _httpClientFactory.CreateClient())
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-					int purchaseId = int.Parse(HttpContext.Request.Form["purchaseId"]); // need to set correct id purchase
+					int purchaseId = int.Parse(HttpContext.Request.Form["purchaseId"]);
 
 					var apiUrl = $"{_config["ApiUrl"]}/Purchase/UpdatePurchase/{purchaseId}";
 
@@ -147,13 +145,13 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 			}
 		}
 
-		public async Task<IActionResult> OnPostDeleteAsync(int purchaseId, int selectedHomeId) // Change parameter name to 'id'
+		public async Task<IActionResult> OnPostDeleteAsync(int purchaseId, int selectedHomeId)
 		{
 			var token = User.FindFirstValue("Token");
 			using (var httpClient = _httpClientFactory.CreateClient())
 			{
 				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-				var apiUrl = $"{_config["ApiUrl"]}/Purchase/{purchaseId}"; // Use 'id' here
+				var apiUrl = $"{_config["ApiUrl"]}/Purchase/{purchaseId}";
 
 				var response = await httpClient.DeleteAsync(apiUrl);
 
@@ -168,6 +166,5 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 				}
 			}
 		}
-
 	}
 }

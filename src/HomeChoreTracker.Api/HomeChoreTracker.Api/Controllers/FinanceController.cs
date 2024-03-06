@@ -174,7 +174,6 @@ namespace HomeChoreTracker.Api.Controllers
                 });
             }
 
-            // Order transfer history by time in ascending order
             transferHistory = transferHistory.OrderByDescending(item => item.Data.Time).ToList();
 
 			transferHistory = transferHistory.Skip(skip).Take(take).ToList();
@@ -229,7 +228,6 @@ namespace HomeChoreTracker.Api.Controllers
                 });
             }
 
-            // Order transfer history by time in ascending order
             transferHistory = transferHistory.OrderByDescending(item => item.Data.Time).ToList();
 
             return Ok(transferHistory);
