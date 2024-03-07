@@ -11,7 +11,6 @@ namespace HomeChoreTracker.Api.Models
 		public int Points { get; set; }
 		public LevelType Level { get; set; }
 		public HomeChoreType ChoreType { get; set; }
-		public Frequency Frequency { get; set; }
 		public TimeLong Time { get; set; }
 		public bool IsActive { get; set; }
 		public bool IsDone { get; set; }

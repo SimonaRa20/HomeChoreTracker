@@ -31,7 +31,6 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Chore Type</th>
-                                <th>Frequency</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -41,7 +40,6 @@
                                 <tr>
                                     <td>@choreBase.Name</td>
                                     <td>@choreBase.ChoreType</td>
-                                    <td>@choreBase.Frequency</td>
                                     <td>
 
                                         <button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
@@ -122,7 +120,6 @@
             <div class="modal-body">
                 <p id="choreName"></p>
                 <p id="choreType"></p>
-                <p id="frequency"></p>
                 <p id="description"></p>
             </div>
             <div class="modal-footer">
@@ -163,16 +160,7 @@
                             <option value="6">Organize</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="editFrequency">Frequency</label>
-                        <select class="form-control" id="editFrequency" name="EditFrequency" asp-for="EditHomeChore.Frequency" required>
-                            <option value="0">Daily</option>
-                            <option value="1">Weekly</option>
-                            <option value="2">Monthly</option>
-                            <option value="3">Seasonally</option>
-                            <option value="4">Other</option>
-                        </select>
-                    </div>
+
                     <div class="form-group">
                         <label for="editDescription">Description</label>
                         <textarea class="form-control" id="editDescription" name="EditDescription" asp-for="EditHomeChore.Description"></textarea>
@@ -198,7 +186,6 @@
                 $('#detailModalLabel').text("Detailed info: " + data.name);
                 $('#choreName').text("Name: " + data.name);
                 $('#choreType').text("Chore Type: " + data.choreType);
-                $('#frequency').text("Frequency: " + data.frequency);
                 $('#description').text("Description: " + data.description);
 
                 // Show the modal
@@ -230,16 +217,10 @@
                     $('#editChoreType option').filter(function () {
                         return $(this).text() === choreTypeText;
                     }).prop('selected', true);
-                    // Set the selected option for frequency
-                    var frequencyText = data.frequency;
-                    $('#editFrequency option').filter(function () {
-                        return $(this).text() === frequencyText;
-                    }).prop('selected', true);
                     // Show the edit modal
                     $('#editModal').modal('show');
                 } else {
                     console.error('Invalid data format:', data);
-                    // Optionally, display an error message to the user
                 }
             },
             error: function (error) {

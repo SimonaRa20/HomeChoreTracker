@@ -119,13 +119,19 @@ namespace HomeChoreTracker.Api.Controllers
                     return NotFound($"Home chore base with ID {id} not found");
                 }
 
-                homeChoreBase.Id = id;
-                homeChoreBase.Name = homeChoreBaseRequest.Name;
-                homeChoreBase.ChoreType = homeChoreBaseRequest.ChoreType;
-                homeChoreBase.Frequency = homeChoreBaseRequest.Frequency;
-                homeChoreBase.Description = homeChoreBaseRequest.Description;
+				homeChoreBase.Id = id;
+				homeChoreBase.Name = homeChoreBaseRequest.Name;
+				homeChoreBase.ChoreType = homeChoreBaseRequest.ChoreType;
+				homeChoreBase.Description = homeChoreBaseRequest.Description;
+                homeChoreBase.LevelType = homeChoreBaseRequest.LevelType;
+                homeChoreBase.Time = homeChoreBaseRequest.Time;
+                homeChoreBase.Interval = homeChoreBaseRequest.Interval;
+				homeChoreBase.Unit = homeChoreBaseRequest.Unit;
+				homeChoreBase.DaysOfWeek = homeChoreBaseRequest.DaysOfWeek;
+				homeChoreBase.DayOfMonth = homeChoreBaseRequest.DayOfMonth;
+				homeChoreBase.MonthlyRepeatType = homeChoreBaseRequest.MonthlyRepeatType;
 
-                await _homeChoreBaseRepository.Update(homeChoreBase);
+				await _homeChoreBaseRepository.Update(homeChoreBase);
                 await _homeChoreBaseRepository.Save();
 
                 return Ok($"Home chore base with ID {id} updated successfully");

@@ -87,13 +87,11 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     if (choreDetails != null)
                     {
                         string choreTypeText = ((HomeChoreType)choreDetails.ChoreType).ToString();
-                        string frequencyText = ((Frequency)choreDetails.Frequency).ToString();
                         string descriptionText = choreDetails.Description ?? "-";
                         return new JsonResult(new
                         {
                             name = choreDetails.Name,
                             choreType = choreTypeText,
-                            frequency = frequencyText,
                             description = descriptionText
                         });
                     }
@@ -130,7 +128,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     // Update EditHomeChore with form values
                     EditHomeChore.Name = Request.Form["EditName"];
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["EditChoreType"]);
-                    EditHomeChore.Frequency = (int)Enum.Parse<Frequency>(Request.Form["EditFrequency"]);
                     EditHomeChore.Description = Request.Form["EditDescription"];
 
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);

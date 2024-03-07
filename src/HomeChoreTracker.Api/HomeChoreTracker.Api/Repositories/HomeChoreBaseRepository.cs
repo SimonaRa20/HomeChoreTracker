@@ -37,8 +37,14 @@ namespace HomeChoreTracker.Api.Repositories
             {
                 Name = homeChoreBase.Name,
                 ChoreType = homeChoreBase.ChoreType,
-                Frequency = homeChoreBase.Frequency,
                 Description = homeChoreBase.Description,
+                Time = homeChoreBase.Time,
+                LevelType = homeChoreBase.LevelType,
+                Interval = homeChoreBase.Interval,
+                Unit = homeChoreBase.Unit,
+                DaysOfWeek = homeChoreBase.DaysOfWeek,
+                DayOfMonth = homeChoreBase.DayOfMonth,
+                MonthlyRepeatType = homeChoreBase.MonthlyRepeatType,
             };
 
             await _dbContext.HomeChoresBases.AddAsync(homeChore);
