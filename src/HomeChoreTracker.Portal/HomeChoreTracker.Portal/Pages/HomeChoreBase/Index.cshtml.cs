@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
+using DayOfWeek = HomeChoreTracker.Portal.Constants.DayOfWeek;
 
 namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 {
@@ -87,12 +88,17 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     if (choreDetails != null)
                     {
                         string choreTypeText = ((HomeChoreType)choreDetails.ChoreType).ToString();
+                        string choreTimeText = ((TimeLong)choreDetails.Time).ToString();
                         string descriptionText = choreDetails.Description ?? "-";
+                        string repeatingDataText = GetRepeatingDataText(choreDetails);
+
                         return new JsonResult(new
                         {
                             name = choreDetails.Name,
                             choreType = choreTypeText,
-                            description = descriptionText
+                            description = descriptionText,
+                            time = choreTimeText,
+                            repeatingData = repeatingDataText // Include repeating data
                         });
                     }
                     else
@@ -185,6 +191,55 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                         field.Value.ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
                     }
                 }
+            }
+        }
+
+        private string GetRepeatingDataText(HomeChoreBaseResponse choreDetails)
+        {
+            if (choreDetails.Unit == RepeatUnit.Day)
+            {
+                return "Every day";
+            }
+            else if (choreDetails.Unit == RepeatUnit.Week)
+            {
+                if (choreDetails.DaysOfWeek != null && choreDetails.DaysOfWeek.Any())
+                {
+                    return "Every week on " + string.Join(", ", choreDetails.DaysOfWeek.Select(d => ((DayOfWeek)d).ToString()));
+                }
+                else
+                {
+                    return "Every week";
+                }
+            }
+            else if (choreDetails.Unit == RepeatUnit.Month)
+            {
+                if (choreDetails.DayOfMonth.HasValue)
+                {
+                    return "Every month on day " + choreDetails.DayOfMonth;
+                }
+                else if (choreDetails.MonthlyRepeatType.HasValue)
+                {
+                    return "Every month on the " + choreDetails.MonthlyRepeatType + " " + string.Join(", ", choreDetails.DaysOfWeek.Select(d => ((DayOfWeek)d).ToString()));
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            else if (choreDetails.Unit == RepeatUnit.Year)
+            {
+                if (choreDetails.DayOfMonth.HasValue)
+                {
+                    return "Every year on day " + choreDetails.DayOfMonth;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            else
+            {
+                return "";
             }
         }
     }

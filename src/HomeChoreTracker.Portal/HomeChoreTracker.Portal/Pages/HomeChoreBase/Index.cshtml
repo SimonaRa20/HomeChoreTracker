@@ -121,6 +121,8 @@
                 <p id="choreName"></p>
                 <p id="choreType"></p>
                 <p id="description"></p>
+                <p id="time"></p>
+                <p id="repeatingData"></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -187,6 +189,8 @@
                 $('#choreName').text("Name: " + data.name);
                 $('#choreType').text("Chore Type: " + data.choreType);
                 $('#description').text("Description: " + data.description);
+                $('#time').text("How long time take to do this task: " + data.time); // Add time
+                $('#repeatingData').text("Repeating Data: " + data.repeatingData); // Add repeating data
 
                 // Show the modal
                 $('#detailModal').modal('show');

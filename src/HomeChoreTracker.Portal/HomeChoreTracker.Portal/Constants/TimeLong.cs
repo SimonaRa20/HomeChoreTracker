@@ -2,20 +2,20 @@
 {
 	public enum TimeLong
 	{
-		fiveMinutes,
-		tenMinutes,
-		fifteenMinutes,
-		twentyMinutes,
-		thirtyMinutes,
-		fourtyFiveMinutes,
-		hour,
-		hourAndHalf,
-		twoHours,
-		twoHoursAndHalf,
-		threeHours,
-		threeHoursAndHalf,
-		fourHours,
-		fourHoursAndHalf,
-		fiveHours
+		FiveMinutes,
+		TenMinutes,
+		FifteenMinutes,
+		TwentyMinutes,
+		ThirtyMinutes,
+		FourtyFiveMinutes,
+		Hour,
+		HourAndHalf,
+		TwoHours,
+		TwoHoursAndHalf,
+		ThreeHours,
+		ThreeHoursAndHalf,
+		FourHours,
+		FourHoursAndHalf,
+		FiveHours
 	}
 }
