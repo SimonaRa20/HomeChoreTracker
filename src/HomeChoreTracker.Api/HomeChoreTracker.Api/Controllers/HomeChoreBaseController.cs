@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Bibliography;
 using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.HomeChoreBase;
 using HomeChoreTracker.Api.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Security.Claims;
+using System.Text;
+using DayOfWeek = HomeChoreTracker.Api.Constants.DayOfWeek;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -62,6 +66,10 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> CreateHomeChoreBase(HomeChoreBaseRequest homeChoreBaseRequest)
         {
+            var json = JsonConvert.SerializeObject(homeChoreBaseRequest);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             await _homeChoreBaseRepository.AddHomeChoreBase(homeChoreBaseRequest);
             await _homeChoreBaseRepository.Save();
 
@@ -119,7 +127,56 @@ namespace HomeChoreTracker.Api.Controllers
                     return NotFound($"Home chore base with ID {id} not found");
                 }
 
-				homeChoreBase.Id = id;
+                List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
+
+                if(homeChoreBase.DaysOfWeek == null)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Default);
+                }
+                else
+                {
+                    foreach (int day in homeChoreBase.DaysOfWeek)
+                    {
+                        if (day == 0)
+                        {
+                            if (day == 0)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Default);
+                            }
+                        }
+                        if (day == 1)
+                        {
+                            dayOfWeeks.Add(DayOfWeek.Monday);
+                        }
+                        if (day == 2)
+                        {
+                            dayOfWeeks.Add(DayOfWeek.Tuesday);
+                        }
+                        if (day == 3)
+                        {
+                            dayOfWeeks.Add(DayOfWeek.Wednesday);
+                        }
+                        if (day == 4)
+                        {
+                            dayOfWeeks.Add(DayOfWeek.Thursday);
+                        }
+                        if (day == 5)
+                        {
+                            dayOfWeeks.Add(DayOfWeek.Friday);
+                        }
+                        if (day == 6)
+                        {
+                            dayOfWeeks.Add(DayOfWeek.Saturday);
+                        }
+                        if (day == 7)
+                        {
+                            dayOfWeeks.Add(DayOfWeek.Sunday);
+                        }
+                    }
+                }
+                
+
+                homeChoreBase.Id = id;
 				homeChoreBase.Name = homeChoreBaseRequest.Name;
 				homeChoreBase.ChoreType = homeChoreBaseRequest.ChoreType;
 				homeChoreBase.Description = homeChoreBaseRequest.Description;
@@ -127,7 +184,7 @@ namespace HomeChoreTracker.Api.Controllers
                 homeChoreBase.Time = homeChoreBaseRequest.Time;
                 homeChoreBase.Interval = homeChoreBaseRequest.Interval;
 				homeChoreBase.Unit = homeChoreBaseRequest.Unit;
-				homeChoreBase.DaysOfWeek = homeChoreBaseRequest.DaysOfWeek;
+				homeChoreBase.DaysOfWeek = dayOfWeeks;
 				homeChoreBase.DayOfMonth = homeChoreBaseRequest.DayOfMonth;
 				homeChoreBase.MonthlyRepeatType = homeChoreBaseRequest.MonthlyRepeatType;
 

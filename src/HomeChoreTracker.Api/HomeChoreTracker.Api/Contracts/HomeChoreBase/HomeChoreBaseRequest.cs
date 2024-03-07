@@ -11,7 +11,7 @@ namespace HomeChoreTracker.Api.Contracts.HomeChoreBase
 		public TimeLong Time { get; set; }
 		public int Interval { get; set; }
 		public RepeatUnit Unit { get; set; }
-		public List<DayOfWeek>? DaysOfWeek { get; set; }
+		public List<int>? DaysOfWeek { get; set; }
 		public int? DayOfMonth { get; set; }
 		public MonthlyRepeatType? MonthlyRepeatType { get; set; }
 	}

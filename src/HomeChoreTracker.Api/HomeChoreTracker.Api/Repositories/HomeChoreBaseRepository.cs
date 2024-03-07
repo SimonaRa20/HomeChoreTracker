@@ -3,6 +3,7 @@ using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using DayOfWeek = HomeChoreTracker.Api.Constants.DayOfWeek;
 
 namespace HomeChoreTracker.Api.Repositories
 {
@@ -33,6 +34,44 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task AddHomeChoreBase(HomeChoreBaseRequest homeChoreBase)
         {
+            List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
+            foreach(int day in homeChoreBase.DaysOfWeek)
+            {
+                if(day == 0)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Default);
+                }
+                if (day == 1)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Monday);
+                }
+                if (day == 2)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Tuesday);
+                }
+                if (day == 3)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Wednesday);
+                }
+                if (day == 4)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Thursday);
+                }
+                if (day == 5)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Friday);
+                }
+                if (day == 6)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Saturday);
+                }
+                if (day == 7)
+                {
+                    dayOfWeeks.Add(DayOfWeek.Sunday);
+                }
+            }
+
+
             HomeChoreBase homeChore = new HomeChoreBase
             {
                 Name = homeChoreBase.Name,
@@ -42,7 +81,7 @@ namespace HomeChoreTracker.Api.Repositories
                 LevelType = homeChoreBase.LevelType,
                 Interval = homeChoreBase.Interval,
                 Unit = homeChoreBase.Unit,
-                DaysOfWeek = homeChoreBase.DaysOfWeek,
+                DaysOfWeek = dayOfWeeks,
                 DayOfMonth = homeChoreBase.DayOfMonth,
                 MonthlyRepeatType = homeChoreBase.MonthlyRepeatType,
             };
