@@ -13,7 +13,7 @@ namespace HomeChoreTracker.Portal.Models.HomeChoreBase
         public int Time { get; set; }
         public int Interval { get; set; }
         public int Unit { get; set; }
-        public List<int>? DayOfWeek { get; set; }
+        public List<int>? DaysOfWeek { get; set; }
         public int? DayOfMonth { get; set; }
         public int? MonthlyRepeatType { get; set; }
     }

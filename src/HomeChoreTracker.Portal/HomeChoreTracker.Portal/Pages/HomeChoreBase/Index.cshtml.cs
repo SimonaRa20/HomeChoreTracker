@@ -87,18 +87,32 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
                     if (choreDetails != null)
                     {
+                        // Directly assign choreDetails.DaysOfWeek to daysOfWeekList
+                        var daysOfWeekList = choreDetails.DaysOfWeek;
+
                         string choreTypeText = ((HomeChoreType)choreDetails.ChoreType).ToString();
                         string choreTimeText = ((TimeLong)choreDetails.Time).ToString();
+                        string choreLevelTypeText = ((LevelType)choreDetails.LevelType).ToString();
+                        string choreUnitText = ((RepeatUnit)choreDetails.Unit).ToString();
+                        string choreMonthlyRepeatTypeText = ((MonthlyRepeatType)choreDetails.MonthlyRepeatType).ToString();
                         string descriptionText = choreDetails.Description ?? "-";
                         string repeatingDataText = GetRepeatingDataText(choreDetails);
 
                         return new JsonResult(new
                         {
+                            id = choreDetails.Id,
                             name = choreDetails.Name,
                             choreType = choreTypeText,
                             description = descriptionText,
                             time = choreTimeText,
-                            repeatingData = repeatingDataText // Include repeating data
+                            levelType = choreLevelTypeText,
+                            interval = choreDetails.Interval,
+                            unit = choreUnitText,
+                            //
+                            dayOfMonth = choreDetails.DayOfMonth,
+                            monthlyRepeatType = choreMonthlyRepeatTypeText,
+                            repeatingData = repeatingDataText,
+                            daysOfWeek = daysOfWeekList
                         });
                     }
                     else
@@ -113,10 +127,11 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
             }
         }
 
+
         public async Task<IActionResult> OnPostEditAsync(int id)
         {
+            ClearFieldErrors(key => key == "EditHomeChore.Name");
             ClearFieldErrors(key => key == "Name");
-
             if (!ModelState.IsValid)
             {
                 await OnGetAsync(); // Refresh the data
@@ -131,10 +146,23 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
 
+                    var val = Request.Form["editDaysOfWeek"];
+
                     // Update EditHomeChore with form values
-                    EditHomeChore.Name = Request.Form["EditName"];
-                    EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["EditChoreType"]);
-                    EditHomeChore.Description = Request.Form["EditDescription"];
+                    EditHomeChore.Name = Request.Form["editName"];
+                    EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
+                    EditHomeChore.Description = Request.Form["editDescription"];
+                    EditHomeChore.LevelType = (int)Enum.Parse<LevelType>(Request.Form["editLevelType"]);
+                    EditHomeChore.Time = (int)Enum.Parse<TimeLong>(Request.Form["editTimeLong"]);
+                    EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
+                    EditHomeChore.Unit = (int)Enum.Parse<RepeatUnit>(Request.Form["editRepeatUnit"]);
+                    EditHomeChore.DaysOfWeek = Request.Form["editDaysOfWeek"]
+                .SelectMany(s => s.Split(','))
+                .Select(int.Parse)
+                .ToList();
+                    EditHomeChore.DayOfMonth = int.Parse(Request.Form["editDayOfMonth"]);
+                    EditHomeChore.MonthlyRepeatType = (int)Enum.Parse<MonthlyRepeatType>(Request.Form["editMonthlyRepeatType"]);
+
 
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
 

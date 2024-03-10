@@ -129,13 +129,13 @@ namespace HomeChoreTracker.Api.Controllers
 
                 List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
 
-                if(homeChoreBase.DaysOfWeek == null)
+                if(homeChoreBaseRequest.DaysOfWeek == null)
                 {
                     dayOfWeeks.Add(DayOfWeek.Default);
                 }
                 else
                 {
-                    foreach (int day in homeChoreBase.DaysOfWeek)
+                    foreach (int day in homeChoreBaseRequest.DaysOfWeek)
                     {
                         if (day == 0)
                         {

@@ -130,9 +130,6 @@
         </div>
     </div>
 </div>
-
-
-
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -146,26 +143,79 @@
             <div class="modal-body">
                 <form method="post" asp-page-handler="Edit">
                     <input type="hidden" id="editChoreId" name="id" value="" />
-                    <div class="form-group" method="post">
+                    <div class="form-group">
                         <label for="editName">Name</label>
-                        <input asp-for="EditHomeChore.Name" name="EditName" type="text" class="form-control" id="editName" required>
+                        <input asp-for="EditHomeChore.Name" name="editName" class="form-control" id="editName" required />
                     </div>
                     <div class="form-group">
                         <label for="editChoreType">Chore Type</label>
-                        <select class="form-control" id="editChoreType" name="EditChoreType" asp-for="EditHomeChore.ChoreType" required>
-                            <option value="0">Cleaning</option>
-                            <option value="1">Laundry</option>
-                            <option value="2">Kitchen</option>
-                            <option value="3">Bathroom</option>
-                            <option value="4">Bedroom</option>
-                            <option value="5">Outdoors</option>
-                            <option value="6">Organize</option>
+                        <select class="form-control" id="editChoreType" name="editChoreType" asp-for="EditHomeChore.ChoreType" required>
+                            @foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.HomeChoreType)))
+                            {
+                                <option value="@((int)choreType)">@choreType</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDescription">Description</label>
+                        <textarea asp-for="EditHomeChore.Description" name="editDescription" class="form-control" id="editDescription"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLevelType">Level Type</label>
+                        <select class="form-control" name="editLevelType" id="editLevelType" asp-for="EditHomeChore.LevelType" required>
+                            @foreach (var levelType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.LevelType)))
+                            {
+                                <option value="@((int)levelType)">@levelType</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTime">Time</label>
+                        <select class="form-control" name="editTimeLong" id="editTimeLong" asp-for="EditHomeChore.Time" required>
+                            @foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
+                            {
+                                <option value="@((int)time)">@time</option>
+                            }
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="editDescription">Description</label>
-                        <textarea class="form-control" id="editDescription" name="EditDescription" asp-for="EditHomeChore.Description"></textarea>
+                        <label for="editInterval">Interval</label>
+                        <input asp-for="EditHomeChore.Interval" name="editInterval" class="form-control" id="editInterval" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="editUnit">Unit</label>
+                        <select class="form-control" id="editRepeatUnit" name="editRepeatUnit" asp-for="EditHomeChore.Unit" required>
+                            @foreach (var unit in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.RepeatUnit)))
+                            {
+                                <option value="@((int)unit)">@unit</option>
+                            }
+                        </select>
+                    </div>
+                    @foreach (var dayOfWeek in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.DayOfWeek)))
+                    {
+                        var checkboxId = "editDayOfWeek_" + (int)dayOfWeek; // Construct the checkbox ID using the enum value
+                        var checkboxName = "editDaysOfWeek"; // Name for the checkbox array
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="@checkboxId" name="@checkboxName" value="@((int)dayOfWeek)">
+                            <label class="form-check-label" for="@checkboxId">@dayOfWeek</label>
+                        </div>
+                    }
+
+
+
+                    <div class="form-group" id="editDayOfMonthField" style="display: none;">
+                        <label for="editDayOfMonth">Day of Month</label>
+                        <input type="number" class="form-control" name="editDayOfMonth" id="editDayOfMonth"  asp-for="EditHomeChore.DayOfMonth" min="1" max="31" value="1">
+                    </div>
+                    <div class="form-group" id="editMonthlyRepeatTypeField" style="display: none;">
+                        <label for="editMonthlyRepeatType">Monthly Repeat Type</label>
+                        <select class="form-control" name="editMonthlyRepeatType" id="editMonthlyRepeatType" asp-for="EditHomeChore.MonthlyRepeatType">
+                            @foreach (var monthlyRepeatType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.MonthlyRepeatType)))
+                            {
+                                <option value="@((int)monthlyRepeatType)">@monthlyRepeatType</option>
+                            }
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Save changes</button>
                 </form>
@@ -173,6 +223,35 @@
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#editRepeatUnit').change(function () {
+            var unit = $(this).val();
+            if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Day)') {
+                $('#editDayOfWeekField').hide();
+                $('#editDayOfMonthField').hide();
+                $('#editMonthlyRepeatTypeField').hide();
+            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Week)') {
+                $('#editDayOfWeekField').show();
+                $('#editDayOfMonthField').hide();
+                $('#editMonthlyRepeatTypeField').hide();
+            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Month)') {
+                $('#editDayOfWeekField').hide();
+                $('#editDayOfMonthField').show();
+                $('#editMonthlyRepeatTypeField').show();
+            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Year)') {
+                $('#editDayOfWeekField').hide();
+                $('#editDayOfMonthField').hide();
+                $('#editMonthlyRepeatTypeField').hide();
+            }
+        });
+
+        // Trigger change event to ensure proper initialization
+        $('#editRepeatUnit').trigger('change');
+    });
+</script>
 
 
 <script>
@@ -212,15 +291,69 @@
             success: function (data) {
                 console.log('Received data:', data); // Log the received data
                 // Check if data is not empty and contains the expected properties
-                if (data && data.name && data.choreType && data.frequency && data.description) {
+                if (data && data.name) {
                     // Populate the edit modal with the retrieved data
                     $('#editName').val(data.name);
                     $('#editDescription').val(data.description);
                     // Set the selected option for chore type
+                    var timeLongText = data.time;
+                    $('#editTimeLong option').filter(function () {
+                        return $(this).text() === timeLongText;
+                    }).prop('selected', true);
+                    var levelTypeText = data.levelType;
+                    $('#editLevelType option').filter(function () {
+                        return $(this).text() === levelTypeText;
+                    }).prop('selected', true);
+                    $('#editInterval').val(data.interval);
+
+                    var unitTypeText = data.unit;
+                    $('#editRepeatUnit option').filter(function () {
+                        return $(this).text() === unitTypeText;
+                    }).prop('selected', true);
+
+                    var monthlyRepeatTypeText = data.monthlyRepeatType;
+                    $('#editMonthlyRepeatType option').filter(function () {
+                        return $(this).text() === monthlyRepeatTypeText;
+                    }).prop('selected', true);
+
+                    $('#editDayOfMonth').val(data.dayOfMonth);
+
                     var choreTypeText = data.choreType;
                     $('#editChoreType option').filter(function () {
                         return $(this).text() === choreTypeText;
                     }).prop('selected', true);
+
+                    if (data.daysOfWeek) {
+                        console.log('Days of Week:', data.daysOfWeek);
+                        data.daysOfWeek.forEach(function (day) {
+                            var checkboxId = 'editDayOfWeek_' + day;
+                            $('#' + checkboxId).prop('checked', true);
+                            console.log(day);
+                            console.log(checkboxId);
+                        });
+                    }
+
+
+                    var unit = unitTypeText;
+                    if (unit === 'Day') {
+                        $('#editDayOfWeekField').hide();
+                        $('#editDayOfMonthField').hide();
+                        $('#editMonthlyRepeatTypeField').hide();
+                    } else if (unit === 'Week') {
+                        $('#editDayOfWeekField').show();
+                        $('#editDayOfMonthField').hide();
+                        $('#editMonthlyRepeatTypeField').hide();
+                    } else if (unit === 'Month') {
+                        $('#editDayOfWeekField').hide();
+                        $('#editDayOfMonthField').show();
+                        $('#editMonthlyRepeatTypeField').show();
+                    } else if (unit === 'Year') {
+                        $('#editDayOfWeekField').hide();
+                        $('#editDayOfMonthField').hide();
+                        $('#editMonthlyRepeatTypeField').hide();
+                    }
+
+
                     // Show the edit modal
                     $('#editModal').modal('show');
                 } else {
@@ -233,5 +366,4 @@
             }
         });
     }
-
 </script>

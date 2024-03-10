@@ -93,7 +93,6 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task Update(HomeChoreBase homeChoreBase)
         {
             _dbContext.Entry(homeChoreBase).State = EntityState.Modified;
-            await Save();
         }
 
         public async Task Delete(int id)
