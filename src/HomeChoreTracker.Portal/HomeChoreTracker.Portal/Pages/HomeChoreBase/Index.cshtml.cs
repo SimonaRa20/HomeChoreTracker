@@ -104,11 +104,11 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                             name = choreDetails.Name,
                             choreType = choreTypeText,
                             description = descriptionText,
+                            points = choreDetails.Points,
                             time = choreTimeText,
                             levelType = choreLevelTypeText,
                             interval = choreDetails.Interval,
                             unit = choreUnitText,
-                            //
                             dayOfMonth = choreDetails.DayOfMonth,
                             monthlyRepeatType = choreMonthlyRepeatTypeText,
                             repeatingData = repeatingDataText,
@@ -152,6 +152,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     EditHomeChore.Name = Request.Form["editName"];
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
                     EditHomeChore.Description = Request.Form["editDescription"];
+                    EditHomeChore.Points = int.Parse(Request.Form["editPoints"]);
                     EditHomeChore.LevelType = (int)Enum.Parse<LevelType>(Request.Form["editLevelType"]);
                     EditHomeChore.Time = (int)Enum.Parse<TimeLong>(Request.Form["editTimeLong"]);
                     EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);

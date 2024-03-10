@@ -1,21 +1,25 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
 using HomeChoreTracker.Api.Constants;
+using DayOfWeek = HomeChoreTracker.Api.Constants.DayOfWeek;
 
 namespace HomeChoreTracker.Api.Models
 {
 	public class HomeChoreTask
 	{
-		public int Id { get; set; }
-		public string Title { get; set; }
-		public string? Description { get; set; }
-		public int Points { get; set; }
-		public LevelType Level { get; set; }
-		public HomeChoreType ChoreType { get; set; }
-		public TimeLong Time { get; set; }
-		public bool IsActive { get; set; }
-		public bool IsDone { get; set; }
-		public bool IsAprroved { get; set; }
-
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public HomeChoreType ChoreType { get; set; }
+        public string? Description { get; set; }
+        public int Points { get; set; }
+        public LevelType LevelType { get; set; }
+        public TimeLong Time { get; set; }
+        public int Interval { get; set; }
+        public RepeatUnit Unit { get; set; }
+        public List<DayOfWeek>? DaysOfWeek { get; set; }
+        public int? DayOfMonth { get; set; }
+        public MonthlyRepeatType? MonthlyRepeatType { get; set; }
+        
+        public bool IsActive { get; set; }
 		public int HomeId { get; set; }
 	}
 }

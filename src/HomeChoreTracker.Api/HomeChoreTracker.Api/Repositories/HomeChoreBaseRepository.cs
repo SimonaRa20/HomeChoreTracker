@@ -77,6 +77,7 @@ namespace HomeChoreTracker.Api.Repositories
                 Name = homeChoreBase.Name,
                 ChoreType = homeChoreBase.ChoreType,
                 Description = homeChoreBase.Description,
+                Points = homeChoreBase.Points,
                 Time = homeChoreBase.Time,
                 LevelType = homeChoreBase.LevelType,
                 Interval = homeChoreBase.Interval,

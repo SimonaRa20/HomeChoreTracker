@@ -9,6 +9,7 @@ namespace HomeChoreTracker.Api.Models
         public string Name { get; set; }
         public HomeChoreType ChoreType { get; set; }
         public string? Description { get; set; }
+		public int Points { get; set; }
 		public LevelType LevelType { get; set; }
 		public TimeLong Time {  get; set; }
 		public int Interval { get; set; }

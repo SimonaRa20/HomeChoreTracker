@@ -161,6 +161,10 @@
                         <textarea asp-for="EditHomeChore.Description" name="editDescription" class="form-control" id="editDescription"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="editPoints">Points</label>
+                        <input asp-for="EditHomeChore.Points" name="editPoints" class="form-control" id="editPoints" required />
+                    </div>
+                    <div class="form-group">
                         <label for="editLevelType">Level Type</label>
                         <select class="form-control" name="editLevelType" id="editLevelType" asp-for="EditHomeChore.LevelType" required>
                             @foreach (var levelType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.LevelType)))
@@ -192,6 +196,7 @@
                             }
                         </select>
                     </div>
+                    <div class="form-group" id="editDayOfWeekField" style="display: none;">
                     @foreach (var dayOfWeek in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.DayOfWeek)))
                     {
                         var checkboxId = "editDayOfWeek_" + (int)dayOfWeek; // Construct the checkbox ID using the enum value
@@ -201,8 +206,7 @@
                             <label class="form-check-label" for="@checkboxId">@dayOfWeek</label>
                         </div>
                     }
-
-
+                    </div>
 
                     <div class="form-group" id="editDayOfMonthField" style="display: none;">
                         <label for="editDayOfMonth">Day of Month</label>
@@ -296,6 +300,9 @@
                     $('#editName').val(data.name);
                     $('#editDescription').val(data.description);
                     // Set the selected option for chore type
+
+                    $('#editPoints').val(data.points);
+
                     var timeLongText = data.time;
                     $('#editTimeLong option').filter(function () {
                         return $(this).text() === timeLongText;
