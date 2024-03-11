@@ -150,7 +150,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 using (var httpClient = _httpClientFactory.CreateClient())
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
+                    var apiUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
 
                     var val = Request.Form["editDaysOfWeek"];
 

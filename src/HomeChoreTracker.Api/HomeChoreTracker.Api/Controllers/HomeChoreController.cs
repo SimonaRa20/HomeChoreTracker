@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
+using DayOfWeek = HomeChoreTracker.Api.Constants.DayOfWeek;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -109,6 +110,120 @@ namespace HomeChoreTracker.Api.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"An error occurred while fetching home chore bases: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateHomeChore(int id, [FromBody] HomeChoreBaseRequest homeChoreBaseRequest)
+        {
+            try
+            {
+                var homeChore = await _homeChoreRepository.Get(id);
+
+                if (homeChore == null)
+                {
+                    return NotFound($"Home chore base with ID {id} not found");
+                }
+
+                if (homeChore.WasEarnedPoints)
+                {
+                    HomeChoreRequest homeChoreRequest = new HomeChoreRequest();
+                    homeChoreRequest.Name = homeChoreBaseRequest.Name;
+                    homeChoreRequest.ChoreType = homeChoreBaseRequest.ChoreType;
+                    homeChoreRequest.Description = homeChoreBaseRequest.Description;
+                    homeChoreRequest.Points = homeChoreBaseRequest.Points;
+                    homeChoreRequest.LevelType = homeChoreBaseRequest.LevelType;
+                    homeChoreRequest.Time = homeChoreBaseRequest.Time;
+                    homeChoreRequest.Interval = homeChoreBaseRequest.Interval;
+                    homeChoreRequest.Unit = homeChoreBaseRequest.Unit;
+                    homeChoreRequest.DaysOfWeek = homeChoreBaseRequest.DaysOfWeek;
+                    homeChoreRequest.DayOfMonth = homeChoreBaseRequest.DayOfMonth;
+                    homeChoreRequest.MonthlyRepeatType = homeChoreBaseRequest.MonthlyRepeatType;
+                    homeChoreRequest.HomeId = homeChore.HomeId;
+
+                    await _homeChoreRepository.CreateHomeChore(homeChoreRequest);
+                    await _homeChoreRepository.Save();
+
+                    return Ok($"Home chore base with ID {id} updated successfully");
+                }
+                if (homeChore.IsActive)
+                {
+                    List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
+
+                    if (homeChoreBaseRequest.DaysOfWeek == null)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Default);
+                    }
+                    else
+                    {
+                        foreach (int day in homeChoreBaseRequest.DaysOfWeek)
+                        {
+                            if (day == 0)
+                            {
+                                if (day == 0)
+                                {
+                                    dayOfWeeks.Add(DayOfWeek.Default);
+                                }
+                            }
+                            if (day == 1)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Monday);
+                            }
+                            if (day == 2)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Tuesday);
+                            }
+                            if (day == 3)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Wednesday);
+                            }
+                            if (day == 4)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Thursday);
+                            }
+                            if (day == 5)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Friday);
+                            }
+                            if (day == 6)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Saturday);
+                            }
+                            if (day == 7)
+                            {
+                                dayOfWeeks.Add(DayOfWeek.Sunday);
+                            }
+                        }
+                    }
+
+                    homeChore.Id = id;
+                    homeChore.Name = homeChoreBaseRequest.Name;
+                    homeChore.ChoreType = homeChoreBaseRequest.ChoreType;
+                    homeChore.Description = homeChoreBaseRequest.Description;
+                    homeChore.Points = homeChoreBaseRequest.Points;
+                    homeChore.LevelType = homeChoreBaseRequest.LevelType;
+                    homeChore.Time = homeChoreBaseRequest.Time;
+                    homeChore.Interval = homeChoreBaseRequest.Interval;
+                    homeChore.Unit = homeChoreBaseRequest.Unit;
+                    homeChore.DaysOfWeek = dayOfWeeks;
+                    homeChore.DayOfMonth = homeChoreBaseRequest.DayOfMonth;
+                    homeChore.MonthlyRepeatType = homeChoreBaseRequest.MonthlyRepeatType;
+
+                    await _homeChoreRepository.Update(homeChore);
+                    await _homeChoreRepository.Save();
+
+                    return Ok($"Home chore base with ID {id} updated successfully");
+                }
+                else
+                {
+                    return BadRequest($"An error occurred while updating the home chore");
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while updating the home chore base: {ex.Message}");
             }
         }
     }

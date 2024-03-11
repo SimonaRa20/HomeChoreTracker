@@ -127,5 +127,10 @@ namespace HomeChoreTracker.Api.Repositories
         {
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task Update(HomeChoreTask homeChoreTask)
+        {
+            _dbContext.Entry(homeChoreTask).State = EntityState.Modified;
+        }
     }
 }
