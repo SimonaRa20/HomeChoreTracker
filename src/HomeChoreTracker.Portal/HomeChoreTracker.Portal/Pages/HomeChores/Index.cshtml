@@ -136,11 +136,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" asp-page-handler="Edit">
+                    <form method="post" asp-page-handler="Edit" id="editForm">
                         <input type="hidden" id="editChoreId" name="id" value="" />
                         <div class="form-group">
                             <label for="editName">Name</label>
-                            <input asp-for="EditHomeChore.Name" name="editName" class="form-control" id="editName" required />
+                            <input asp-for="EditHomeChore.Name" name="editName" class="form-control" id="editName" />
+                            <div id="nameError" class="text-danger" style="display: none;">Name is required.</div>
                         </div>
                         <div class="form-group">
                             <label for="editChoreType">Chore Type</label>
@@ -157,7 +158,8 @@
                         </div>
                         <div class="form-group">
                             <label for="editPoints">Points</label>
-                            <input asp-for="EditHomeChore.Points" name="editPoints" class="form-control" id="editPoints" required />
+                            <input asp-for="EditHomeChore.Points" name="editPoints" class="form-control" id="editPoints" />
+                            <div id="pointsError" class="text-danger" style="display: none;">Points are required.</div>
                         </div>
                         <div class="form-group">
                             <label for="editLevelType">Level Type</label>
@@ -180,7 +182,8 @@
 
                         <div class="form-group">
                             <label for="editInterval">Interval</label>
-                            <input asp-for="EditHomeChore.Interval" name="editInterval" class="form-control" id="editInterval" required />
+                            <input asp-for="EditHomeChore.Interval" name="editInterval" class="form-control" id="editInterval" />
+                            <div id="intervalError" class="text-danger" style="display: none;">Interval is required.</div>
                         </div>
                         <div class="form-group">
                             <label for="editUnit">Unit</label>
@@ -224,6 +227,34 @@
     </div>
 }
 <script>
+    $(document).ready(function () {
+        $('#editForm').submit(function (event) {
+            var name = $('#editName').val().trim();
+            var points = $('#editPoints').val().trim();
+            var interval = $('#editInterval').val().trim();
+
+            if (name === '') {
+                $('#nameError').text('Name is required.').show();
+                event.preventDefault(); // Prevent form submission
+            } else {
+                $('#nameError').hide();
+            }
+
+            if (points === '') {
+                $('#pointsError').text('Points are required.').show();
+                event.preventDefault(); // Prevent form submission
+            } else {
+                $('#pointsError').hide();
+            }
+
+            if (interval === '') {
+                $('#intervalError').text('Interval is required.').show();
+                event.preventDefault(); // Prevent form submission
+            } else {
+                $('#intervalError').hide();
+            }
+        });
+    });
     $(document).ready(function () {
         $('#editRepeatUnit').change(function () {
             var unit = $(this).val();

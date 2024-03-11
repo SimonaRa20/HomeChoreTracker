@@ -1,16 +1,20 @@
 ﻿using HomeChoreTracker.Portal.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeChoreTracker.Portal.Models.HomeChore
 {
     public class HomeChoreRequest
     {
+        [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
         public HomeChoreType ChoreType { get; set; }
         public string? Description { get; set; }
-        public int Points { get; set; }
+        [Required(ErrorMessage = "Points are required.")]
+        public int? Points { get; set; }
         public LevelType LevelType { get; set; }
         public TimeLong Time { get; set; }
-        public int Interval { get; set; }
+        [Required(ErrorMessage = "Interval is required.")]
+        public int? Interval { get; set; }
         public RepeatUnit Unit { get; set; }
         public List<int>? DaysOfWeek { get; set; }
         public int? DayOfMonth { get; set; }

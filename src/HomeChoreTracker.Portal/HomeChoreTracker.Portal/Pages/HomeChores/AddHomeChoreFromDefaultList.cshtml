@@ -64,6 +64,19 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <p>Are you sure you want to add this '@choreBase.Name' home chore?</p>
+                                                            @if (!string.IsNullOrEmpty(choreBase.Description))
+                                                            {
+                                                                <p><strong>Description: </strong>@choreBase.Description</p>
+                                                            }
+                                                            else
+                                                            {
+                                                                <p><strong>Description: </strong>-</p>
+                                                            }
+                                                            <p><strong>Points: </strong>@choreBase.Points</p>
+                                                            <p><strong>Chore Type: </strong>@choreBase.ChoreType</p>
+                                                            <p><strong>Level Type: </strong>@choreBase.LevelType</p>
+                                                            <p><strong>Time: </strong>@choreBase.Time</p>
+                                                            <p><strong>Repeat what: </strong>@choreBase.Interval @choreBase.Unit</p>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
