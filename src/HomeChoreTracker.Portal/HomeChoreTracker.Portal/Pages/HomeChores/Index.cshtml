@@ -1,5 +1,10 @@
 ﻿@page "{id}"
 @model HomeChoreTracker.Portal.Pages.HomeChores.IndexModel
+
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
 @section HeadContent
 {
     <title>@ViewData["Title"] - Home Chore Tracker</title>
@@ -12,4 +17,23 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <a class="btn btn-secondary btn-sm mb-2" href="/HomeChores/@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
+            <a class="btn btn-light btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
+            <a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.Id"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
+            <div class="card mb-4 py-3 border-left-primary mr-2">
+
+                <div class="collapse show">
+                    <div class="card-body">
+                        There have to be home page
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }

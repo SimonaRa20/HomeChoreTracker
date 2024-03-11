@@ -157,13 +157,9 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     EditHomeChore.Time = (int)Enum.Parse<TimeLong>(Request.Form["editTimeLong"]);
                     EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
                     EditHomeChore.Unit = (int)Enum.Parse<RepeatUnit>(Request.Form["editRepeatUnit"]);
-                    EditHomeChore.DaysOfWeek = Request.Form["editDaysOfWeek"]
-                .SelectMany(s => s.Split(','))
-                .Select(int.Parse)
-                .ToList();
+                    EditHomeChore.DaysOfWeek = Request.Form["editDaysOfWeek"].SelectMany(s => s.Split(',')).Select(int.Parse).ToList();
                     EditHomeChore.DayOfMonth = int.Parse(Request.Form["editDayOfMonth"]);
                     EditHomeChore.MonthlyRepeatType = (int)Enum.Parse<MonthlyRepeatType>(Request.Form["editMonthlyRepeatType"]);
-
 
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
 
