@@ -1,9 +1,11 @@
-﻿using HomeChoreTracker.Api.Constants;
-using DayOfWeek = HomeChoreTracker.Api.Constants.DayOfWeek;
-namespace HomeChoreTracker.Api.Contracts.HomeChore
+﻿using HomeChoreTracker.Portal.Constants;
+using DayOfWeek = HomeChoreTracker.Portal.Constants.DayOfWeek;
+
+namespace HomeChoreTracker.Portal.Models.HomeChore
 {
-    public class HomeChoreRequest
+    public class HomeChoreResponse
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public HomeChoreType ChoreType { get; set; }
         public string? Description { get; set; }
@@ -12,10 +14,12 @@ namespace HomeChoreTracker.Api.Contracts.HomeChore
         public TimeLong Time { get; set; }
         public int Interval { get; set; }
         public RepeatUnit Unit { get; set; }
-        public List<int>? DaysOfWeek { get; set; }
+        public List<DayOfWeek>? DaysOfWeek { get; set; }
         public int? DayOfMonth { get; set; }
         public MonthlyRepeatType? MonthlyRepeatType { get; set; }
-        public int HomeId { get; set; }
+
         public bool WasEarnedPoints { get; set; }
+        public bool IsActive { get; set; }
+        public int HomeId { get; set; }
     }
 }

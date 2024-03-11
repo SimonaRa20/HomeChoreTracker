@@ -20,7 +20,7 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly IHomeChoreBaseRepository _homeChoreBaseRepository;
         private readonly IMapper _mapper;
 
-        public HomeChoreController(IHomeChoreRepository homeChoreRepository,  IMapper mapper, IHomeChoreBaseRepository homeChoreBaseRepository)
+        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IMapper mapper, IHomeChoreBaseRepository homeChoreBaseRepository)
         {
             _homeChoreRepository = homeChoreRepository;
             _mapper = mapper;
@@ -51,6 +51,65 @@ namespace HomeChoreTracker.Api.Controllers
             await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest);
             await _homeChoreRepository.Save();
             return Ok("Home chore base created successfully");
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetHomeChoresBase(int id)
+        {
+            try
+            {
+                var homeChore = await _homeChoreRepository.GetAll(id);
+
+                if (homeChore == null || !homeChore.Any())
+                {
+                    return NotFound("No home chore found");
+                }
+
+                return Ok(homeChore);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while fetching home chore bases: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{taskId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteHomeChore(int taskId)
+        {
+            try
+            {
+                await _homeChoreRepository.Delete(taskId);
+                await _homeChoreRepository.Save();
+
+                return Ok($"Home chore base with ID {taskId} deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while deleting the article: {ex.Message}");
+            }
+        }
+
+        [HttpGet("Chore/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetHomeChore(int id)
+        {
+            try
+            {
+                var homeChore = await _homeChoreRepository.Get(id);
+
+                if (homeChore == null)
+                {
+                    return NotFound("No home chore found");
+                }
+
+                return Ok(homeChore);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while fetching home chore bases: {ex.Message}");
+            }
         }
     }
 }

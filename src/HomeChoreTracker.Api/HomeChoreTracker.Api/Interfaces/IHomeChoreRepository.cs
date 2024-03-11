@@ -9,5 +9,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task AddHomeChoreBase(HomeChoreBase homeChoreBase, int homeId);
         Task CreateHomeChore(HomeChoreRequest homeChoreRequest);
         Task Save();
+        Task<List<HomeChoreTask>> GetAll(int id);
+        Task Delete(int id);
+        Task<HomeChoreTask> Get(int id);
     }
 }

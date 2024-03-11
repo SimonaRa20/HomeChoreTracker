@@ -3,6 +3,7 @@ using HomeChoreTracker.Api.Contracts.HomeChoreBase;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
+using Microsoft.EntityFrameworkCore;
 using DayOfWeek = HomeChoreTracker.Api.Constants.DayOfWeek;
 
 namespace HomeChoreTracker.Api.Repositories
@@ -33,6 +34,7 @@ namespace HomeChoreTracker.Api.Repositories
                 MonthlyRepeatType = homeChoreBase.MonthlyRepeatType,
                 IsActive = true,
                 HomeId = homeId,
+                WasEarnedPoints = false,
             };
 
             await _dbContext.HomeChoreTasks.AddAsync(homeChore);
@@ -42,42 +44,44 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task CreateHomeChore(HomeChoreRequest homeChoreRequest)
         {
             List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
-            foreach (int day in homeChoreRequest.DaysOfWeek)
+            if(homeChoreRequest.DaysOfWeek != null)
             {
-                if (day == 0)
+                foreach (int day in homeChoreRequest.DaysOfWeek)
                 {
-                    dayOfWeeks.Add(DayOfWeek.Default);
-                }
-                if (day == 1)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Monday);
-                }
-                if (day == 2)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Tuesday);
-                }
-                if (day == 3)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Wednesday);
-                }
-                if (day == 4)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Thursday);
-                }
-                if (day == 5)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Friday);
-                }
-                if (day == 6)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Saturday);
-                }
-                if (day == 7)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Sunday);
+                    if (day == 0)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Default);
+                    }
+                    if (day == 1)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Monday);
+                    }
+                    if (day == 2)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Tuesday);
+                    }
+                    if (day == 3)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Wednesday);
+                    }
+                    if (day == 4)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Thursday);
+                    }
+                    if (day == 5)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Friday);
+                    }
+                    if (day == 6)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Saturday);
+                    }
+                    if (day == 7)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Sunday);
+                    }
                 }
             }
-
 
             HomeChoreTask homeChore = new HomeChoreTask
             {
@@ -94,9 +98,29 @@ namespace HomeChoreTracker.Api.Repositories
                 MonthlyRepeatType = homeChoreRequest.MonthlyRepeatType,
                 IsActive = true,
                 HomeId = homeChoreRequest.HomeId,
+                WasEarnedPoints = false,
             };
 
             await _dbContext.HomeChoreTasks.AddAsync(homeChore);
+        }
+
+        public async Task Delete(int id)
+        {
+            HomeChoreTask homeChore = await _dbContext.HomeChoreTasks.FindAsync(id);
+            if (homeChore != null)
+            {
+                _dbContext.HomeChoreTasks.Remove(homeChore);
+            }
+        }
+
+        public async Task<HomeChoreTask> Get(int id)
+        {
+            return await _dbContext.HomeChoreTasks.Where(x => x.Id.Equals(id)).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<HomeChoreTask>> GetAll(int id)
+        {
+            return await _dbContext.HomeChoreTasks.Where(x=>x.HomeId.Equals(id)).ToListAsync();
         }
 
         public async Task Save()
