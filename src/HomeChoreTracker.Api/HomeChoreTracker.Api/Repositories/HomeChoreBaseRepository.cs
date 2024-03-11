@@ -35,40 +35,49 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task AddHomeChoreBase(HomeChoreBaseRequest homeChoreBase)
         {
             List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
-            foreach(int day in homeChoreBase.DaysOfWeek)
+
+            if(homeChoreBase.DaysOfWeek != null)
             {
-                if(day == 0)
+                foreach (int day in homeChoreBase.DaysOfWeek)
                 {
-                    dayOfWeeks.Add(DayOfWeek.Default);
+                    if (day == 0)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Default);
+                    }
+                    if (day == 1)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Monday);
+                    }
+                    if (day == 2)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Tuesday);
+                    }
+                    if (day == 3)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Wednesday);
+                    }
+                    if (day == 4)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Thursday);
+                    }
+                    if (day == 5)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Friday);
+                    }
+                    if (day == 6)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Saturday);
+                    }
+                    if (day == 7)
+                    {
+                        dayOfWeeks.Add(DayOfWeek.Sunday);
+                    }
                 }
-                if (day == 1)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Monday);
-                }
-                if (day == 2)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Tuesday);
-                }
-                if (day == 3)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Wednesday);
-                }
-                if (day == 4)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Thursday);
-                }
-                if (day == 5)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Friday);
-                }
-                if (day == 6)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Saturday);
-                }
-                if (day == 7)
-                {
-                    dayOfWeeks.Add(DayOfWeek.Sunday);
-                }
+            }
+
+            else if(homeChoreBase.Unit == Constants.RepeatUnit.Week && homeChoreBase.DaysOfWeek == null)
+            {
+                dayOfWeeks.Add(DayOfWeek.Default);
             }
 
 
