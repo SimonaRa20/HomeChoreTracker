@@ -20,7 +20,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
         public List<Models.Purchase.Purchase> Purchases { get; set; }
 
         [BindProperty]
-        public int SelectedHomeId { get; set; }
+        public int PurchaseId { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -29,13 +29,13 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
         }
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            SelectedHomeId = id;
+            PurchaseId = id;
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var apiUrl = $"{_config["ApiUrl"]}/Purchase/{SelectedHomeId}";
+                var apiUrl = $"{_config["ApiUrl"]}/Purchase/{PurchaseId}";
 
                 var response = await httpClient.GetAsync(apiUrl);
 
@@ -77,38 +77,39 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
             }
         }
 
-        public async Task<IActionResult> OnPostUpdateShoppingItemsAsync()
-        {
-            var token = User.FindFirstValue("Token");
-            var itemsToUpdateJson = HttpContext.Request.Form["itemsToUpdate"];
+		public async Task<IActionResult> OnPostUpdateShoppingItemsAsync(int purchaseId)
+		{
+			var token = User.FindFirstValue("Token");
+			var itemsToUpdateJson = HttpContext.Request.Form["itemsToUpdate"];
 
-            if (!string.IsNullOrEmpty(itemsToUpdateJson))
-            {
-                var itemsToUpdate = JsonConvert.DeserializeObject<List<ShoppingItemUpdateRequest>>(itemsToUpdateJson);
+			if (!string.IsNullOrEmpty(itemsToUpdateJson))
+			{
+				var itemsToUpdate = JsonConvert.DeserializeObject<List<ShoppingItemUpdateRequest>>(itemsToUpdateJson);
 
-                using (var httpClient = _httpClientFactory.CreateClient())
-                {
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+				using (var httpClient = _httpClientFactory.CreateClient())
+				{
+					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                    var apiUrl = $"{_config["ApiUrl"]}/Purchase/UpdateShoppingItems";
+					var apiUrl = $"{_config["ApiUrl"]}/Purchase/UpdateShoppingItems";
 
-                    var response = await httpClient.PostAsJsonAsync(apiUrl, itemsToUpdate);
+					var response = await httpClient.PostAsJsonAsync(apiUrl, itemsToUpdate);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return RedirectToPage("/Purchase/Index", new { id = SelectedHomeId });
-                    }
-                    else
-                    {
-                        return BadRequest($"Failed to update shopping items: {response.ReasonPhrase}");
-                    }
-                }
-            }
-            else
-            {
-                return BadRequest("No data received from the form.");
-            }
-        }
+					if (response.IsSuccessStatusCode)
+					{
+						return RedirectToPage("/Purchase/Index", new { id = purchaseId });
+					}
+					else
+					{
+						return BadRequest($"Failed to update shopping items: {response.ReasonPhrase}");
+					}
+				}
+			}
+			else
+			{
+				return BadRequest("No data received from the form.");
+			}
+		}
+
 
 		public async Task<IActionResult> OnPostUpdateShoppingPurchaseAsync()
 		{
@@ -131,7 +132,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
 					if (response.IsSuccessStatusCode)
 					{
-						return RedirectToPage("/Purchase/Index", new { id = SelectedHomeId });
+						return RedirectToPage("/Purchase/Index", new { id = PurchaseId });
 					}
 					else
 					{
