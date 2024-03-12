@@ -173,9 +173,19 @@
 				content += "<ul id='itemsList' style='list-style-type: none; padding-left: 0;'>";
 				data.items.forEach(function (item) {
 					content += "<li style='margin-bottom: 10px;' id='item_" + item.id + "'>";
+					content += "<label for='title_" + item.id + "'>Title:</label>";
 					content += "<input type='text' class='form-control' id='title_" + item.id + "' value='" + item.title + "'>";
+					
+					content += "<div class='error-message-title' style='color: red'></div>";
+					
+					content += "<label for='quantity_" + item.id + "'>Quantity:</label>";
 					content += "<input type='number' class='form-control' id='quantity_" + item.id + "' value='" + item.quantity + "'>";
+					
+					content += "<div class='error-message-quantity' style='color: red'></div>"
+					
+					content += "<label for='quantityType_" + item.id + "'>Quantity Type:</label>";
 					content += "<select class='form-control' id='quantityType_" + item.id + "'>" + getQuantityTypeOptions(item.quantityType) + "</select>";
+					content += "<label for='productType_" + item.id + "'>Product Type:</label>";
 					content += "<select class='form-control' id='productType_" + item.id + "'>" + getProductTypeOptions(item.productType) + "</select>";
 					content += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + item.id + "'>Remove</button>";
 					content += "</li>";
@@ -192,7 +202,6 @@
 			}
 		});
 	}
-
 	function getQuantityTypeOptions(selectedType) {
 		var options = "";
 		var quantityTypes = ["Grams", "Kilograms", "Liters", "Milliliters", "Pieces"];
@@ -224,12 +233,23 @@
 		$('#item_' + itemId).remove();
 	});
 
+
 	$(document).on('click', '.add-item', function () {
 		var newItemId = 0;
 		var newItemHtml = "<li style='margin-bottom: 10px;' id='item_" + newItemId + "'>";
+		newItemHtml += "<label for='title_" + newItemId + "'>Title:</label>";
 		newItemHtml += "<input type='text' class='form-control' id='title_" + newItemId + "' value=''>";
+		
+		newItemHtml += "<div class='error-message-title' style='color: red'></div>"
+		
+		newItemHtml += "<label for='quantity_" + newItemId + "'>Quantity:</label>";
 		newItemHtml += "<input type='number' class='form-control' id='quantity_" + newItemId + "' value=''>";
+		
+		newItemHtml += "<div class='error-message-quantity' style='color: red'></div>"
+		
+		newItemHtml += "<label for='quantityType_" + newItemId + "'>Quantity Type:</label>";
 		newItemHtml += "<select class='form-control' id='quantityType_" + newItemId + "'><option value='0'>Grams</option><option value='1'>Kilograms</option><option value='2'>Liters</option><option value='3'>Milliliters</option><option value='4'>Pieces</option></select>";
+		newItemHtml += "<label for='productType_" + newItemId + "'>Product Type:</label>";
 		newItemHtml += "<select class='form-control' id='productType_" + newItemId + "'>";
 		newItemHtml += "<option value='0'>Dairy</option>";
 		newItemHtml += "<option value='1'>Fruits</option>";
@@ -311,16 +331,28 @@
 	function validateForm() {
 		var isValid = true;
 		$('#updateItemsForm li').each(function () {
-			var title = $(this).find('input[type="text"]').val();
-			var quantity = $(this).find('input[type="number"]').val();
-			if (title.trim() === '' || quantity.trim() === '') {
-				$('#errorMessage').text('Please enter both title and quantity for all items.');
+			var title = $(this).find('input[type="text"]').val().trim();
+			var quantity = $(this).find('input[type="number"]').val().trim();
+			var errorDivTitle = $(this).find('.error-message-title');
+			var errorDivQuantity = $(this).find('.error-message-quantity');
+
+			if (title === '') {
+				errorDivTitle.text('Title is required');
 				isValid = false;
-				return false;
+			} else {
+				errorDivTitle.text('');
+			}
+
+			if (quantity === '' || parseFloat(quantity) <= 0) {
+				errorDivQuantity.text('Quantity is required and must be more than 0');
+				isValid = false;
+			} else {
+				errorDivQuantity.text('');
 			}
 		});
 		return isValid;
 	}
+
 
 	function DisplayPurchaseDetailModal(purchaseId) {
 		$.ajax({
