@@ -4,6 +4,6 @@
 	{
 		public int Id { get; set; }
 		public int TaskAssignmentId { get; set; }
-		public int HomeMemberId { get; set; }  // have to be home admin
+		public int HomeMemberId { get; set; }
 	}
 }
