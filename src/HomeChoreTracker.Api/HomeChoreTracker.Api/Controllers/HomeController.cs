@@ -35,6 +35,15 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<IActionResult> CreateHome([FromBody] HomeRequest homeRequest)
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+			if(await _homeRepository.CheckOrExistTitle(homeRequest))
+			{
+                return new ObjectResult("Home with the same title already exists.")
+                {
+                    StatusCode = (int)HttpStatusCode.UnprocessableEntity
+                };
+            }
+
 			await _homeRepository.CreateHome(homeRequest, userId);
 			return Ok($"Home created successfully");
 		}

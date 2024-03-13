@@ -42,7 +42,8 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 					}
 					else
 					{
-						ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
+						var errorMessage = await response.Content.ReadAsStringAsync();
+						ModelState.AddModelError(string.Empty, errorMessage);
 						return Page();
 					}
 				}

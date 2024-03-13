@@ -16,6 +16,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
+
+@if (User.Identity.IsAuthenticated)
+{
 <div class="row">
     <div class="col-lg-12">
         <a class="btn btn-light btn-sm" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Purchases</a>
@@ -26,11 +29,9 @@
                 <form method="post" onsubmit="return validatePurchase()">
                     <div class="form-group">
                         <label for="PurchaseDate">Purchase Date</label>
-                        <!-- Add an id attribute to the PurchaseDate input field -->
                         <input type="date" class="form-control" id="PurchaseDate" name="PurchaseDate" asp-for="PurchaseRequest.PurchaseDate">
                         <span asp-validation-for="PurchaseRequest.PurchaseDate" class="text-danger"></span>
                     </div>
-                    <!-- Shopping Items Section -->
                     <div class="form-group" id="shoppingItems">
                         <label>Shopping Items</label>
                         <div class="shopping-item">
@@ -74,7 +75,14 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
+}
+else
+{
+    Response.Redirect("/Auth/Login");
+}
+
+
 <<script>
      function addShoppingItem() {
          var itemCount = document.querySelectorAll('.shopping-item').length;
@@ -82,17 +90,16 @@
              '<div class="form-group">' +
              '<label for="Title' + itemCount + '">Title</label>' +
              '<input type="text" class="form-control mb-2" id="Title' + itemCount + '" name="Items[' + itemCount + '].Title" placeholder="Title" asp-for="PurchaseRequest.Items[' + itemCount + '].Title">' +
-             '<span id="TitleError' + itemCount + '" class="text-danger"></span>' + // Placeholder for validation message
+             '<span id="TitleError' + itemCount + '" class="text-danger"></span>' +
              '</div>' +
              '<div class="form-group">' +
              '<label for="Quantity' + itemCount + '">Quantity</label>' +
              '<input type="number" class="form-control mb-2" id="Quantity' + itemCount + '" name="Items[' + itemCount + '].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[' + itemCount + '].Quantity" step="0.01" min="0.01">' +
-             '<span id="QuantityError' + itemCount + '" class="text-danger"></span>' +  // Placeholder for validation message
+             '<span id="QuantityError' + itemCount + '" class="text-danger"></span>' +
              '</div>' +
              '<label for="QuantityType' + itemCount + '">Quantity Type</label>' +
              '<select class="form-control mb-2" id="QuantityType' + itemCount + '" name="Items[' + itemCount + '].QuantityType" asp-for="PurchaseRequest.Items[' + itemCount + '].QuantityType">';
 
-         // Dynamically generate options for QuantityType dropdown
          var quantityTypeOptions = '';
          var quantityTypes = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(HomeChoreTracker.Portal.Constants.QuantityType))));
          quantityTypes.forEach(function (type) {
@@ -104,7 +111,6 @@
              '<label for="ProductType' + itemCount + '">Product Type</label>' +
              '<select class="form-control mb-2" id="ProductType' + itemCount + '" name="Items[' + itemCount + '].ProductType" asp-for="PurchaseRequest.Items[' + itemCount + '].ProductType">';
 
-         // Dynamically generate options for ProductType dropdown
          var productTypeOptions = '';
          var productTypes = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(HomeChoreTracker.Portal.Constants.ProductType))));
          productTypes.forEach(function (type) {
@@ -125,7 +131,6 @@
          var titleError = document.getElementById('TitleError' + itemCount);
          var quantityError = document.getElementById('QuantityError' + itemCount);
 
-         // Check if elements exist before accessing their properties
          if (title && quantity && titleError && quantityError) {
              if (title.value.trim() === '') {
                  titleError.textContent = 'Title is required';
@@ -153,7 +158,6 @@
              var titleError = document.getElementById('TitleError' + i);
              var quantityError = document.getElementById('QuantityError' + i);
 
-             // Check if elements exist before accessing their properties
              if (title && quantity && titleError && quantityError) {
                  if (title.value.trim() === '') {
                      titleError.textContent = 'Title is required';

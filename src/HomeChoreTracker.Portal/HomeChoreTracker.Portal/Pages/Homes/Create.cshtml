@@ -16,6 +16,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
+@if (User.Identity.IsAuthenticated)
+{
 <div class="row">
 	<div class="col-lg-12">
 
@@ -30,9 +32,28 @@
 						<input type="text" class="form-control" id="Name" name="CreateHome.Title" asp-for="CreateHome.Title">
 						<span asp-validation-for="CreateHome.Title" class="text-danger"></span>
 					</div>
+					<div class="text-danger" style="padding-left: 0; margin-left: 0;">
+						@if (!ModelState.IsValid)
+						{
+							<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+								@foreach (var modelStateKey in ViewData.ModelState.Keys)
+								{
+									foreach (var error in ViewData.ModelState[modelStateKey].Errors)
+									{
+										<li>@error.ErrorMessage</li>
+									}
+								}
+							</ul>
+						}
+					</div>
 					<button type="submit" class="btn btn-primary">Create</button>
 				</form>
 			</div>
 		</div>
 	</div>
-</div>
+	</div>
+}
+else
+{
+	Response.Redirect("/Auth/Login");
+}

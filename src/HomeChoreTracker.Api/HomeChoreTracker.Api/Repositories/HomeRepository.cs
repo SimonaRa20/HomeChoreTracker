@@ -139,5 +139,19 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.UserHomes
                 .AnyAsync(uh => uh.UserId == userId && uh.HomeId == homeId);
         }
+
+        public async Task<bool> CheckOrExistTitle(HomeRequest homeRequest)
+        {
+            var home = await _dbContext.Homes.Where(x => x.Title.Equals(homeRequest.Title)).FirstOrDefaultAsync();
+            if(home == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
     }
 }

@@ -3,6 +3,8 @@
 @{
 	ViewData["Title"] = "Homes";
 }
+@if (User.Identity.IsAuthenticated)
+{
 <div class="row">
 	<div class="col-lg-6">
 		<a class="btn btn-secondary btn-sm mb-2" href="~/Homes">
@@ -48,3 +50,8 @@
 		</div>
 	</div>
 </div>
+}
+else
+{
+	Response.Redirect("/Auth/Login");
+}
