@@ -129,6 +129,7 @@ namespace HomeChoreTracker.Api.Controllers
                 {
                     HomeChoreRequest homeChoreRequest = new HomeChoreRequest();
                     homeChoreRequest.Name = homeChoreBaseRequest.Name;
+                    homeChoreRequest.StartDate = DateTime.Now;
                     homeChoreRequest.ChoreType = homeChoreBaseRequest.ChoreType;
                     homeChoreRequest.Description = homeChoreBaseRequest.Description;
                     homeChoreRequest.Points = homeChoreBaseRequest.Points;

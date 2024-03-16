@@ -23,6 +23,7 @@ namespace HomeChoreTracker.Api.Repositories
             {
                 Name = homeChoreBase.Name,
                 ChoreType = homeChoreBase.ChoreType,
+                StartDate = DateTime.Now,
                 Description = homeChoreBase.Description,
                 Points = homeChoreBase.Points,
                 Time = homeChoreBase.Time,
@@ -87,6 +88,7 @@ namespace HomeChoreTracker.Api.Repositories
             {
                 Name = homeChoreRequest.Name,
                 ChoreType = homeChoreRequest.ChoreType,
+                StartDate = homeChoreRequest.StartDate,
                 Description = homeChoreRequest.Description,
                 Points = homeChoreRequest.Points,
                 Time = homeChoreRequest.Time,

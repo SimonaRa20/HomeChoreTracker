@@ -210,6 +210,9 @@ namespace HomeChoreTracker.Api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("HomeId")
                         .HasColumnType("int");
 
@@ -231,6 +234,9 @@ namespace HomeChoreTracker.Api.Migrations
 
                     b.Property<int>("Points")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Time")
                         .HasColumnType("int");
