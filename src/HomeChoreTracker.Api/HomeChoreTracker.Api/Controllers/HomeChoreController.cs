@@ -113,6 +113,25 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
+        [HttpPut("Chore/Dates/{id}")]
+        [Authorize]
+        public async Task <IActionResult> UpdateHomeChoreDates(int id, [FromBody] SetHomeChoreDatesRequest homeChoreDatesRequest)
+        {
+            var homeChore = await _homeChoreRepository.Get(id);
+            if (homeChore == null)
+            {
+                return NotFound($"Home chore base with ID {id} not found");
+            }
+
+            homeChore.StartDate = homeChoreDatesRequest.StartDate;
+            homeChore.EndDate = homeChoreDatesRequest.EndDate;
+
+            await _homeChoreRepository.Update(homeChore);
+            await _homeChoreRepository.Save();
+
+            return Ok($"Home chore base with ID {id} updated successfully");
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHomeChore(int id, [FromBody] HomeChoreBaseRequest homeChoreBaseRequest)
         {
@@ -129,7 +148,6 @@ namespace HomeChoreTracker.Api.Controllers
                 {
                     HomeChoreRequest homeChoreRequest = new HomeChoreRequest();
                     homeChoreRequest.Name = homeChoreBaseRequest.Name;
-                    homeChoreRequest.StartDate = DateTime.Now;
                     homeChoreRequest.ChoreType = homeChoreBaseRequest.ChoreType;
                     homeChoreRequest.Description = homeChoreBaseRequest.Description;
                     homeChoreRequest.Points = homeChoreBaseRequest.Points;

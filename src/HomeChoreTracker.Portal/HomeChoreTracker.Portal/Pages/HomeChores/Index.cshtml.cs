@@ -22,11 +22,15 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         [BindProperty]
         public HomeChoreBaseEditRequest EditHomeChore { get; set; }
 
+        [BindProperty]
+        public SetHomeChoreDatesRequest EditHomeChoreDates { get; set; }
+
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
             EditHomeChore = new HomeChoreBaseEditRequest();
+            EditHomeChoreDates = new SetHomeChoreDatesRequest();
         }
 
         public async Task<IActionResult> OnGetAsync(int id)
@@ -108,6 +112,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         {
                             id = choreDetails.Id,
                             name = choreDetails.Name,
+                            startDate = choreDetails.StartDate,
+                            endDate = choreDetails.EndDate,
                             choreType = choreTypeText,
                             description = descriptionText,
                             points = choreDetails.Points,
@@ -158,14 +164,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     EditHomeChore.Name = Request.Form["editName"];
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
                     EditHomeChore.Description = Request.Form["editDescription"];
-                    EditHomeChore.Points = int.Parse(Request.Form["editPoints"]);
-                    EditHomeChore.LevelType = (int)Enum.Parse<LevelType>(Request.Form["editLevelType"]);
-                    EditHomeChore.Time = (int)Enum.Parse<TimeLong>(Request.Form["editTimeLong"]);
-                    EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
-                    EditHomeChore.Unit = (int)Enum.Parse<RepeatUnit>(Request.Form["editRepeatUnit"]);
-                    EditHomeChore.DaysOfWeek = Request.Form["editDaysOfWeek"].SelectMany(s => s.Split(',')).Select(int.Parse).ToList();
-                    EditHomeChore.DayOfMonth = int.Parse(Request.Form["editDayOfMonth"]);
-                    EditHomeChore.MonthlyRepeatType = (int)Enum.Parse<MonthlyRepeatType>(Request.Form["editMonthlyRepeatType"]);
 
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
 
@@ -187,6 +185,52 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 return Page();
             }
         }
+
+        public async Task<IActionResult> OnPostEditDateAsync(int id, int editChoreHomeId)
+        {
+            ClearFieldErrors(key => key == "id");
+            ClearFieldErrors(key => key == "Name");
+            ClearFieldErrors(key => key == "HomeId");
+            if (!ModelState.IsValid)
+            {
+                await OnGetAsync(editChoreHomeId); // Refresh the data
+                return Page();
+            }
+
+            try
+            {
+                var token = User.FindFirstValue("Token");
+                using (var httpClient = _httpClientFactory.CreateClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                    var apiUrl = $"{_config["ApiUrl"]}/HomeChore/Chore/Dates/{id}";
+
+                    // Update EditHomeChore with form values
+                    EditHomeChoreDates.StartDate = DateTime.Parse(Request.Form["editStartDate"]);
+                    EditHomeChoreDates.EndDate = DateTime.Parse(Request.Form["editEndDate"]);
+
+                    var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChoreDates);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToPage();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, $"Failed to update chore: {response.StatusCode}");
+                        return Page();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                await OnGetAsync(editChoreHomeId); // Refresh the data
+                return Page();
+            }
+        }
+
 
         private void ClearFieldErrors(Func<string, bool> predicate)
         {

@@ -7,12 +7,12 @@
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "library": "moment.js@2.30.1",
-      "destination": "wwwroot/lib/moment.js/"
-    },
-    {
       "library": "fullcalendar@6.1.11",
       "destination": "wwwroot/lib/fullcalendar/"
+    },
+    {
+      "library": "moment.js@2.30.1",
+      "destination": "wwwroot/lib/moment.js/"
     }
   ]
 }

@@ -26,7 +26,7 @@
             <a class="btn btn-secondary btn-sm mb-2" href="/HomeChores/@Model.HomeId"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
             <a class="btn btn-light btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.HomeId"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
             <a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.HomeId"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.HomeId"><i class="fa fa-list mr-2" aria-hidden="true"></i>Calendar</a>
+            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.HomeId"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Calendar</a>
             <div class="card mb-4 py-3 border-left-primary">
 
                 <div class="card-body">
@@ -44,6 +44,8 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Chore Type</th>
+                                    <th>Start date</th>
+                                    <th>End date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -54,6 +56,27 @@
                                         <td>@choreBase.Name</td>
                                         <td>@choreBase.ChoreType</td>
                                         <td>
+                                            @if(choreBase.StartDate != null)
+                                            {
+                                                @choreBase.StartDate?.ToString("yyyy-MM-dd")
+                                            }
+                                            else
+                                            {
+                                                <a>—</a>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (choreBase.EndDate != null)
+                                            {
+                                                @choreBase.EndDate?.ToString("yyyy-MM-dd")
+                                            }
+                                            else
+                                            {
+                                                <a>—</a>
+                                            }
+                                        </td>
+
+                                        <td>
                                             <button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
                                                 <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                                             </button>
@@ -62,11 +85,17 @@
                                             <button class='btn btn-sm' onclick="DisplayEditModal('@choreBase.Id')">
                                                 <i class='fa fa-pencil-alt'></i>
                                             </button>
+                                                <button class='btn btn-sm' onclick="DisplayEditDateModal('@choreBase.Id', @Model.HomeId)">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
                                             }
                                             @if (!choreBase.WasEarnedPoints && choreBase.IsActive)
                                             {
                                                 <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
                                             }
+
+                                            
+
 
                                             <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
                                                 <div class="modal-dialog" role="document">
@@ -226,6 +255,41 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="editDateModal" tabindex="-1" role="dialog" aria-labelledby="editDateModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDateModalLabel">Edit Chore</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="EditDate" id="editDateForm">
+                        <input type="hidden" id="editChoreDateId" name="id" value="" />
+                        <input type="hidden" id="editChoreHomeId" name="editChoreHomeId" value="@Model.HomeId" />
+
+                        <div class="form-group">
+                            <label for="editStartDate">Start date</label>
+                            <input type="date" class="form-control" id="editStartDate" name="editStartDate" asp-for="EditHomeChoreDates.StartDate" required>
+                            <span asp-validation-for="EditHomeChoreDates.StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEndDate">End date</label>
+                            <input type="date" class="form-control" id="editEndDate" name="editEndDate" asp-for="EditHomeChoreDates.EndDate" required>
+                            <span asp-validation-for="EditHomeChoreDates.EndDate" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 }
 <script>
     $(document).ready(function () {
@@ -335,6 +399,9 @@
 
                     $('#editPoints').val(data.points);
 
+                    $('#editStartDate').val(data.startDate);
+                    $('#editEndDate').val(data.endDate);
+
                     var timeLongText = data.time;
                     $('#editTimeLong option').filter(function () {
                         return $(this).text() === timeLongText;
@@ -405,4 +472,38 @@
             }
         });
     }
+
+    function DisplayEditDateModal(choreId, homeId) {
+
+        console.log(choreId);
+        console.log(homeId);
+
+        currentChoreId = choreId; // Store the current chore ID
+        editChoreHomeId = homeId;
+        $('#editChoreDateId').val(choreId);
+        $.ajax({
+            url: '@Url.Page("/HomeChores/Index")?handler=Detail&choreId=' + choreId,
+            type: 'GET',
+            success: function (data) {
+                console.log('Received data:', data); // Log the received data
+                if (data) {
+                    // Format the start date and end date
+                    var startDate = new Date(data.startDate).toISOString().split('T')[0];
+                    var endDate = new Date(data.endDate).toISOString().split('T')[0];
+
+                    // Assign the formatted dates to the input fields
+                    $('#editStartDate').val(startDate);
+                    $('#editEndDate').val(endDate);
+                    $('#editDateModal').modal('show');
+                } else {
+                    console.error('Invalid data format:', data);
+                }
+            },
+            error: function (error) {
+                console.error('Error fetching chore details:', error);
+            }
+        });
+    }
+
+
 </script>

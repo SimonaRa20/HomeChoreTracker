@@ -1,11 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using HomeChoreTracker.Portal.Constants;
+using HomeChoreTracker.Portal.Models.HomeChore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using HomeChoreTracker.Portal.Models.HomeChore;
-using System.Security.Claims;
+using DayOfWeek = HomeChoreTracker.Portal.Constants.DayOfWeek;
 
 namespace HomeChoreTracker.Portal.Pages.HomeChores
 {
@@ -41,15 +46,22 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 {
                     HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<HomeChoreResponse>>();
 
-                    var events = HomeChoreResponse.Select(chore => new
-                    {
-                        id = chore.Id,
-                        title = chore.Name,
-                        start = chore.StartDate.ToString("yyyy-MM-dd"),
-                        end = chore.EndDate != null ? chore.EndDate.Value.ToString("yyyy-MM-dd") : chore.StartDate.AddDays(1).ToString("yyyy-MM-dd")
-                    });
+                    var events = new List<object>();
 
-                    return Page(); // Return events as JSON result
+                    foreach (var chore in HomeChoreResponse)
+                    {
+                        //var occurrences = CalculateOccurrences(chore);
+
+                        //events.AddRange(occurrences.Select(occurrence => new
+                        //{
+                        //    id = chore.Id,
+                        //    title = chore.Name,
+                        //    start = occurrence.ToString("yyyy-MM-dd"),
+                        //    end = occurrence.ToString("yyyy-MM-dd")
+                        //}));
+                    }
+
+                    return Page();
                 }
                 else
                 {
@@ -57,5 +69,43 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 }
             }
         }
+
+        //private List<DateTime> CalculateOccurrences(HomeChoreResponse chore)
+        //{
+        //    var occurrences = new List<DateTime>();
+
+        //    if (chore.Unit == RepeatUnit.Day)
+        //    {
+        //        // For daily repetition, add occurrences based on the interval
+        //        for (var i = 0; i < chore.Interval; i++)
+        //        {
+        //            var occurrence = chore.StartDate.AddDays(i);
+        //            if (chore.EndDate == null || occurrence <= chore.EndDate)
+        //            {
+        //                occurrences.Add(occurrence);
+        //            }
+        //        }
+        //    }
+        //    else if (chore.Unit == RepeatUnit.Week && chore.DaysOfWeek != null)
+        //    {
+        //        // For weekly repetition, add occurrences based on the interval and selected days
+        //        for (var i = 0; i < chore.Interval * 7; i++)
+        //        {
+        //            var occurrence = chore.StartDate.AddDays(i);
+        //            if (chore.EndDate != null && occurrence > chore.EndDate)
+        //            {
+        //                break;
+        //            }
+
+        //            if (chore.DaysOfWeek.Contains((DayOfWeek)occurrence.DayOfWeek))
+        //            {
+        //                occurrences.Add(occurrence);
+        //            }
+        //        }
+        //    }
+        //    // Add support for other repeat units (Month, Year) as needed
+
+        //    return occurrences;
+        //}
     }
 }
