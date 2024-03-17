@@ -112,8 +112,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         {
                             id = choreDetails.Id,
                             name = choreDetails.Name,
-                            startDate = choreDetails.StartDate,
-                            endDate = choreDetails.EndDate,
                             choreType = choreTypeText,
                             description = descriptionText,
                             points = choreDetails.Points,
@@ -138,7 +136,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 }
             }
         }
-
 
         public async Task<IActionResult> OnPostEditAsync(int id)
         {
@@ -165,7 +162,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
                     EditHomeChore.Description = Request.Form["editDescription"];
 
-                    var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
+                    var response = await httpClient.PostAsJsonAsync(apiUrl, EditHomeChore);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -183,6 +180,37 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
                 await OnGetAsync(HomeId); // Refresh the data
                 return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnGetDatesAsync(int choreId)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/HomeChore/Chore/Dates/{choreId}";
+                var response = await httpClient.GetAsync(apiUrl);
+
+                var choreDetails = new List<TaskSchedule>();
+                if (response.IsSuccessStatusCode)
+                {
+                    choreDetails = await response.Content.ReadFromJsonAsync<List<TaskSchedule>>();
+
+                    if (choreDetails != null)
+                    {
+                        return new JsonResult(choreDetails);
+                    }
+                    else
+                    {
+                        return NotFound("Chore details not found.");
+                    }
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
+                }
             }
         }
 
@@ -210,7 +238,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     EditHomeChoreDates.StartDate = DateTime.Parse(Request.Form["editStartDate"]);
                     EditHomeChoreDates.EndDate = DateTime.Parse(Request.Form["editEndDate"]);
 
-                    var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChoreDates);
+                    var response = await httpClient.PostAsJsonAsync(apiUrl, EditHomeChoreDates);
 
                     if (response.IsSuccessStatusCode)
                     {

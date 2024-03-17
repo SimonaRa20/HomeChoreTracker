@@ -123,8 +123,19 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.HomeChoreTasks.Where(x=>x.HomeId.Equals(id)).ToListAsync();
         }
 
+        public async Task<List<TaskSchedule>> GetTaskSchedule(int id)
+        {
+            return await _dbContext.TaskSchedules.Where(x => x.TaskId.Equals(id)).ToListAsync();
+        }
+
         public async Task Save()
         {
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task SetHomeChoreDates(TaskSchedule taskSchedule)
+        {
+            await _dbContext.TaskSchedules.AddAsync(taskSchedule);
             await _dbContext.SaveChangesAsync();
         }
 

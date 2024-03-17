@@ -13,5 +13,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task Delete(int id);
         Task<HomeChoreTask> Get(int id);
         Task Update(HomeChoreTask homeChoreTask);
+        Task SetHomeChoreDates(TaskSchedule taskSchedule);
+        Task<List<TaskSchedule>> GetTaskSchedule(int id);
     }
 }

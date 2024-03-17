@@ -24,7 +24,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<PointsHistory> PointsHistory { get; set; }
         public DbSet<TaskApproval> TaskApprovals { get; set; }
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
-        public DbSet<TaskSchedule> taskSchedules { get; set; }
+        public DbSet<TaskSchedule> TaskSchedules { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
 

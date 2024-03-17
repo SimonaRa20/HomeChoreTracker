@@ -1,4 +1,4 @@
-﻿namespace HomeChoreTracker.Api.Models
+﻿namespace HomeChoreTracker.Portal.Models.HomeChore
 {
     public class TaskSchedule
     {

@@ -113,9 +113,9 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        [HttpPut("Chore/Dates/{id}")]
+        [HttpPost("Chore/Dates/{id}")]
         [Authorize]
-        public async Task <IActionResult> UpdateHomeChoreDates(int id, [FromBody] SetHomeChoreDatesRequest homeChoreDatesRequest)
+        public async Task <IActionResult> SetHomeChoreDates(int id, [FromBody] SetHomeChoreDatesRequest homeChoreDatesRequest)
         {
             var homeChore = await _homeChoreRepository.Get(id);
             if (homeChore == null)
@@ -123,14 +123,33 @@ namespace HomeChoreTracker.Api.Controllers
                 return NotFound($"Home chore base with ID {id} not found");
             }
 
-            homeChore.StartDate = homeChoreDatesRequest.StartDate;
-            homeChore.EndDate = homeChoreDatesRequest.EndDate;
+            TaskSchedule taskSchedule = new TaskSchedule
+            {
+                TaskId = id,
+                StartDate = homeChoreDatesRequest.StartDate,
+                EndDate = homeChoreDatesRequest.EndDate,
+            };
 
-            await _homeChoreRepository.Update(homeChore);
+            await _homeChoreRepository.SetHomeChoreDates(taskSchedule);
             await _homeChoreRepository.Save();
-
-            return Ok($"Home chore base with ID {id} updated successfully");
+            return Ok("Home chore date created successfully");
         }
+
+
+        [HttpGet("Chore/Dates/{id}")]
+        [Authorize]
+        public async Task<IActionResult>GetHomeChoreDates(int id)
+        {
+            var homeChore = await _homeChoreRepository.Get(id);
+            if (homeChore == null)
+            {
+                return NotFound($"Home chore base with ID {id} not found");
+            }
+
+            var homeChores = await _homeChoreRepository.GetTaskSchedule(id);
+            return Ok(homeChores);
+        }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHomeChore(int id, [FromBody] HomeChoreBaseRequest homeChoreBaseRequest)

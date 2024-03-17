@@ -44,8 +44,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Chore Type</th>
-                                    <th>Start date</th>
-                                    <th>End date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -55,27 +53,7 @@
                                     <tr>
                                         <td>@choreBase.Name</td>
                                         <td>@choreBase.ChoreType</td>
-                                        <td>
-                                            @if(choreBase.StartDate != null)
-                                            {
-                                                @choreBase.StartDate?.ToString("yyyy-MM-dd")
-                                            }
-                                            else
-                                            {
-                                                <a>—</a>
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (choreBase.EndDate != null)
-                                            {
-                                                @choreBase.EndDate?.ToString("yyyy-MM-dd")
-                                            }
-                                            else
-                                            {
-                                                <a>—</a>
-                                            }
-                                        </td>
-
+                                      
                                         <td>
                                             <button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
                                                 <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
@@ -93,9 +71,6 @@
                                             {
                                                 <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
                                             }
-
-                                            
-
 
                                             <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
                                                 <div class="modal-dialog" role="document">
@@ -261,12 +236,16 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editDateModalLabel">Edit Chore</h5>
+                    <h5 class="modal-title" id="editDateModalLabel">Set Chore Date</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+
+                    <ul id="datesList" style="list-style-type: none; padding-left: 0;">
+
+                    </ul>
                     <form method="post" asp-page-handler="EditDate" id="editDateForm">
                         <input type="hidden" id="editChoreDateId" name="id" value="" />
                         <input type="hidden" id="editChoreHomeId" name="editChoreHomeId" value="@Model.HomeId" />
@@ -281,6 +260,7 @@
                             <input type="date" class="form-control" id="editEndDate" name="editEndDate" asp-for="EditHomeChoreDates.EndDate" required>
                             <span asp-validation-for="EditHomeChoreDates.EndDate" class="text-danger"></span>
                         </div>
+                        <div id="editDateErrorMessage" class="text-danger" style="display: none;">Start date cannot be greater than end date.</div>
 
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </form>
@@ -345,6 +325,7 @@
         // Trigger change event to ensure proper initialization
         $('#editRepeatUnit').trigger('change');
     });
+
 </script>
 
 
@@ -474,26 +455,43 @@
     }
 
     function DisplayEditDateModal(choreId, homeId) {
-
-        console.log(choreId);
-        console.log(homeId);
-
         currentChoreId = choreId; // Store the current chore ID
-        editChoreHomeId = homeId;
+        editChoreHomeId = homeId; // Store the home ID (Note: this variable should be declared somewhere in your script)
+
+        // Set the chore ID in the hidden input field
         $('#editChoreDateId').val(choreId);
+        // Get today's date
+        var today = new Date();
+        // Set the start date input field value to today's date
+        $('#editStartDate').val(today.toISOString().substring(0, 10));
+
+        // Calculate the end date as one month from today
+        var endDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        // Set the end date input field value to the calculated end date
+        $('#editEndDate').val(endDate.toISOString().substring(0, 10));
+
+        // Make an AJAX request to fetch detailed information about the chore dates
         $.ajax({
-            url: '@Url.Page("/HomeChores/Index")?handler=Detail&choreId=' + choreId,
+            url: '@Url.Page("/HomeChores/Index")?handler=Dates&choreId=' + choreId,
             type: 'GET',
             success: function (data) {
                 console.log('Received data:', data); // Log the received data
                 if (data) {
-                    // Format the start date and end date
-                    var startDate = new Date(data.startDate).toISOString().split('T')[0];
-                    var endDate = new Date(data.endDate).toISOString().split('T')[0];
+                    // Clear any previous list of dates
+                    $('#datesList').empty();
 
-                    // Assign the formatted dates to the input fields
-                    $('#editStartDate').val(startDate);
-                    $('#editEndDate').val(endDate);
+                    // Populate the list of previous dates
+                    data.forEach(function (date) {
+                        // Format the start and end dates
+                        var formattedStartDate = date.startDate.substring(0, 10);
+                        var formattedEndDate = date.endDate.substring(0, 10);
+
+                        $('#datesList').append('<li>' + formattedStartDate + ' - ' + formattedEndDate + '</li>');
+                    });
+
+
+
+                    // Show the modal
                     $('#editDateModal').modal('show');
                 } else {
                     console.error('Invalid data format:', data);
@@ -504,6 +502,17 @@
             }
         });
     }
+    $('#editDateForm').submit(function (event) {
+        var startDate = new Date($('#editStartDate').val());
+        var endDate = new Date($('#editEndDate').val());
 
+        if (startDate >= endDate) {
+            $('#editDateErrorMessage').text('Start date cannot be greater or equals with end date.');
+            $('#editDateErrorMessage').show();
+            event.preventDefault(); // Prevent form submission
+        } else {
+            $('#editDateErrorMessage').hide();
+        }
+    });
 
 </script>
