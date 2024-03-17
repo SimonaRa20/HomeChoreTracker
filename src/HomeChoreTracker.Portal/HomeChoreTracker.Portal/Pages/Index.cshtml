@@ -9,30 +9,33 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel='stylesheet' />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 }
 
 @if (!User.Identity.IsAuthenticated)
 {
-    <script>window.location.href = "/Auth/Login";</script>
+    Response.Redirect("/Auth/Login");
 }
 else
 {
     <div class="row">
         <div class="col-lg-12">
             <div class="card mb-4 py-3 border-left-primary">
-                <div id="calendar"></div>
+                <div id="calendar" style="margin-left:4px"></div>
             </div>
         </div>
     </div>
 }
 
 <script>
-    $(document).ready(function () {
+    // Load FullCalendar dynamically
+    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js").done(function () {
+        // Initialize FullCalendar
         $('#calendar').fullCalendar({
             defaultView: 'month',
             firstDay: 1,
             // Add your other FullCalendar options here
         });
+    }).fail(function (jqxhr, settings, exception) {
+        console.error("Failed to load FullCalendar:", exception);
     });
 </script>
