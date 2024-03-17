@@ -132,9 +132,148 @@ namespace HomeChoreTracker.Api.Controllers
 
             await _homeChoreRepository.SetHomeChoreDates(taskSchedule);
             await _homeChoreRepository.Save();
+
+
+            if (homeChore.Unit == RepeatUnit.Day)
+            {
+                int numberOfDays = (int)(homeChoreDatesRequest.EndDate - homeChoreDatesRequest.StartDate).TotalDays;
+
+                for (int i = 0; i <= numberOfDays; i += homeChore.Interval)
+                {
+                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddDays(i);
+
+                    TaskAssignment taskAssignment = new TaskAssignment
+                    {
+                        TaskId = id,
+                        StartDate = assignmentDate,
+                        EndDate = assignmentDate,
+                        IsDone = false,
+                        IsApproved = false,
+                        HomeId = homeChore.HomeId
+                    };
+
+                    await _homeChoreRepository.AddTaskAssignment(taskAssignment);
+                    await _homeChoreRepository.Save();
+                }
+            }
+            if (homeChore.Unit == RepeatUnit.Week)
+            {
+                int totalWeeks = (int)Math.Ceiling((homeChoreDatesRequest.EndDate - homeChoreDatesRequest.StartDate).TotalDays / 7.0);
+
+                for (int i = 0; i < totalWeeks; i += homeChore.Interval)
+                {
+                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddDays(i * 7);
+
+                    if (homeChore.DaysOfWeek == null || homeChore.DaysOfWeek.Contains(DayOfWeek.Default))
+                    {
+                        Random rnd = new Random();
+                        int randomDay = rnd.Next(1, 8);
+                        assignmentDate = assignmentDate.AddDays(randomDay - (int)assignmentDate.DayOfWeek);
+                    }
+                    else
+                    {
+                        DayOfWeek firstDayOfWeek = homeChore.DaysOfWeek.First();
+                        int daysToAdd = ((int)firstDayOfWeek - (int)assignmentDate.DayOfWeek + 7) % 7;
+                        assignmentDate = assignmentDate.AddDays(daysToAdd);
+                    }
+
+                    TaskAssignment taskAssignment = new TaskAssignment
+                    {
+                        TaskId = id,
+                        StartDate = assignmentDate,
+                        EndDate = assignmentDate,
+                        IsDone = false,
+                        IsApproved = false,
+                        HomeId = homeChore.HomeId
+                    };
+
+                    await _homeChoreRepository.AddTaskAssignment(taskAssignment);
+                    await _homeChoreRepository.Save();
+                }
+            }
+            if (homeChore.Unit == RepeatUnit.Month)
+            {
+                int totalMonths = ((homeChoreDatesRequest.EndDate.Year - homeChoreDatesRequest.StartDate.Year) * 12) + homeChoreDatesRequest.EndDate.Month - homeChoreDatesRequest.StartDate.Month;
+
+                for (int i = 0; i < totalMonths; i += homeChore.Interval)
+                {
+                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddMonths(i);
+
+                    if (homeChore.MonthlyRepeatType == MonthlyRepeatType.DayOfMonth)
+                    {
+                        if (homeChore.DayOfMonth.HasValue)
+                        {
+                            int maxDayOfMonth = DateTime.DaysInMonth(assignmentDate.Year, assignmentDate.Month);
+                            int selectedDayOfMonth = homeChore.DayOfMonth.Value;
+                            selectedDayOfMonth = Math.Min(selectedDayOfMonth, maxDayOfMonth);
+
+                            assignmentDate = new DateTime(assignmentDate.Year, assignmentDate.Month, selectedDayOfMonth);
+                        }
+                        else
+                        {
+                            assignmentDate = new DateTime(assignmentDate.Year, assignmentDate.Month, 1);
+                        }
+                    }
+                    else if (homeChore.MonthlyRepeatType == MonthlyRepeatType.FirstDayOfWeek)
+                    {
+                        assignmentDate = new DateTime(assignmentDate.Year, assignmentDate.Month, 1);
+                    }
+
+                    TaskAssignment taskAssignment = new TaskAssignment
+                    {
+                        TaskId = id,
+                        StartDate = assignmentDate,
+                        EndDate = assignmentDate,
+                        IsDone = false,
+                        IsApproved = false,
+                        HomeId = homeChore.HomeId
+                    };
+
+                    await _homeChoreRepository.AddTaskAssignment(taskAssignment);
+                    await _homeChoreRepository.Save();
+                }
+            }
+            if (homeChore.Unit == RepeatUnit.Year)
+            {
+                int totalYears = homeChoreDatesRequest.EndDate.Year - homeChoreDatesRequest.StartDate.Year;
+
+                for (int i = 0; i <= totalYears; i += homeChore.Interval)
+                {
+                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddYears(i);
+
+                    if ((i + 1) % homeChore.Interval == 0)
+                    {
+                        TaskAssignment taskAssignment = new TaskAssignment
+                        {
+                            TaskId = id,
+                            StartDate = assignmentDate,
+                            EndDate = assignmentDate,
+                            IsDone = false,
+                            IsApproved = false,
+                            HomeId = homeChore.HomeId
+                        };
+
+                        await _homeChoreRepository.AddTaskAssignment(taskAssignment);
+                        await _homeChoreRepository.Save();
+                    }
+                }
+            }
+
             return Ok("Home chore date created successfully");
         }
 
+        [HttpGet("Chore/Calendar/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetHomeChoresToCalendar(int id)
+        {
+            var homeChores = await _homeChoreRepository.GetCalendar(id);
+            if (homeChores == null)
+            {
+                return NotFound($"Home chore base with ID {id} not found");
+            }
+
+            return Ok(homeChores);
+        }
 
         [HttpGet("Chore/Dates/{id}")]
         [Authorize]

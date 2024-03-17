@@ -4,14 +4,35 @@
     ViewData["Title"] = "Home page";
 }
 
-@{
-    if (!User.Identity.IsAuthenticated)
-    {
-        Response.Redirect("/Auth/Login");
-    }
+@section HeadContent
+{
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel='stylesheet' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (!User.Identity.IsAuthenticated)
+{
+    <script>window.location.href = "/Auth/Login";</script>
+}
+else
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4 py-3 border-left-primary">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        $('#calendar').fullCalendar({
+            defaultView: 'month',
+            firstDay: 1,
+            // Add your other FullCalendar options here
+        });
+    });
+</script>

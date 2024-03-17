@@ -10,10 +10,12 @@ namespace HomeChoreTracker.Api.Interfaces
         Task CreateHomeChore(HomeChoreRequest homeChoreRequest);
         Task Save();
         Task<List<HomeChoreTask>> GetAll(int id);
+        Task<List<TaskAssignment>> GetCalendar(int id);
         Task Delete(int id);
         Task<HomeChoreTask> Get(int id);
         Task Update(HomeChoreTask homeChoreTask);
         Task SetHomeChoreDates(TaskSchedule taskSchedule);
         Task<List<TaskSchedule>> GetTaskSchedule(int id);
+        Task AddTaskAssignment(TaskAssignment taskAssignment);
     }
 }

@@ -19,7 +19,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
 
-        public List<HomeChoreResponse> HomeChoreResponse { get; set; }
+        public List<TaskAssignment> HomeChoreResponse { get; set; }
 
         public CalendarModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -38,28 +38,22 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var apiUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
+                var apiUrl = $"{_config["ApiUrl"]}/HomeChore/Chore/Calendar/{id}";
 
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<HomeChoreResponse>>();
+                    HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<TaskAssignment>>();
 
-                    var events = new List<object>();
-
-                    foreach (var chore in HomeChoreResponse)
+                    var events = HomeChoreResponse.Select(chore => new
                     {
-                        //var occurrences = CalculateOccurrences(chore);
-
-                        //events.AddRange(occurrences.Select(occurrence => new
-                        //{
-                        //    id = chore.Id,
-                        //    title = chore.Name,
-                        //    start = occurrence.ToString("yyyy-MM-dd"),
-                        //    end = occurrence.ToString("yyyy-MM-dd")
-                        //}));
-                    }
+                        id = chore.Id,
+                        title = chore.TaskId,
+                        start = chore.StartDate.ToString("yyyy-MM-dd"),
+                        end = chore.EndDate.ToString("yyyy-MM-dd"),
+                        assigned = chore.HomeMemberId,
+                    });
 
                     return Page();
                 }
@@ -69,43 +63,5 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 }
             }
         }
-
-        //private List<DateTime> CalculateOccurrences(HomeChoreResponse chore)
-        //{
-        //    var occurrences = new List<DateTime>();
-
-        //    if (chore.Unit == RepeatUnit.Day)
-        //    {
-        //        // For daily repetition, add occurrences based on the interval
-        //        for (var i = 0; i < chore.Interval; i++)
-        //        {
-        //            var occurrence = chore.StartDate.AddDays(i);
-        //            if (chore.EndDate == null || occurrence <= chore.EndDate)
-        //            {
-        //                occurrences.Add(occurrence);
-        //            }
-        //        }
-        //    }
-        //    else if (chore.Unit == RepeatUnit.Week && chore.DaysOfWeek != null)
-        //    {
-        //        // For weekly repetition, add occurrences based on the interval and selected days
-        //        for (var i = 0; i < chore.Interval * 7; i++)
-        //        {
-        //            var occurrence = chore.StartDate.AddDays(i);
-        //            if (chore.EndDate != null && occurrence > chore.EndDate)
-        //            {
-        //                break;
-        //            }
-
-        //            if (chore.DaysOfWeek.Contains((DayOfWeek)occurrence.DayOfWeek))
-        //            {
-        //                occurrences.Add(occurrence);
-        //            }
-        //        }
-        //    }
-        //    // Add support for other repeat units (Month, Year) as needed
-
-        //    return occurrences;
-        //}
     }
 }
