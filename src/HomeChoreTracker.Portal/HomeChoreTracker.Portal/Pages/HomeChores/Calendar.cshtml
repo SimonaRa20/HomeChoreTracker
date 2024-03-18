@@ -18,8 +18,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
-
 }
+
 @if (User.Identity.IsAuthenticated)
 {
     <div class="row">
@@ -29,7 +29,6 @@
             <a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.Id"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
             <a class="btn btn-secondary btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.Id"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Calendar</a>
             <div class="card mb-4 py-3 border-left-primary">
-
                 <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Assign tasks randomly</a>
 
                 <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@Model.Id">
@@ -46,7 +45,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <form method="post" asp-page-handler="Delete" asp-route-taskId="@Model.Id">
+                                <form id="assign-form" asp-page-handler="Delete" asp-route-taskId="@Model.Id">
                                     <button type="submit" class="btn btn-primary">Assign</button>
                                 </form>
                             </div>
@@ -64,6 +63,30 @@ else
 }
 <script>
     $(function () {
+        // Function to check if an option is selected in the dropdown
+        function validateForm() {
+            var selectedOption = $('#assigned-person').val();
+            if (!selectedOption || selectedOption == 0) {
+                // If no option is selected or selected option is 0, show an error message
+                $('#error-message').text("Please select a member").show();
+                return false;
+            }
+            return true;
+        }
+
+        $('#save-btn').click(function (e) {
+            if (!validateForm()) {
+                // Prevent form submission if validation fails
+                e.preventDefault();
+            } else {
+                // If validation passes, set the selected member ID in the hidden input field
+                $('#selected-member-id').val($('#assigned-person').val());
+                // Then submit the form
+                $('#assign-form').submit();
+            }
+        });
+
+        // Your existing fullCalendar initialization code
         $('#calendar').fullCalendar({
             defaultView: 'month',
             firstDay: 1,
@@ -90,24 +113,25 @@ else
             },
             eventClick: function (calEvent, jsEvent, view) {
                 $('#myModal').modal('show');
+
                 // Display detailed task data in the modal
-
-                var task = calEvent.task; // Assuming you're passing task details as part of the event data
-
-                console.log(calEvent.description)
-
                 $('#event-id').text(calEvent.id);
                 $('#task-name').text(calEvent.title);
                 $('#task-description').text(calEvent.description);
                 $('#task-type').text(calEvent.type);
                 $('#task-long-type').text(calEvent.time);
                 $('#task-assigned').text(calEvent.assigned);
-                // Dynamically set taskId
+
+                // Set the current assigned member in the dropdown
+                $('#assigned-person').val(calEvent.assigned);
+
+                // Set the task ID
                 $('#task-id').val(calEvent.id);
             }
         });
     });
 </script>
+
 
 <div id="myModal" class="modal fade">
     <div class="modal-dialog" role="document">
@@ -118,29 +142,40 @@ else
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <!-- Inside the modal body -->
             <div class="modal-body">
+                <!-- Existing task details -->
                 <p>Event ID: <span id="event-id"></span></p>
                 <p>Task Name: <span id="task-name"></span></p>
                 <p>Description: <span id="task-description"></span></p>
                 <p>Type: <span id="task-type"></span></p>
                 <p>Long Type: <span id="task-long-type"></span></p>
-                <p>Assigned member: <span id="task-assigned"></span></p>
-                <form id="assign-person-form" method="post" asp-page-handler="Assign">
+
+                <!-- Dropdown to select assigned member -->
+                <form id="assign-form" method="post" asp-action="Calendar">
                     <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
                     <input type="hidden" id="task-id" name="taskId" value="" />
                     <div class="form-group">
                         <label for="assigned-person">Assign To:</label>
                         <select class="form-control" id="assigned-person" name="AssignedHomeMember.HomeMemberId">
+                            <!-- Populate dropdown with home members -->
                             @foreach (var member in Model.HomeMembers)
                             {
                                 <option value="@member.HomeMemberId">@member.UserName</option>
                             }
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </form>
+                    <input type="hidden" id="selected-member-id" name="AssignedHomeMember.HomeMemberId" />
 
+                    <!-- Error message for validation -->
+                    <div id="error-message" class="text-danger" style="display:none;"></div>
+
+                    <div class="text-right">
+                        <button type="button" id="save-btn" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
             </div>
+
         </div>
     </div>
 </div>
