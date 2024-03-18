@@ -73,7 +73,7 @@ else
         <text>
                     {
                         id: @chore.Id,
-                        title: '@chore.TaskId',
+                        title: '@chore.Title',
                         start: '@chore.StartDate.ToString("yyyy-MM-dd")',
                         end: '@chore.EndDate.ToString("yyyy-MM-dd")',
                         color: '@(chore.HomeMemberId == null ? "#4e73df" : "#1cc88a")',

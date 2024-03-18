@@ -272,7 +272,29 @@ namespace HomeChoreTracker.Api.Controllers
                 return NotFound($"Home chore base with ID {id} not found");
             }
 
-            return Ok(homeChores);
+            List<TaskAssignmentResponse> taskAssignments = new List<TaskAssignmentResponse>();
+
+            foreach(var taskAssignment in homeChores)
+            {
+                HomeChoreTask homeChoreTask = await _homeChoreRepository.Get(taskAssignment.TaskId);
+
+                TaskAssignmentResponse assignmentResponse = new TaskAssignmentResponse
+                {
+                    Id = taskAssignment.Id,
+                    StartDate = taskAssignment.StartDate,
+                    EndDate = taskAssignment.EndDate,
+                    Title = homeChoreTask.Name,
+                    TaskId = taskAssignment.TaskId,
+                    HomeMemberId = taskAssignment.HomeMemberId,
+                    HomeId = taskAssignment.HomeId,
+                    IsDone = taskAssignment.IsDone,
+                    IsApproved = taskAssignment.IsApproved,
+                };
+
+                taskAssignments.Add(assignmentResponse);
+            }
+
+            return Ok(taskAssignments);
         }
 
         [HttpGet("Chore/Dates/{id}")]

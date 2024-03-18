@@ -27,6 +27,11 @@ namespace HomeChoreTracker.Portal.Pages
         public async Task<IActionResult> OnGetAsync()
         {
             var token = User.FindFirstValue("Token");
+
+            if(token == null)
+            {
+                return RedirectToPage("Auth/Login");
+            }
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -44,7 +49,7 @@ namespace HomeChoreTracker.Portal.Pages
                         id = chore.Id,
                         start = chore.StartDate.ToString("yyyy-MM-dd"),
                         end = chore.EndDate.ToString("yyyy-MM-dd"),
-                        summary = chore.Summary,
+                        title = chore.Summary,
                     });
 
                     return Page();

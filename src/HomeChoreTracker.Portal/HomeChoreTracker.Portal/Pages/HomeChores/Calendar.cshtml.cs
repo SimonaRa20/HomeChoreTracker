@@ -19,7 +19,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
 
-        public List<TaskAssignment> HomeChoreResponse { get; set; }
+        public List<TaskAssignmentResponse> HomeChoreResponse { get; set; }
 
         public CalendarModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -44,12 +44,12 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
                 if (response.IsSuccessStatusCode)
                 {
-                    HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<TaskAssignment>>();
+                    HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<TaskAssignmentResponse>>();
 
                     var events = HomeChoreResponse.Select(chore => new
                     {
                         id = chore.Id,
-                        title = chore.TaskId,
+                        title = chore.Title,
                         start = chore.StartDate.ToString("yyyy-MM-dd"),
                         end = chore.EndDate.ToString("yyyy-MM-dd"),
                         assigned = chore.HomeMemberId,
