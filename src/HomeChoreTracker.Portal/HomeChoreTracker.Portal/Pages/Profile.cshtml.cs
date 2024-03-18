@@ -60,6 +60,7 @@ namespace HomeChoreTracker.Portal.Pages
 
                     var apiUrl = _config["ApiUrl"] + "/User/Update/" + userId;
 
+
                     var response = await httpClient.PutAsJsonAsync(apiUrl, UserProfile);
 
                     if (response.IsSuccessStatusCode)

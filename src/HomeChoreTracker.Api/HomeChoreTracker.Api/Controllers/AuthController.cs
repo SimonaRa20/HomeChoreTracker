@@ -67,6 +67,9 @@ namespace HomeChoreTracker.Api.Controllers
 
                 User userDto = _mapper.Map<User>(user);
                 userDto.Role = Role.User;
+                userDto.Morning = true;
+                userDto.MiddleDay = true;
+                userDto.Evening = true;
                 await _authRepository.AddUser(userDto);
                 await _authRepository.Save();
 

@@ -5,22 +5,36 @@
     ViewData["Title"] = "Profile";
 }
 
-
 <div class="row">
+    <div class="col-lg-6">
+        <div class="card border-left-primary">
+            <div class="card-body">
+                <h4>Update Profile</h4>
+                <form method="post" asp-page="./Profile">
+                    <div class="form-group">
+                        <label for="UserName">User Name:</label>
+                        <input type="text" class="form-control" id="UserName" name="UserName" value="@Model.UserProfile.UserName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Email">Email:</label>
+                        <input type="text" class="form-control" id="Email" name="Email" value="@Model.UserProfile.Email" />
+                    </div>
+                    <div class="form-group">
+                        <label>Home Chore Settings:</label><br />
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="Morning" id="morningCheckbox" value="true" @(Model.UserProfile.Morning ? "checked" : "") />
+                            <label class="form-check-label" for="morningCheckbox">Morning</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="MiddleDay" id="middleDayCheckbox" value="true" @(Model.UserProfile.MiddleDay ? "checked" : "") />
+                            <label class="form-check-label" for="middleDayCheckbox">Middle Day</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="Evening" id="eveningCheckbox" value="true" @(Model.UserProfile.Evening ? "checked" : "") />
+                            <label class="form-check-label" for="eveningCheckbox">Evening</label>
+                        </div>
+                    </div>
 
-<div class="col-lg-6">
-	<div class="card border-left-primary">
-		<div class="card-body">
-            <h4 >Update Profile</h4>
-            <form method="post" asp-page="./Profile">
-                <div class="form-group">
-                    <label for="UserName">User Name:</label>
-                    <input type="text" class="form-control" id="UserName" name="UserName" value="@Model.UserProfile.UserName" />
-                </div>
-                <div class="form-group">
-                    <label for="Email">Email:</label>
-                    <input type="text" class="form-control" id="Email" name="Email" value="@Model.UserProfile.Email" />
-                </div>
                     <div class="text-danger" style="padding-left: 0; margin-left: 0;">
                         @if (!ModelState.IsValid)
                         {
@@ -35,9 +49,9 @@
                             </ul>
                         }
                     </div>
-                <button type="submit" class="btn btn-primary">Update Profile</button>
-            </form>
-		</div>
-	</div>
-</div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

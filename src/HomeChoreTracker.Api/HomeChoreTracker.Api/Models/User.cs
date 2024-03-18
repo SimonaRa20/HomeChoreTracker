@@ -7,8 +7,11 @@
         public string? Email { get; set; }
         public string? Password { get; set; }
         public string? Role { get; set; }
+        public bool Morning { get; set; }
+        public bool MiddleDay { get; set; }
+        public bool Evening { get; set; }
 
-		public List<Income> Incomes { get; set; }
+        public List<Income> Incomes { get; set; }
 		public List<Expense> Expenses { get; set; }
         public List<Event> CalendarEvents { get; set; }
 	}

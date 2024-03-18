@@ -91,6 +91,9 @@ namespace HomeChoreTracker.Api.Controllers
 
                 user.UserName = updatedProfile.UserName;
                 user.Email = updatedProfile.Email;
+                user.Morning = updatedProfile.Morning;
+                user.MiddleDay = updatedProfile.MiddleDay;
+                user.Evening = updatedProfile.Evening;
 
                 await _userRepository.UpdateUser(user);
 
