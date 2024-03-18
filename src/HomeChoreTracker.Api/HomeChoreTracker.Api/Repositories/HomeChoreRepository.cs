@@ -123,6 +123,11 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.HomeChoreTasks.Where(x => x.Id.Equals(id)).FirstOrDefaultAsync();
         }
 
+        public async Task<TaskAssignment> GetTaskAssigment(int id)
+        {
+            return await _dbContext.TaskAssignments.Where(x => x.Id.Equals(id)).FirstOrDefaultAsync();
+        }
+
         public async Task<List<HomeChoreTask>> GetAll(int id)
         {
             return await _dbContext.HomeChoreTasks.Where(x=>x.HomeId.Equals(id)).ToListAsync();
@@ -152,6 +157,11 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task Update(HomeChoreTask homeChoreTask)
         {
             _dbContext.Entry(homeChoreTask).State = EntityState.Modified;
+        }
+
+        public async Task UpdateTaskAssignment(TaskAssignment assignment)
+        {
+            _dbContext.Entry(assignment).State = EntityState.Modified;
         }
     }
 }

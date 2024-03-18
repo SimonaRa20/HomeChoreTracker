@@ -125,6 +125,7 @@ namespace HomeChoreTracker.Api.Repositories
                .Include(uh => uh.User)
                .Select(uh => new UserGetResponse
                {
+                   HomeMemberId = uh.UserId,
                    UserName = uh.User.UserName,
                    Email = uh.User.Email,
                    Role = uh.HomeRole

@@ -13,6 +13,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<List<TaskAssignment>> GetCalendar(int id);
         Task Delete(int id);
         Task<HomeChoreTask> Get(int id);
+        Task<TaskAssignment> GetTaskAssigment(int id);
+        Task UpdateTaskAssignment(TaskAssignment taskAssignment);
         Task Update(HomeChoreTask homeChoreTask);
         Task SetHomeChoreDates(TaskSchedule taskSchedule);
         Task<List<TaskSchedule>> GetTaskSchedule(int id);

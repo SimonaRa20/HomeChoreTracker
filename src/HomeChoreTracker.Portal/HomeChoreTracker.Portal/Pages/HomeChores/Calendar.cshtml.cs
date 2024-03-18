@@ -6,7 +6,9 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using HomeChoreTracker.Portal.Constants;
+using HomeChoreTracker.Portal.Models.Home;
 using HomeChoreTracker.Portal.Models.HomeChore;
+using HomeChoreTracker.Portal.Models.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +22,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         private readonly IConfiguration _config;
 
         public List<TaskAssignmentResponse> HomeChoreResponse { get; set; }
-
+        public List<UserGetResponse> HomeMembers { get; set; }
         public CalendarModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
@@ -29,6 +31,9 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
         [BindProperty]
         public int Id { get; set; }
+
+        [BindProperty]
+        public AssignedHomeMember AssignedHomeMember { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -58,12 +63,56 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         time = chore.Task.Time.ToString(),
                     });
 
+
+                    var apiUrlMembers = $"{_config["ApiUrl"]}/Home/HomeMembers?homeId={Id}";
+
+                    var responseMembers = await httpClient.GetAsync(apiUrlMembers);
+
+                    if (responseMembers.IsSuccessStatusCode)
+                    {
+                        HomeMembers = await responseMembers.Content.ReadFromJsonAsync<List<UserGetResponse>>();
+                    }
                     return Page();
                 }
                 else
                 {
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
+            }
+        }
+
+        public async Task<IActionResult> OnPostAsync(int homeId, int taskId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var apiUrl = _config["ApiUrl"] + $"/Calendar/{homeId}";
+
+                var selectedMemberId = int.Parse(Request.Form["AssignedHomeMember.HomeMemberId"]);
+
+                AssignedHomeMember = new AssignedHomeMember
+                {
+                    TaskId = taskId,
+                    HomeMemberId = selectedMemberId
+                };
+
+                var response = await httpClient.PutAsJsonAsync(apiUrl, AssignedHomeMember);
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                    return Page();
+                }
+
             }
         }
     }

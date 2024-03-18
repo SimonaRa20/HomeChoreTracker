@@ -79,28 +79,31 @@ else
                         end: '@chore.EndDate.ToString("yyyy-MM-dd")',
                         type: '@chore.Task.ChoreType',
                         time: '@chore.Task.Time',
+                        assigned: '@chore.HomeMemberId',
                         color: '@(chore.HomeMemberId == null ? "#4e73df" : "#1cc88a")',
                         textColor: 'white'
                     },
         </text>
     }
-                ],
+                    ],
             eventRender: function (event, element) {
             },
             eventClick: function (calEvent, jsEvent, view) {
                 $('#myModal').modal('show');
                 // Display detailed task data in the modal
-                
+
                 var task = calEvent.task; // Assuming you're passing task details as part of the event data
-                
+
                 console.log(calEvent.description)
-                
+
                 $('#event-id').text(calEvent.id);
                 $('#task-name').text(calEvent.title);
                 $('#task-description').text(calEvent.description);
                 $('#task-type').text(calEvent.type);
                 $('#task-long-type').text(calEvent.time);
-                // You can add more details as needed
+                $('#task-assigned').text(calEvent.assigned);
+                // Dynamically set taskId
+                $('#task-id').val(calEvent.id);
             }
         });
     });
@@ -121,11 +124,22 @@ else
                 <p>Description: <span id="task-description"></span></p>
                 <p>Type: <span id="task-type"></span></p>
                 <p>Long Type: <span id="task-long-type"></span></p>
-                
+                <p>Assigned member: <span id="task-assigned"></span></p>
+                <form id="assign-person-form" method="post" asp-page-handler="Assign">
+                    <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
+                    <input type="hidden" id="task-id" name="taskId" value="" />
+                    <div class="form-group">
+                        <label for="assigned-person">Assign To:</label>
+                        <select class="form-control" id="assigned-person" name="AssignedHomeMember.HomeMemberId">
+                            @foreach (var member in Model.HomeMembers)
+                            {
+                                <option value="@member.HomeMemberId">@member.UserName</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

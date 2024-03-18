@@ -17,10 +17,12 @@ namespace HomeChoreTracker.Api.Controllers
     public class CalendarController : Controller
     {
         private readonly ICalendarRepository _calendarRepository;
+        private readonly IHomeChoreRepository _homeChoreRepository;
 
-        public CalendarController(ICalendarRepository calendarRepository)
+        public CalendarController(ICalendarRepository calendarRepository, IHomeChoreRepository homeChoreRepository)
         {
             _calendarRepository = calendarRepository;
+            _homeChoreRepository = homeChoreRepository;
         }
 
         [HttpPost]
@@ -73,6 +75,25 @@ namespace HomeChoreTracker.Api.Controllers
 
             List<Event> events = await _calendarRepository.GetAll(userId);
             return Ok(events);
+        }
+
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> AssignTaskToMember(int id, AssignedHomeMember assignedHomeMember)
+        {
+            try
+            {
+                TaskAssignment task = await _homeChoreRepository.GetTaskAssigment(assignedHomeMember.TaskId);
+                task.HomeMemberId = assignedHomeMember.HomeMemberId;
+                await _homeChoreRepository.UpdateTaskAssignment(task);
+                await _homeChoreRepository.Save();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }
