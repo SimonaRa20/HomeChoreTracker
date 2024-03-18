@@ -1,6 +1,7 @@
 ﻿using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeChoreTracker.Api.Repositories
 {
@@ -19,5 +20,9 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<List<Event>> GetAll(int userId)
+        {
+            return await _dbContext.Events.Where(x => x.UserId.Equals(userId)).ToListAsync();
+        }
     }
 }

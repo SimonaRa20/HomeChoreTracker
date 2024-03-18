@@ -65,5 +65,14 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAdvice()
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+            List<Event> events = await _calendarRepository.GetAll(userId);
+            return Ok(events);
+        }
     }
 }

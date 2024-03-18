@@ -15,6 +15,8 @@ namespace HomeChoreTracker.Portal.Pages
         [BindProperty]
         public CalendarRequest CalendarRequest { get; set; }
 
+        public List<Event> Events { get; set; }
+
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
@@ -22,9 +24,36 @@ namespace HomeChoreTracker.Portal.Pages
             CalendarRequest = new CalendarRequest();
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+                var apiUrl = $"{_config["ApiUrl"]}/Calendar";
+
+                var response = await httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Events = await response.Content.ReadFromJsonAsync<List<Event>>();
+
+                    var events = Events.Select(chore => new
+                    {
+                        id = chore.Id,
+                        start = chore.StartDate.ToString("yyyy-MM-dd"),
+                        end = chore.EndDate.ToString("yyyy-MM-dd"),
+                        summary = chore.Summary,
+                    });
+
+                    return Page();
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
+                }
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
