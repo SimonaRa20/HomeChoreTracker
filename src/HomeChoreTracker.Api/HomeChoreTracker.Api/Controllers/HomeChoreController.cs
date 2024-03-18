@@ -283,7 +283,7 @@ namespace HomeChoreTracker.Api.Controllers
                     Id = taskAssignment.Id,
                     StartDate = taskAssignment.StartDate,
                     EndDate = taskAssignment.EndDate,
-                    Title = homeChoreTask.Name,
+                    Task = homeChoreTask,
                     TaskId = taskAssignment.TaskId,
                     HomeMemberId = taskAssignment.HomeMemberId,
                     HomeId = taskAssignment.HomeId,

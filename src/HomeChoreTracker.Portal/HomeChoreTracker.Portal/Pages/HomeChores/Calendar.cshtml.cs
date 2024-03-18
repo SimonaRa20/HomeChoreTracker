@@ -49,10 +49,13 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     var events = HomeChoreResponse.Select(chore => new
                     {
                         id = chore.Id,
-                        title = chore.Title,
+                        title = chore.Task.Name,
                         start = chore.StartDate.ToString("yyyy-MM-dd"),
                         end = chore.EndDate.ToString("yyyy-MM-dd"),
                         assigned = chore.HomeMemberId,
+                        description = chore.Task.Description,
+                        type = chore.Task.ChoreType.ToString(),
+                        time = chore.Task.Time.ToString(),
                     });
 
                     return Page();

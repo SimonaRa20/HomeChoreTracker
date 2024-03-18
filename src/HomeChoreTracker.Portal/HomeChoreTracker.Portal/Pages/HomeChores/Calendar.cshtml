@@ -73,9 +73,12 @@ else
         <text>
                     {
                         id: @chore.Id,
-                        title: '@chore.Title',
+                        title: '@chore.Task.Name',
+                        description: '@chore.Task.Description',
                         start: '@chore.StartDate.ToString("yyyy-MM-dd")',
                         end: '@chore.EndDate.ToString("yyyy-MM-dd")',
+                        type: '@chore.Task.ChoreType',
+                        time: '@chore.Task.Time',
                         color: '@(chore.HomeMemberId == null ? "#4e73df" : "#1cc88a")',
                         textColor: 'white'
                     },
@@ -86,6 +89,18 @@ else
             },
             eventClick: function (calEvent, jsEvent, view) {
                 $('#myModal').modal('show');
+                // Display detailed task data in the modal
+                
+                var task = calEvent.task; // Assuming you're passing task details as part of the event data
+                
+                console.log(calEvent.description)
+                
+                $('#event-id').text(calEvent.id);
+                $('#task-name').text(calEvent.title);
+                $('#task-description').text(calEvent.description);
+                $('#task-type').text(calEvent.type);
+                $('#task-long-type').text(calEvent.time);
+                // You can add more details as needed
             }
         });
     });
@@ -95,13 +110,19 @@ else
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Event Details</h5>
+                <h5 class="modal-title">Home chore details</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <p>Event ID: <span id="event-id"></span></p>
+                <p>Task Name: <span id="task-name"></span></p>
+                <p>Description: <span id="task-description"></span></p>
+                <p>Type: <span id="task-type"></span></p>
+                <p>Long Type: <span id="task-long-type"></span></p>
+                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -109,4 +130,3 @@ else
         </div>
     </div>
 </div>
-

@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string Title { get; set; }
+        public HomeChoreResponse Task { get; set; }
         public int TaskId { get; set; }
         public int? HomeMemberId { get; set; }
         public int HomeId { get; set; }

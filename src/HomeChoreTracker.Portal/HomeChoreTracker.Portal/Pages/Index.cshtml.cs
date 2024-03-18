@@ -1,5 +1,6 @@
 using HomeChoreTracker.Portal.Models.Calendar;
 using HomeChoreTracker.Portal.Models.HomeChore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http;
@@ -56,6 +57,12 @@ namespace HomeChoreTracker.Portal.Pages
                 }
                 else
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await HttpContext.SignOutAsync();
+                        return RedirectToPage("/Index");
+                    }
+
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
             }
