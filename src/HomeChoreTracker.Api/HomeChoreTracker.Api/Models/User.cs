@@ -10,5 +10,6 @@
 
 		public List<Income> Incomes { get; set; }
 		public List<Expense> Expenses { get; set; }
+        public List<Event> CalendarEvents { get; set; }
 	}
 }
