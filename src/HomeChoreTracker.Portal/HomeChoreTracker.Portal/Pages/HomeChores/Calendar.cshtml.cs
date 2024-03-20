@@ -85,7 +85,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
+                return Page();
             }
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
@@ -93,7 +93,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var apiUrl = _config["ApiUrl"] + $"/Calendar/{homeId}";
 
-                var selectedMemberId = int.Parse(Request.Form["selected-member-id"]);
+                var selectedMemberId = int.Parse(Request.Form["AssignedHomeMember.HomeMemberId"]);
 
                 AssignedHomeMember = new AssignedHomeMember
                 {
@@ -110,7 +110,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     ModelState.AddModelError(string.Empty, errorMessage);
-                    return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
+                    return Page();
                 }
 
             }

@@ -20,7 +20,11 @@ namespace HomeChoreTracker.Api.Repositories
         }
         public async Task<User> GetUserById(int id)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Users
+        .Include(u => u.Incomes)
+        .Include(u => u.Expenses)
+        .Include(u => u.CalendarEvents)
+        .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task UpdateUser(User user)
