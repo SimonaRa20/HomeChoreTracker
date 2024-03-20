@@ -6,7 +6,7 @@
 }
 
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-12">
         <div class="card border-left-primary">
             <div class="card-body">
                 <h4>Update Profile</h4>
@@ -32,6 +32,50 @@
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" name="Evening" id="eveningCheckbox" value="true" @(Model.UserProfile.Evening ? "checked" : "") />
                             <label class="form-check-label" for="eveningCheckbox">Evening</label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Start Day:</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartDayHour" min="0" max="23" step="1" style="width: 24px;" />
+                                <span class="text" style="margin-top: 2px;">h</span>
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartDayMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
+                                <span class="text" style="margin-top: 2px;">min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Start Lunch:</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartLunchHour" min="0" max="23" step="1" style="width: 24px;" />
+                                <span class="text" style="margin-top: 2px;">h</span>
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartLunchMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
+                                <span class="text" style="margin-top: 2px;">min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">End Lunch:</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndLunchHour" min="0" max="23" step="1" style="width: 24px;" />
+                                <span class="text" style="margin-top: 2px;">h</span>
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndLunchMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
+                                <span class="text" style="margin-top: 2px;">min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">End Day:</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndDayHour" min="0" max="23" step="1" style="width: 24px;" />
+                                <span class="text" style="margin-top: 2px;">h</span>
+                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndDayMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
+                                <span class="text" style="margin-top: 2px;">min</span>
+                            </div>
                         </div>
                     </div>
 

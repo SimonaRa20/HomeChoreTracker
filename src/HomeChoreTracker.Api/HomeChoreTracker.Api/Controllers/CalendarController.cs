@@ -119,9 +119,9 @@ public class CalendarController : Controller
     {
         List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
 
-        TimeSpan lunchStart = TimeSpan.FromHours(12);
-        TimeSpan lunchEnd = TimeSpan.FromHours(13);
-        TimeSpan nightEnd = TimeSpan.FromHours(22);
+        TimeSpan lunchStart = TimeSpan.FromHours(user.StartLunchHour);
+        TimeSpan lunchEnd = TimeSpan.FromHours(user.EndLunchHour);
+        TimeSpan nightEnd = TimeSpan.FromHours(user.EndDayHour);
 
         events = events.Where(e => e.StartDate > StartTime).OrderBy(e => e.StartDate).ToList();
 
@@ -137,7 +137,7 @@ public class CalendarController : Controller
 
         suitableIntervals = suitableIntervals
             .Where(i => (i.end - i.start).TotalMinutes >= GetMinutesFromTimeLong(choreTime)) // Ensure duration is sufficient
-            .Where(i => i.start.TimeOfDay >= TimeSpan.FromHours(8)) // Ensure tasks start at 8:00 AM or later
+            .Where(i => i.start.TimeOfDay >= TimeSpan.FromHours(user.StartDayHour)) // Ensure tasks start at 8:00 AM or later
             .ToList();
 
         return suitableIntervals;

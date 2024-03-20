@@ -70,6 +70,14 @@ namespace HomeChoreTracker.Api.Controllers
                 userDto.Morning = true;
                 userDto.MiddleDay = true;
                 userDto.Evening = true;
+                userDto.StartDayHour = 8;
+                userDto.StartDayMinutes = 0;
+                userDto.StartLunchHour = 12;
+                userDto.StartLunchMinutes = 0;
+                userDto.EndLunchHour = 13;
+                userDto.EndLunchMinutes = 0;
+                userDto.EndDayHour = 22;
+                userDto.EndDayMinutes = 0;
                 await _authRepository.AddUser(userDto);
                 await _authRepository.Save();
 
