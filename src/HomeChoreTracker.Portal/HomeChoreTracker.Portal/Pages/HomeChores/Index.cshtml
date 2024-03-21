@@ -162,6 +162,7 @@
                 <div class="modal-body">
                     <form method="post" asp-page-handler="Edit" id="editForm">
                         <input type="hidden" id="editChoreId" name="id" value="" />
+                        <input type="hidden" id="editHomeId" name="homeId" value="@Model.HomeId" />
                         <div class="form-group">
                             <label for="editName">Name</label>
                             <input asp-for="EditHomeChore.Name" name="editName" class="form-control" id="editName" />
@@ -243,6 +244,17 @@
                                 }
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="StartDate">Start date</label>
+                            <input type="date" class="form-control" id="editStartDate" name="editStartDate" asp-for="EditHomeChore.StartDate" required>
+                            <span asp-validation-for="EditHomeChore.StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="EndDate">End date</label>
+                            <input type="date" class="form-control" id="editEndDate" name="editEndDate" asp-for="EditHomeChore.EndDate" required>
+                            <span asp-validation-for="EditHomeChore.EndDate" class="text-danger"></span>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </form>
                 </div>
@@ -342,6 +354,7 @@
     }
 
     function DisplayEditModal(choreId) {
+        console.log(choreId)
         currentChoreId = choreId; // Store the current chore ID
         // Set the chore ID in the hidden input field
         $('#editChoreId').val(choreId);
@@ -360,9 +373,12 @@
 
                     $('#editPoints').val(data.points);
 
-                    $('#editStartDate').val(data.startDate);
-                    $('#editEndDate').val(data.endDate);
-
+                    if (data.startDate) {
+                        $('#editStartDate').val(new Date(data.startDate).toISOString().substr(0, 10));
+                    }
+                    if (data.endDate) {
+                        $('#editEndDate').val(new Date(data.endDate).toISOString().substr(0, 10));
+                    }
                     var timeLongText = data.time;
                     $('#editTimeLong option').filter(function () {
                         return $(this).text() === timeLongText;
@@ -434,4 +450,23 @@
         });
     }
 
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Get today's date
+        var today = new Date().toISOString().split('T')[0];
+
+        // Set default values for start date and end date if they are null
+        if ($('#editStartDate').val() === '') {
+            $('#editStartDate').val(today);
+        }
+        if ($('#editEndDate').val() === '') {
+            // Add one month to today's date
+            var endDate = new Date();
+            endDate.setMonth(endDate.getMonth() + 1);
+            var endDateString = endDate.toISOString().split('T')[0];
+            $('#editEndDate').val(endDateString);
+        }
+    });
 </script>

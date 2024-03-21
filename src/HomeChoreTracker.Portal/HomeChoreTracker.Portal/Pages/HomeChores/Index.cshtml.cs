@@ -3,6 +3,7 @@ using HomeChoreTracker.Portal.Models.HomeChore;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
 using System.Net.Http;
 using System.Security.Claims;
 using DayOfWeek = HomeChoreTracker.Portal.Constants.DayOfWeek;
@@ -119,7 +120,9 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                             dayOfMonth = choreDetails.DayOfMonth,
                             monthlyRepeatType = choreMonthlyRepeatTypeText,
                             repeatingData = repeatingDataText,
-                            daysOfWeek = daysOfWeekList
+                            daysOfWeek = daysOfWeekList,
+                            startDate = choreDetails.StartDate,
+                            endDate = choreDetails.EndDate,
                         });
                     }
                     else
@@ -134,7 +137,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             }
         }
 
-        public async Task<IActionResult> OnPostEditAsync(int id)
+        public async Task<IActionResult> OnPostEditAsync(int id, int homeId)
         {
             ClearFieldErrors(key => key == "EditHomeChore.Name");
             ClearFieldErrors(key => key == "Name");
@@ -156,14 +159,22 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
                     // Update EditHomeChore with form values
                     EditHomeChore.Name = Request.Form["editName"];
+                    EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
                     EditHomeChore.Description = Request.Form["editDescription"];
-
-                    var response = await httpClient.PostAsJsonAsync(apiUrl, EditHomeChore);
+                    EditHomeChore.StartDate = DateTime.Parse(Request.Form["editStartDate"]);
+                    EditHomeChore.EndDate = DateTime.Parse(Request.Form["editEndDate"]);
+                    EditHomeChore.Points = int.Parse(Request.Form["editPoints"]);
+                    EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
+                    EditHomeChore.DaysOfWeek = Request.Form["editDaysOfWeek"].Select(int.Parse).ToList(); 
+                    EditHomeChore.DayOfMonth = int.Parse(Request.Form["editDayOfMonth"]);
+                    EditHomeChore.MonthlyRepeatType = int.Parse(Request.Form["editMonthlyRepeatType"]);
+                    EditHomeChore.Unit = (int)Enum.Parse<RepeatUnit>(Request.Form["editRepeatUnit"]);
+                    var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage();
+                        return RedirectToPage("/HomeChores/Index", new { id = homeId });
                     }
                     else
                     {
