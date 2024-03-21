@@ -154,7 +154,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Chore</h5>
+                    <h5 class="modal-title" id="editModalLabel">Edit @Model.EditHomeChore.Name Chore</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -435,7 +435,8 @@
                         $('#editDayOfMonthField').hide();
                         $('#editMonthlyRepeatTypeField').hide();
                     }
-
+                    // Dynamically update the modal title with the chore name
+                    $('#editModalLabel').text("Edit '" +  data.name + "' Chore");
 
                     // Show the edit modal
                     $('#editModal').modal('show');
