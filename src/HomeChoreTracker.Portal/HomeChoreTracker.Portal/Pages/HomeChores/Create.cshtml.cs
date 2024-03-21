@@ -58,7 +58,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage("/HomeChore/Index", new { id = Id });
+                        return RedirectToPage("/HomeChores/Index", new { id = Id });
                     }
                     else
                     {

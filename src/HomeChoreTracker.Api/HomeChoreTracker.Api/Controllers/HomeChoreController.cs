@@ -49,8 +49,16 @@ namespace HomeChoreTracker.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateHomeChoreBase(HomeChoreRequest homeChoreBaseRequest)
         {
-            await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest);
+            HomeChoreTask task = await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest);
+           
             await _homeChoreRepository.Save();
+            if(task == null)
+            {
+                return NotFound("No home chore found");
+            }
+
+
+            await SetHomeChoreDates(task);
             return Ok("Home chore base created successfully");
         }
 
@@ -61,11 +69,6 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 var homeChore = await _homeChoreRepository.GetAll(id);
-
-                if (homeChore == null || !homeChore.Any())
-                {
-                    return NotFound("No home chore found");
-                }
 
                 return Ok(homeChore);
             }
@@ -81,8 +84,21 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
-                await _homeChoreRepository.Delete(taskId);
-                await _homeChoreRepository.Save();
+                TaskAssignment task = await _homeChoreRepository.GetTaskAssigment(taskId);
+
+                bool taskAssigned = await _homeChoreRepository.CheckOrHomeChoreWasAssigned(taskId);
+
+                if(!taskAssigned)
+                {
+                    await _homeChoreRepository.DeleteNotAssignedTasks(taskId);
+                    await _homeChoreRepository.Delete(taskId);
+                    await _homeChoreRepository.Save();
+                }
+                else
+                {
+                    await _homeChoreRepository.DeleteAssignedTasks(taskId);
+                    await _homeChoreRepository.Save();
+                }
 
                 return Ok($"Home chore base with ID {taskId} deleted successfully");
             }
@@ -113,21 +129,19 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        [HttpPost("Chore/Dates/{id}")]
-        [Authorize]
-        public async Task <IActionResult> SetHomeChoreDates(int id, [FromBody] SetHomeChoreDatesRequest homeChoreDatesRequest)
+        private async Task SetHomeChoreDates(HomeChoreTask homeChore)
         {
-            var homeChore = await _homeChoreRepository.Get(id);
-            if (homeChore == null)
+            try
             {
-                return NotFound($"Home chore base with ID {id} not found");
-            }
+                DateTime startDate = (DateTime)homeChore.StartDate;
+            DateTime endDate = (DateTime)homeChore.EndDate;
+            int id = homeChore.Id;
 
             TaskSchedule taskSchedule = new TaskSchedule
             {
                 TaskId = id,
-                StartDate = homeChoreDatesRequest.StartDate,
-                EndDate = homeChoreDatesRequest.EndDate,
+                StartDate = startDate,
+                EndDate = endDate,
             };
 
             await _homeChoreRepository.SetHomeChoreDates(taskSchedule);
@@ -136,11 +150,11 @@ namespace HomeChoreTracker.Api.Controllers
 
             if (homeChore.Unit == RepeatUnit.Day)
             {
-                int numberOfDays = (int)(homeChoreDatesRequest.EndDate - homeChoreDatesRequest.StartDate).TotalDays;
+                int numberOfDays = (int)(endDate - startDate).TotalDays;
 
                 for (int i = 0; i <= numberOfDays; i += homeChore.Interval)
                 {
-                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddDays(i);
+                    DateTime assignmentDate = startDate.AddDays(i);
 
                     TaskAssignment taskAssignment = new TaskAssignment
                     {
@@ -158,11 +172,11 @@ namespace HomeChoreTracker.Api.Controllers
             }
             if (homeChore.Unit == RepeatUnit.Week)
             {
-                int totalWeeks = (int)Math.Ceiling((homeChoreDatesRequest.EndDate - homeChoreDatesRequest.StartDate).TotalDays / 7.0);
+                int totalWeeks = (int)Math.Ceiling((endDate - startDate).TotalDays / 7.0);
 
                 for (int i = 0; i < totalWeeks; i += homeChore.Interval)
                 {
-                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddDays(i * 7);
+                    DateTime assignmentDate = startDate.AddDays(i * 7);
 
                     if (homeChore.DaysOfWeek == null || homeChore.DaysOfWeek.Contains(DayOfWeek.Default))
                     {
@@ -193,11 +207,11 @@ namespace HomeChoreTracker.Api.Controllers
             }
             if (homeChore.Unit == RepeatUnit.Month)
             {
-                int totalMonths = ((homeChoreDatesRequest.EndDate.Year - homeChoreDatesRequest.StartDate.Year) * 12) + homeChoreDatesRequest.EndDate.Month - homeChoreDatesRequest.StartDate.Month;
+                int totalMonths = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month;
 
                 for (int i = 0; i < totalMonths; i += homeChore.Interval)
                 {
-                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddMonths(i);
+                    DateTime assignmentDate = startDate.AddMonths(i);
 
                     if (homeChore.MonthlyRepeatType == MonthlyRepeatType.DayOfMonth)
                     {
@@ -235,11 +249,11 @@ namespace HomeChoreTracker.Api.Controllers
             }
             if (homeChore.Unit == RepeatUnit.Year)
             {
-                int totalYears = homeChoreDatesRequest.EndDate.Year - homeChoreDatesRequest.StartDate.Year;
+                int totalYears = endDate.Year - startDate.Year;
 
                 for (int i = 0; i <= totalYears; i += homeChore.Interval)
                 {
-                    DateTime assignmentDate = homeChoreDatesRequest.StartDate.AddYears(i);
+                    DateTime assignmentDate = startDate.AddYears(i);
 
                     if ((i + 1) % homeChore.Interval == 0)
                     {
@@ -257,9 +271,13 @@ namespace HomeChoreTracker.Api.Controllers
                         await _homeChoreRepository.Save();
                     }
                 }
+                }
             }
-
-            return Ok("Home chore date created successfully");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in SetHomeChoreDates: {ex}");
+                throw; // Re-throw the exception to maintain the error propagation
+            }
         }
 
         [HttpGet("Chore/Calendar/{id}")]
@@ -296,21 +314,6 @@ namespace HomeChoreTracker.Api.Controllers
 
             return Ok(taskAssignments);
         }
-
-        [HttpGet("Chore/Dates/{id}")]
-        [Authorize]
-        public async Task<IActionResult>GetHomeChoreDates(int id)
-        {
-            var homeChore = await _homeChoreRepository.Get(id);
-            if (homeChore == null)
-            {
-                return NotFound($"Home chore base with ID {id} not found");
-            }
-
-            var homeChores = await _homeChoreRepository.GetTaskSchedule(id);
-            return Ok(homeChores);
-        }
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHomeChore(int id, [FromBody] HomeChoreBaseRequest homeChoreBaseRequest)

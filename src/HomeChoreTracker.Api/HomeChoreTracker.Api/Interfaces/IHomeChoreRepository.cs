@@ -7,7 +7,7 @@ namespace HomeChoreTracker.Api.Interfaces
     public interface IHomeChoreRepository
     {
         Task AddHomeChoreBase(HomeChoreBase homeChoreBase, int homeId);
-        Task CreateHomeChore(HomeChoreRequest homeChoreRequest);
+        Task<HomeChoreTask> CreateHomeChore(HomeChoreRequest homeChoreRequest);
         Task Save();
         Task<List<HomeChoreTask>> GetAll(int id);
         Task<List<TaskAssignment>> GetCalendar(int id);
@@ -17,7 +17,9 @@ namespace HomeChoreTracker.Api.Interfaces
         Task UpdateTaskAssignment(TaskAssignment taskAssignment);
         Task Update(HomeChoreTask homeChoreTask);
         Task SetHomeChoreDates(TaskSchedule taskSchedule);
-        Task<List<TaskSchedule>> GetTaskSchedule(int id);
         Task AddTaskAssignment(TaskAssignment taskAssignment);
+        Task<bool> CheckOrHomeChoreWasAssigned(int id);
+        Task DeleteAssignedTasks(int id);
+        Task DeleteNotAssignedTasks(int id);
     }
 }

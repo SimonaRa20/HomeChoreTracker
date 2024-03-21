@@ -22,15 +22,12 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         [BindProperty]
         public HomeChoreBaseEditRequest EditHomeChore { get; set; }
 
-        [BindProperty]
-        public SetHomeChoreDatesRequest EditHomeChoreDates { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
             EditHomeChore = new HomeChoreBaseEditRequest();
-            EditHomeChoreDates = new SetHomeChoreDatesRequest();
         }
 
         public async Task<IActionResult> OnGetAsync(int id)
@@ -182,83 +179,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 return Page();
             }
         }
-
-        public async Task<IActionResult> OnGetDatesAsync(int choreId)
-        {
-            var token = User.FindFirstValue("Token");
-            using (var httpClient = _httpClientFactory.CreateClient())
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                var apiUrl = $"{_config["ApiUrl"]}/HomeChore/Chore/Dates/{choreId}";
-                var response = await httpClient.GetAsync(apiUrl);
-
-                var choreDetails = new List<TaskSchedule>();
-                if (response.IsSuccessStatusCode)
-                {
-                    choreDetails = await response.Content.ReadFromJsonAsync<List<TaskSchedule>>();
-
-                    if (choreDetails != null)
-                    {
-                        return new JsonResult(choreDetails);
-                    }
-                    else
-                    {
-                        return NotFound("Chore details not found.");
-                    }
-                }
-                else
-                {
-                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
-                }
-            }
-        }
-
-        public async Task<IActionResult> OnPostEditDateAsync(int id, int editChoreHomeId)
-        {
-            ClearFieldErrors(key => key == "id");
-            ClearFieldErrors(key => key == "Name");
-            ClearFieldErrors(key => key == "HomeId");
-            if (!ModelState.IsValid)
-            {
-                await OnGetAsync(editChoreHomeId); // Refresh the data
-                return Page();
-            }
-
-            try
-            {
-                var token = User.FindFirstValue("Token");
-                using (var httpClient = _httpClientFactory.CreateClient())
-                {
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                    var apiUrl = $"{_config["ApiUrl"]}/HomeChore/Chore/Dates/{id}";
-
-                    // Update EditHomeChore with form values
-                    EditHomeChoreDates.StartDate = DateTime.Parse(Request.Form["editStartDate"]);
-                    EditHomeChoreDates.EndDate = DateTime.Parse(Request.Form["editEndDate"]);
-
-                    var response = await httpClient.PostAsJsonAsync(apiUrl, EditHomeChoreDates);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return RedirectToPage();
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, $"Failed to update chore: {response.StatusCode}");
-                        return Page();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-                await OnGetAsync(editChoreHomeId); // Refresh the data
-                return Page();
-            }
-        }
-
 
         private void ClearFieldErrors(Func<string, bool> predicate)
         {

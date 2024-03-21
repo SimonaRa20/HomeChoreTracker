@@ -22,7 +22,7 @@
         <a class="btn btn-light btn-sm mb-2" href="/HomeChores/@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
         <a class="btn btn-secondary btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
         <a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.Id"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.Id"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Calendar</a>
+            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.Id"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Home Calendar</a>
         <div class="card mb-4 py-3 mt-2 border-left-primary">
             <div class="card-body">
                 <form method="post" asp-action="Create">
@@ -115,6 +115,17 @@
                         </select>
                         <span asp-validation-for="CreateHomeChore.MonthlyRepeatType" class="text-danger"></span>
                     </div>
+
+                        <div class="form-group">
+                            <label for="StartDate">Start date</label>
+                            <input type="date" class="form-control" id="StartDate" name="CreateHomeChore.StartDate" asp-for="CreateHomeChore.StartDate" required>
+                            <span asp-validation-for="CreateHomeChore.StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="EndDate">End date</label>
+                            <input type="date" class="form-control" id="EndDate" name="CreateHomeChore.EndDate" asp-for="CreateHomeChore.EndDate" required>
+                            <span asp-validation-for="CreateHomeChore.EndDate" class="text-danger"></span>
+                        </div>
                     <button type="submit" class="btn btn-primary">Create</button>
                 </form>
             </div>
@@ -122,9 +133,23 @@
     </div>
 </div>
 }
-
 <script>
     $(document).ready(function () {
+        // Function to add months to a date
+        function addMonths(date, months) {
+            var d = new Date(date);
+            d.setMonth(d.getMonth() + months);
+            return d.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+        }
+
+        // Set start date to today
+        var today = new Date().toISOString().slice(0, 10);
+        $('#StartDate').val(today);
+
+        // Calculate and set end date to one month from today
+        var oneMonthFromToday = addMonths(today, 1);
+        $('#EndDate').val(oneMonthFromToday);
+
         $('#Unit').change(function () {
             var unit = $(this).val();
             if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Day)') {

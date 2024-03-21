@@ -46,7 +46,7 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.TaskAssignments.AddAsync(taskAssignment);
         }
 
-        public async Task CreateHomeChore(HomeChoreRequest homeChoreRequest)
+        public async Task <HomeChoreTask>CreateHomeChore(HomeChoreRequest homeChoreRequest)
         {
             List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
             if(homeChoreRequest.DaysOfWeek != null)
@@ -101,12 +101,15 @@ namespace HomeChoreTracker.Api.Repositories
                 DaysOfWeek = dayOfWeeks,
                 DayOfMonth = homeChoreRequest.DayOfMonth,
                 MonthlyRepeatType = homeChoreRequest.MonthlyRepeatType,
+                StartDate = homeChoreRequest.StartDate,
+                EndDate = homeChoreRequest.EndDate,
                 IsActive = true,
                 HomeId = homeChoreRequest.HomeId,
                 WasEarnedPoints = false,
             };
 
             await _dbContext.HomeChoreTasks.AddAsync(homeChore);
+            return homeChore;
         }
 
         public async Task Delete(int id)
@@ -136,6 +139,54 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task<List<TaskAssignment>> GetCalendar(int id)
         {
             return await _dbContext.TaskAssignments.Where(x => x.HomeId.Equals(id)).ToListAsync();
+        }
+
+        public async Task<bool> CheckOrHomeChoreWasAssigned(int id) // id - send task id
+        {
+            List<TaskAssignment> tasks = await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).ToListAsync();
+            bool flag = false;
+
+            foreach (var task in tasks)
+            {
+                if(task.TaskId.Equals(id) && task.HomeMemberId != null)
+                {
+                    flag = true;
+                    break;
+                }
+            }
+
+            return flag;
+        }
+
+        public async Task DeleteAssignedTasks(int id) // id - send task id
+        {
+            List<TaskAssignment> tasks = await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                if (task.TaskId.Equals(id) && task.HomeMemberId == null)
+                {
+                    if (task.StartDate > DateTime.Now)
+                    {
+                        _dbContext.TaskAssignments.Remove(task);
+                    }
+                    else
+                    {
+                        task.EndDate = DateTime.Now;
+                        _dbContext.Entry(task).State = EntityState.Modified;
+                    }
+                }
+            }
+        }
+
+        public async Task DeleteNotAssignedTasks(int id) // id - send task id
+        {
+            List<TaskAssignment> tasks = await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                _dbContext.TaskAssignments.Remove(task);
+            }
         }
 
         public async Task<List<TaskSchedule>> GetTaskSchedule(int id)

@@ -26,7 +26,7 @@
             <a class="btn btn-secondary btn-sm mb-2" href="/HomeChores/@Model.HomeId"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
             <a class="btn btn-light btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.HomeId"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
             <a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.HomeId"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.HomeId"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Calendar</a>
+            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.HomeId"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Home Calendar</a>
             <div class="card mb-4 py-3 border-left-primary">
 
                 <div class="card-body">
@@ -44,6 +44,8 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Chore Type</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -53,7 +55,27 @@
                                     <tr>
                                         <td>@choreBase.Name</td>
                                         <td>@choreBase.ChoreType</td>
-                                      
+                                        <td>
+                                                @if (choreBase.StartDate != null)
+                                                {
+                                                <p>@choreBase.StartDate.Value.ToString("yyyy/MM/dd")</p>
+                                                }
+                                                else
+                                                {
+                                                <p>-</p>
+                                                }
+                                        </td>
+
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(choreBase.EndDate.ToString()))
+                                            {
+                                                <p>@choreBase.EndDate.Value.ToString("yyyy/MM/dd")</p>
+                                            }
+                                            else
+                                            {
+                                                <p>-</p>
+                                            }
+                                        </td>
                                         <td>
                                             <button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
                                                 <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
@@ -63,9 +85,6 @@
                                             <button class='btn btn-sm' onclick="DisplayEditModal('@choreBase.Id')">
                                                 <i class='fa fa-pencil-alt'></i>
                                             </button>
-                                                <button class='btn btn-sm' onclick="DisplayEditDateModal('@choreBase.Id', @Model.HomeId)">
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
                                             }
                                             @if (!choreBase.WasEarnedPoints && choreBase.IsActive)
                                             {
@@ -226,45 +245,6 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="editDateModal" tabindex="-1" role="dialog" aria-labelledby="editDateModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editDateModalLabel">Set Chore Date</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-
-                    <ul id="datesList" style="list-style-type: none; padding-left: 0;">
-
-                    </ul>
-                    <form method="post" asp-page-handler="EditDate" id="editDateForm">
-                        <input type="hidden" id="editChoreDateId" name="id" value="" />
-                        <input type="hidden" id="editChoreHomeId" name="editChoreHomeId" value="@Model.HomeId" />
-
-                        <div class="form-group">
-                            <label for="editStartDate">Start date</label>
-                            <input type="date" class="form-control" id="editStartDate" name="editStartDate" asp-for="EditHomeChoreDates.StartDate" required>
-                            <span asp-validation-for="EditHomeChoreDates.StartDate" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="editEndDate">End date</label>
-                            <input type="date" class="form-control" id="editEndDate" name="editEndDate" asp-for="EditHomeChoreDates.EndDate" required>
-                            <span asp-validation-for="EditHomeChoreDates.EndDate" class="text-danger"></span>
-                        </div>
-                        <div id="editDateErrorMessage" class="text-danger" style="display: none;">Start date cannot be greater than end date.</div>
-
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </form>
-
                 </div>
             </div>
         </div>
@@ -453,66 +433,5 @@
             }
         });
     }
-
-    function DisplayEditDateModal(choreId, homeId) {
-        currentChoreId = choreId; // Store the current chore ID
-        editChoreHomeId = homeId; // Store the home ID (Note: this variable should be declared somewhere in your script)
-
-        // Set the chore ID in the hidden input field
-        $('#editChoreDateId').val(choreId);
-        // Get today's date
-        var today = new Date();
-        // Set the start date input field value to today's date
-        $('#editStartDate').val(today.toISOString().substring(0, 10));
-
-        // Calculate the end date as one month from today
-        var endDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-        // Set the end date input field value to the calculated end date
-        $('#editEndDate').val(endDate.toISOString().substring(0, 10));
-
-        // Make an AJAX request to fetch detailed information about the chore dates
-        $.ajax({
-            url: '@Url.Page("/HomeChores/Index")?handler=Dates&choreId=' + choreId,
-            type: 'GET',
-            success: function (data) {
-                console.log('Received data:', data); // Log the received data
-                if (data) {
-                    // Clear any previous list of dates
-                    $('#datesList').empty();
-
-                    // Populate the list of previous dates
-                    data.forEach(function (date) {
-                        // Format the start and end dates
-                        var formattedStartDate = date.startDate.substring(0, 10);
-                        var formattedEndDate = date.endDate.substring(0, 10);
-
-                        $('#datesList').append('<li>' + formattedStartDate + ' - ' + formattedEndDate + '</li>');
-                    });
-
-
-
-                    // Show the modal
-                    $('#editDateModal').modal('show');
-                } else {
-                    console.error('Invalid data format:', data);
-                }
-            },
-            error: function (error) {
-                console.error('Error fetching chore details:', error);
-            }
-        });
-    }
-    $('#editDateForm').submit(function (event) {
-        var startDate = new Date($('#editStartDate').val());
-        var endDate = new Date($('#editEndDate').val());
-
-        if (startDate >= endDate) {
-            $('#editDateErrorMessage').text('Start date cannot be greater or equals with end date.');
-            $('#editDateErrorMessage').show();
-            event.preventDefault(); // Prevent form submission
-        } else {
-            $('#editDateErrorMessage').hide();
-        }
-    });
 
 </script>

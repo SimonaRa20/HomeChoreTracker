@@ -17,7 +17,8 @@ namespace HomeChoreTracker.Portal.Models.HomeChore
         public List<DayOfWeek>? DaysOfWeek { get; set; }
         public int? DayOfMonth { get; set; }
         public MonthlyRepeatType? MonthlyRepeatType { get; set; }
-
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public bool WasEarnedPoints { get; set; }
         public bool IsActive { get; set; }
         public int HomeId { get; set; }
