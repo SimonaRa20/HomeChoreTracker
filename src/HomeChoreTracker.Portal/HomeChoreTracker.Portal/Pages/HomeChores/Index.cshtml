@@ -352,11 +352,30 @@
             }
         });
     }
+    function clearEditModalFields() {
+        $('#editName').val('');
+        $('#editDescription').val('');
+        $('#editPoints').val('');
+        $('#editStartDate').val('');
+        $('#editEndDate').val('');
+        $('#editInterval').val('');
+        $('#editDayOfMonth').val('');
+        $('#editChoreType').val('');
+        $('#editTimeLong').val('');
+        $('#editLevelType').val('');
+        $('#editRepeatUnit').val('');
+        $('#editMonthlyRepeatType').val('');
+
+        // Clear checkbox for days of week
+        $('input[name="editDaysOfWeek"]').prop('checked', false);
+    }
 
     function DisplayEditModal(choreId) {
         console.log(choreId)
+        clearEditModalFields();
         currentChoreId = choreId; // Store the current chore ID
         // Set the chore ID in the hidden input field
+
         $('#editChoreId').val(choreId);
         // Make an AJAX request to fetch detailed information about the chore
         $.ajax({
@@ -436,7 +455,7 @@
                         $('#editMonthlyRepeatTypeField').hide();
                     }
                     // Dynamically update the modal title with the chore name
-                    $('#editModalLabel').text("Edit '" +  data.name + "' Chore");
+                    $('#editModalLabel').text("Edit '" +  data.name + "' chore");
 
                     // Show the edit modal
                     $('#editModal').modal('show');
