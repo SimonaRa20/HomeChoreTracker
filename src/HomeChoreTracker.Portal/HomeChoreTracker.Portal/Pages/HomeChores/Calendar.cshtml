@@ -30,9 +30,9 @@
             <a class="btn btn-secondary btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.Id"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Home Calendar</a>
             <div class="card mb-4 py-3 border-left-primary">
 
-                <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Assign tasks randomly</a>
+                <a class='btn btn-sm' id='btnSystemAssign' data-toggle="modal" data-target="#SystemAssignModal-@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Assign tasks randomly</a>
 
-                <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@Model.Id">
+                <div class="modal" tabindex="-1" role="dialog" id="SystemAssignModal-@Model.Id">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -46,7 +46,8 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <form method="post" asp-page-handler="Delete" asp-route-taskId="@Model.Id">
+                                <form method="post" asp-page-handler="SystemAssign" asp-route-taskId="@Model.Id">
+                                    <input type="hidden" id="editHomeId" name="homeId" value="@Model.Id" />
                                     <button type="submit" class="btn btn-primary">Assign</button>
                                 </form>
                             </div>

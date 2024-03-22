@@ -17,6 +17,7 @@ namespace HomeChoreTracker.Portal.Pages
         public CalendarRequest CalendarRequest { get; set; }
 
         public List<Event> Events { get; set; }
+        public List<TaskAssignmentResponse> HomeChoreResponse { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -53,9 +54,31 @@ namespace HomeChoreTracker.Portal.Pages
                         title = chore.Summary,
                     });
 
+                    var apiUrlHomeChore = $"{_config["ApiUrl"]}/Calendar/Chores";
+
+                    var responseHomeChore = await httpClient.GetAsync(apiUrlHomeChore);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        HomeChoreResponse = await responseHomeChore.Content.ReadFromJsonAsync<List<TaskAssignmentResponse>>();
+
+                        var eventsHomeChore = HomeChoreResponse.Select(chore => new
+                        {
+                            id = chore.Id,
+                            title = chore.Task.Name,
+                            start = chore.StartDate.ToString("yyyy-MM-dd"),
+                            end = chore.EndDate.ToString("yyyy-MM-dd"),
+                            assigned = chore.HomeMemberId,
+                            description = chore.Task.Description,
+                            type = chore.Task.ChoreType.ToString(),
+                            time = chore.Task.Time.ToString(),
+                        });
+
+                        
+                    }
                     return Page();
                 }
-                else
+                    else
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {

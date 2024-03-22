@@ -131,6 +131,32 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.TaskAssignments.Where(x => x.Id.Equals(id)).FirstOrDefaultAsync();
         }
 
+        public async Task<List<TaskAssignment>> GetAssignedTasks(int userId)
+        {
+            return await _dbContext.TaskAssignments.Where(x => x.HomeMemberId.Equals(userId)).ToListAsync();
+        }
+
+
+        public async Task<int> GetTotalPointsAssigned(int memberId)
+        {
+            var completedAssignments = await _dbContext.TaskAssignments
+        .Where(assignment => assignment.HomeMemberId == memberId)
+        .ToListAsync();
+
+            int totalPoints = 0;
+
+            foreach (var assignment in completedAssignments)
+            {
+                var task = await _dbContext.HomeChoreTasks.FindAsync(assignment.TaskId);
+                if (task != null)
+                {
+                    totalPoints += task.Points;
+                }
+            }
+
+            return totalPoints;
+        }
+
         public async Task<List<HomeChoreTask>> GetAll(int id)
         {
             return await _dbContext.HomeChoreTasks.Where(x=>x.HomeId.Equals(id)).ToListAsync();
@@ -141,7 +167,7 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.TaskAssignments.Where(x => x.HomeId.Equals(id)).ToListAsync();
         }
 
-        public async Task<bool> CheckOrHomeChoreWasAssigned(int id) // id - send task id
+        public async Task<bool> CheckOrHomeChoreWasAssigned(int id)
         {
             List<TaskAssignment> tasks = await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).ToListAsync();
             bool flag = false;
@@ -158,7 +184,16 @@ namespace HomeChoreTracker.Api.Repositories
             return flag;
         }
 
-        public async Task DeleteAssignedTasks(int id) // id - send task id
+        public async Task<List<TaskAssignment>> GetUnassignedTasks(int homeId)
+        {
+            var unassignedTasks = await _dbContext.TaskAssignments
+                .Where(assignment => assignment.HomeId == homeId && assignment.HomeMemberId == null)
+                .ToListAsync();
+
+            return unassignedTasks;
+        }
+
+        public async Task DeleteAssignedTasks(int id)
         {
             List<TaskAssignment> tasks = await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).ToListAsync();
 
@@ -179,7 +214,7 @@ namespace HomeChoreTracker.Api.Repositories
             }
         }
 
-        public async Task DeleteNotAssignedTasks(int id) // id - send task id
+        public async Task DeleteNotAssignedTasks(int id)
         {
             List<TaskAssignment> tasks = await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).ToListAsync();
 
@@ -188,6 +223,7 @@ namespace HomeChoreTracker.Api.Repositories
                 _dbContext.TaskAssignments.Remove(task);
             }
         }
+
 
         public async Task<List<TaskSchedule>> GetTaskSchedule(int id)
         {
@@ -213,6 +249,11 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task UpdateTaskAssignment(TaskAssignment assignment)
         {
             _dbContext.Entry(assignment).State = EntityState.Modified;
+        }
+
+        public async Task<List<TaskAssignment>> GetHomeChoresUserCalendar(int id)
+        {
+            return await _dbContext.TaskAssignments.Where(x => x.HomeMemberId.Equals(id)).ToListAsync();
         }
     }
 }

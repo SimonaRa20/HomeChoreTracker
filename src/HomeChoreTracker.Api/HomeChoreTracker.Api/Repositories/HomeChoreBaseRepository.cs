@@ -117,7 +117,6 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task<List<HomeChoreBase>> GetPaginated(int skip, int take)
         {
-            // Assuming you have a DbSet<HomeChoreBase> in your DbContext named "HomeChoreBases"
             List<HomeChoreBase> homeChores = await _dbContext.HomeChoresBases.OrderBy(h => h.Id)
                 .Skip(skip)
                 .Take(take)

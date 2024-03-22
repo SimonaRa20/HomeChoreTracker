@@ -7,5 +7,6 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<int> GetUserIdByEmail(string inviteeEmail);
         Task<User> GetUserById(int id);
         Task UpdateUser(User user);
+        Task<List<User>> GetHomeMembers(int homeId);
     }
 }

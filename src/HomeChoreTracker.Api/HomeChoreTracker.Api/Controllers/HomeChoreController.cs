@@ -129,6 +129,29 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
+        private int GetMinutesFromTimeLong(TimeLong timeLong)
+        {
+            switch (timeLong)
+            {
+                case TimeLong.fiveMinutes: return 5;
+                case TimeLong.tenMinutes: return 10;
+                case TimeLong.fifteenMinutes: return 15;
+                case TimeLong.twentyMinutes: return 20;
+                case TimeLong.thirtyMinutes: return 30;
+                case TimeLong.fourtyFiveMinutes: return 45;
+                case TimeLong.hour: return 60;
+                case TimeLong.hourAndHalf: return 90;
+                case TimeLong.twoHours: return 120;
+                case TimeLong.twoHoursAndHalf: return 150;
+                case TimeLong.threeHours: return 180;
+                case TimeLong.threeHoursAndHalf: return 210;
+                case TimeLong.fourHours: return 240;
+                case TimeLong.fourHoursAndHalf: return 270;
+                case TimeLong.fiveHours: return 300;
+                default: return 0;
+            }
+        }
+
         private async Task SetHomeChoreDates(HomeChoreTask homeChore)
         {
             try
@@ -136,7 +159,7 @@ namespace HomeChoreTracker.Api.Controllers
                 DateTime startDate = (DateTime)homeChore.StartDate;
                 DateTime endDate = (DateTime)homeChore.EndDate;
                 int id = homeChore.Id;
-
+                
                 TaskSchedule taskSchedule = new TaskSchedule
                 {
                     TaskId = id,
@@ -160,7 +183,7 @@ namespace HomeChoreTracker.Api.Controllers
                         {
                             TaskId = id,
                             StartDate = assignmentDate,
-                            EndDate = assignmentDate,
+                            EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
                             IsDone = false,
                             IsApproved = false,
                             HomeId = homeChore.HomeId
@@ -188,7 +211,7 @@ namespace HomeChoreTracker.Api.Controllers
                             {
                                 TaskId = id,
                                 StartDate = assignmentDate,
-                                EndDate = assignmentDate,
+                                EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
                                 IsDone = false,
                                 IsApproved = false,
                                 HomeId = homeChore.HomeId
@@ -233,7 +256,7 @@ namespace HomeChoreTracker.Api.Controllers
                         {
                             TaskId = id,
                             StartDate = assignmentDate,
-                            EndDate = assignmentDate,
+                            EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
                             IsDone = false,
                             IsApproved = false,
                             HomeId = homeChore.HomeId
@@ -257,7 +280,7 @@ namespace HomeChoreTracker.Api.Controllers
                             {
                                 TaskId = id,
                                 StartDate = assignmentDate,
-                                EndDate = assignmentDate,
+                                EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
                                 IsDone = false,
                                 IsApproved = false,
                                 HomeId = homeChore.HomeId

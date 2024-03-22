@@ -27,6 +27,14 @@ namespace HomeChoreTracker.Api.Repositories
         .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<List<User>> GetHomeMembers(int homeId)
+        {
+            return await _dbContext.UserHomes
+                .Where(uh => uh.HomeId == homeId)
+                .Select(uh => uh.User)
+                .ToListAsync();
+        }
+
         public async Task UpdateUser(User user)
         {
             _dbContext.Entry(user).State = EntityState.Modified;

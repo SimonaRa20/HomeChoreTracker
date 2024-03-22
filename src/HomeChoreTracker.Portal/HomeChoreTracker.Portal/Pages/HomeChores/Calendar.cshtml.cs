@@ -115,5 +115,36 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
             }
         }
+
+        public async Task<IActionResult> OnPostSystemAssignAsync(int homeId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var apiUrl = _config["ApiUrl"] + $"/Calendar/AssignTasksToMembers/{homeId}";
+
+                // Create an empty StringContent since no content needs to be sent
+                var emptyContent = new StringContent("");
+
+                var response = await httpClient.PostAsync(apiUrl, emptyContent);
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                    return Page();
+                }
+            }
+        }
+
     }
 }

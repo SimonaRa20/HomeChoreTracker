@@ -80,6 +80,19 @@ else
                     },
         </text>
     }
+    @foreach (var chore in Model.HomeChoreResponse)
+    {
+        <text>
+                    {
+                        id: '@chore.Id',
+                        title: '@chore.Task.Name',
+                        start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                        end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                        color: "#4e73df",
+                        textColor: 'white'
+                    },
+        </text>
+    }
                 ],
             eventRender: function (event, element) {
             },
