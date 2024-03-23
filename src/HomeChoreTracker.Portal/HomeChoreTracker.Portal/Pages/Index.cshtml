@@ -22,7 +22,10 @@ else
             <a class="btn btn-secondary btn-sm mb-2" asp-page="./"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>My Calendar</a>
             <div class="card mb-4 py-3 border-left-primary">
 
-                <a class='btn btn-sm' id='btnCalendar' data-toggle="modal" data-target="#CalendarModal"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Import Google Calendar events</a>
+                <div class="d-flex justify-content-between m-2">
+                    <button class='btn btn-secondary btn-sm' id='btnCalendar' data-toggle="modal" data-target="#CalendarModal"><i class="fa fa-download mr-2" aria-hidden="true"></i>Import Google Calendar events</button>
+                    <button class="btn btn-secondary btn-sm" id="btnExport"><i class="fa fa-upload mr-2" aria-hidden="true"></i>Export Home Chores</button>
+                </div>
 
                 <div class="modal" tabindex="-1" role="dialog" id="CalendarModal">
                     <div class="modal-dialog" role="document">
@@ -50,7 +53,7 @@ else
                     </div>
                 </div>
 
-                <div id="calendar" style="margin-left:4px"></div>
+                <div id="calendar" class="m-2"></div>
             </div>
         </div>
     </div>
@@ -103,4 +106,37 @@ else
     }).fail(function (jqxhr, settings, exception) {
         console.error("Failed to load FullCalendar:", exception);
     });
+</script>
+<script>
+    $('#btnExport').click(function () {
+        $.ajax({
+            url: '@Url.Page("/Index")?handler=Detail',
+            type: 'GET',
+            success: function (response) {
+                if (response) {
+                    var blob = new Blob([response], { type: 'text/calendar' });
+
+                    var url = window.URL.createObjectURL(blob);
+
+                    var downloadLink = document.createElement('a');
+                    downloadLink.href = url;
+                    downloadLink.download = 'HomeChores.ics';
+
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+
+                    document.body.removeChild(downloadLink);
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    console.error("Failed to export home chores: Empty response");
+                    alert("Failed to export home chores. Please try again.");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to export home chores:", error);
+                alert("Failed to export home chores. Please try again.");
+            }
+        });
+    });
+
 </script>

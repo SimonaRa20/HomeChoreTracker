@@ -1,3 +1,4 @@
+using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Calendar;
 using HomeChoreTracker.Portal.Models.HomeChore;
 using Microsoft.AspNetCore.Authentication;
@@ -124,6 +125,32 @@ namespace HomeChoreTracker.Portal.Pages
             {
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
                 return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnGetDetailAsync()
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/Calendar/Chores/File";
+                var response = await httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var calendarFileBytes = await response.Content.ReadAsByteArrayAsync();
+                    var contentType = "text/calendar"; // Set the content type to indicate that this is a calendar file
+                    var fileName = "HomeChores.ics"; // Set the file name
+
+                    // Return the calendar file as a FileResult
+                    return File(calendarFileBytes, contentType, fileName);
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
+                }
             }
         }
 

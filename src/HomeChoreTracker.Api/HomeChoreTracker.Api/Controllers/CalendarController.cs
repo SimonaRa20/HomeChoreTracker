@@ -6,9 +6,12 @@ using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
 
 [Route("[controller]")]
 [ApiController]
@@ -364,4 +367,43 @@ public class CalendarController : Controller
             default: return 0;
         }
     }
+
+    [HttpGet("Chores/File")]
+    [Authorize]
+    public async Task<IActionResult> HomeChoreCalendarFile()
+    {
+        int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+        var homeChores = await _homeChoreRepository.GetHomeChoresUserCalendar(userId);
+        if (homeChores == null)
+        {
+            return NotFound($"Home chore base with user ID {userId} not found");
+        }
+
+        var calendar = new Calendar();
+
+        foreach (var taskAssignment in homeChores)
+        {
+            HomeChoreTask homeChoreTask = await _homeChoreRepository.Get(taskAssignment.TaskId);
+
+            var evt = new CalendarEvent
+            {
+                Start = new CalDateTime(taskAssignment.StartDate),
+                End = new CalDateTime(taskAssignment.EndDate),
+                Summary = homeChoreTask.Name,
+            };
+
+            calendar.Events.Add(evt);
+        }
+
+        var serializer = new CalendarSerializer();
+        var serializedCalendar = serializer.SerializeToString(calendar);
+
+        var bytes = Encoding.UTF8.GetBytes(serializedCalendar);
+        var contentType = "text/calendar";
+        var fileName = "HomeChores.ics";
+
+        return File(bytes, contentType, fileName);
+    }
+
 }

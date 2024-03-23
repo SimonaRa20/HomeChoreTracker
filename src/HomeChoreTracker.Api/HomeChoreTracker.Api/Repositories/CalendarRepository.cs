@@ -24,5 +24,7 @@ namespace HomeChoreTracker.Api.Repositories
         {
             return await _dbContext.Events.Where(x => x.UserId.Equals(userId)).ToListAsync();
         }
+
+
     }
 }
