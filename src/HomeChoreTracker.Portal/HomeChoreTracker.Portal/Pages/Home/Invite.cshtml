@@ -38,6 +38,17 @@ else
 							<input type="email" class="form-control" id="InviteeEmail" name="InviteUserRequest.InviteeEmail" asp-for="InviteUserRequest.InviteeEmail">
 							<span asp-validation-for="InviteUserRequest.InviteeEmail" class="text-danger"></span>
 						</div>
+						<div class="text-danger">
+							@if (!ModelState.IsValid)
+							{
+								<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+									@foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+									{
+										<li>@error.ErrorMessage</li>
+									}
+								</ul>
+							}
+						</div>
 						<button type="submit" class="btn btn-info">Send Invitation</button>
 					</form>
 				</div>

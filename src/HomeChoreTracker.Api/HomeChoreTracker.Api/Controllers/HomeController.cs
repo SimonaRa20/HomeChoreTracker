@@ -65,6 +65,20 @@ namespace HomeChoreTracker.Api.Controllers
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 
+			var CheckOrIsMember = await _authRepository.GetUserByEmail(inviteUserRequest.InviteeEmail);
+
+			if(CheckOrIsMember != null)
+			{
+				var checkOrHomeMember = await _homeRepository.OrHomeMember(inviteUserRequest.HomeId, CheckOrIsMember.Id); 
+				if(checkOrHomeMember)
+				{
+					return new ObjectResult("User already added to home.")
+					{
+						StatusCode = (int)HttpStatusCode.UnprocessableEntity
+					};
+				}
+			}
+
 			var user = await _authRepository.GetUserByEmail(inviteUserRequest.InviteeEmail);
 			User sender = await _authRepository.GetUserById(userId);
 
