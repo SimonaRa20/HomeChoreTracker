@@ -36,9 +36,12 @@
 					</div>
 					<div class="form-group">
 						<label for="Amount">Amount</label>
-						<input type="number" class="form-control" id="Amount" name="CreateNewIncome.Amount" asp-for="CreateNewIncome.Amount" step="0.01" min="0.01" required>
+						<input type="number" class="form-control" id="Amount" name="CreateNewIncome.Amount" asp-for="CreateNewIncome.Amount" step="0.01" min="0.01">
 						<span asp-validation-for="CreateNewIncome.Amount" class="text-danger"></span>
+						<span id="amountErrorMessage" class="text-danger" style="display:none;">Amount is required, has to be more than 0</span>
 					</div>
+
+
 
 
 					<div class="form-group">
@@ -48,8 +51,9 @@
 
 					<div class="form-group">
 						<label for="Time">Time</label>
-						<input type="datetime-local" class="form-control" id="Time" name="CreateNewIncome.Time" asp-for="CreateNewIncome.Time" required>
+						<input type="datetime-local" class="form-control" id="Time" name="CreateNewIncome.Time" asp-for="CreateNewIncome.Time">
 						<span asp-validation-for="CreateNewIncome.Time" class="text-danger"></span>
+						<span id="timeErrorMessage" class="text-danger" style="display:none;">Time is required</span>
 					</div>
 					<div class="form-group">
 						<label for="Type">Income Type</label>
@@ -97,4 +101,59 @@
 
 	document.getElementById('Amount').value = '0.01';
 
+</script>
+
+
+<script>
+	// Function to check if the time field is empty
+	function validateTime() {
+		var timeInput = document.getElementById('Time');
+		var errorMessage = document.getElementById('timeErrorMessage');
+
+		if (!timeInput.value) {
+			errorMessage.style.display = 'inline'; // Show error message
+			return false;
+		} else {
+			errorMessage.style.display = 'none'; // Hide error message
+			return true;
+		}
+	}
+
+	// Validate time when form is submitted
+	document.querySelector('form').addEventListener('submit', function (event) {
+		if (!validateTime()) {
+			event.preventDefault(); // Prevent form submission
+		}
+	});
+
+	// Validate time when input field loses focus
+	document.getElementById('Time').addEventListener('blur', validateTime);
+</script>
+<script>
+	// Function to check if the amount field is valid
+	function validateAmount() {
+		var amountInput = document.getElementById('Amount');
+		var errorMessage = document.getElementById('amountErrorMessage');
+
+		// Parse the value to ensure it's a valid number
+		var amountValue = parseFloat(amountInput.value);
+
+		if (isNaN(amountValue) || amountValue <= 0) {
+			errorMessage.style.display = 'inline'; // Show error message
+			return false;
+		} else {
+			errorMessage.style.display = 'none'; // Hide error message
+			return true;
+		}
+	}
+
+	// Validate amount when form is submitted
+	document.querySelector('form').addEventListener('submit', function (event) {
+		if (!validateAmount()) {
+			event.preventDefault(); // Prevent form submission
+		}
+	});
+
+	// Validate amount when input field loses focus
+	document.getElementById('Amount').addEventListener('blur', validateAmount);
 </script>

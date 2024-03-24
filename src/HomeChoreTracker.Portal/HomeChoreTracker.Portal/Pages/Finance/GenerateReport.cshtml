@@ -35,16 +35,16 @@
         <form method="post" asp-action="GenerateReport">
             <div class="form-group">
                 <label for="StartDate">Start date</label>
-                <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" asp-for="StartDate" required>
+                <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" asp-for="StartDate">
                 <span asp-validation-for="StartDate" class="text-danger"></span>
+                <span id="startDateErrorMessage" class="text-danger" style="display:none;">Start date is required</span>
             </div>
             <div class="form-group">
                 <label for="EndDate">End date</label>
-                <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" asp-for="EndDate" required>
+                <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" asp-for="EndDate">
                 <span asp-validation-for="EndDate" class="text-danger"></span>
+                <span id="endDateErrorMessage" class="text-danger" style="display:none;">End date is required</span>
             </div>
-
-            <!-- Validation message placeholder -->
             <div id="dateValidationMessage" class="text-danger"></div>
 
             <button type="submit" class="btn btn-primary">Generate report</button>
@@ -53,45 +53,10 @@
 </div>
 
 <script>
-    // Get reference to the date input fields
-    const startDateInput = document.getElementById('StartDate');
-    const endDateInput = document.getElementById('EndDate');
-
-    // Add event listener to start date input field
-    startDateInput.addEventListener('input', function () {
-        // Set the minimum value of end date to be equal to the value of start date
-        endDateInput.min = startDateInput.value;
-
-        // If end date is earlier than start date, reset end date value to start date value
-        if (endDateInput.value < startDateInput.value) {
-            endDateInput.value = startDateInput.value;
-        }
-
-        // If start date and end date are the same, add one day to the end date
-        if (startDateInput.value === endDateInput.value) {
-            const endDate = new Date(endDateInput.value);
-            endDate.setDate(endDate.getDate() + 1);
-            const endDateString = endDate.toISOString().slice(0, 16); // Format to YYYY-MM-DDTHH:MM
-            endDateInput.value = endDateString;
-        }
-    });
-
-    // Add event listener to end date input field
-    endDateInput.addEventListener('input', function () {
-        // If end date is earlier than start date, display validation message
-        if (endDateInput.value < startDateInput.value) {
-            document.getElementById('dateValidationMessage').innerText = "End date cannot be earlier than start date";
-        } else {
-            document.getElementById('dateValidationMessage').innerText = "";
-        }
-    });
-</script>
-<script>
-    // Function to get today's date and time in the required format
     function getTodayISOString() {
         var now = new Date();
         var year = now.getFullYear();
-        var month = (now.getMonth() + 1).toString().padStart(2, '0'); // Month starts from 0
+        var month = (now.getMonth() + 1).toString().padStart(2, '0');
         var day = now.getDate().toString().padStart(2, '0');
         var hours = now.getHours().toString().padStart(2, '0');
         var minutes = now.getMinutes().toString().padStart(2, '0');
@@ -101,9 +66,9 @@
 
     function getMonthBeforeISOString() {
         var now = new Date();
-        now.setMonth(now.getMonth() - 1); // Subtract one month
+        now.setMonth(now.getMonth() - 1);
         var year = now.getFullYear();
-        var month = (now.getMonth() + 1).toString().padStart(2, '0'); // Month starts from 0
+        var month = (now.getMonth() + 1).toString().padStart(2, '0');
         var day = now.getDate().toString().padStart(2, '0');
         var hours = now.getHours().toString().padStart(2, '0');
         var minutes = now.getMinutes().toString().padStart(2, '0');
@@ -111,9 +76,44 @@
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
-    // Set default value for the StartDate field to one month before the current date
     document.getElementById('StartDate').value = getMonthBeforeISOString();
 
-    // Set default value for the EndDate field to the current date
     document.getElementById('EndDate').value = getTodayISOString();
+</script>
+<script>
+    function validateDates() {
+        var startDateInput = document.getElementById('StartDate');
+        var endDateInput = document.getElementById('EndDate');
+        var startDateErrorMessage = document.getElementById('startDateErrorMessage');
+        var endDateErrorMessage = document.getElementById('endDateErrorMessage');
+
+        if (!startDateInput.value) {
+            startDateErrorMessage.style.display = 'inline';
+            return false;
+        } else {
+            startDateErrorMessage.style.display = 'none';
+        }
+
+        if (!endDateInput.value) {
+            endDateErrorMessage.style.display = 'inline';
+            return false;
+        } else {
+            endDateErrorMessage.style.display = 'none';
+        }
+
+        if (endDateInput.value < startDateInput.value) {
+            document.getElementById('dateValidationMessage').innerText = "End date cannot be earlier than start date";
+            return false;
+        } else {
+            document.getElementById('dateValidationMessage').innerText = "";
+        }
+
+        return true;
+    }
+
+    document.querySelector('form').addEventListener('submit', function (event) {
+        if (!validateDates()) {
+            event.preventDefault();
+        }
+    });
 </script>

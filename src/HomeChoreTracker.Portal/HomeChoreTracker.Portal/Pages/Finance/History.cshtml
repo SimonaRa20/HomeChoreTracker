@@ -194,7 +194,7 @@
 	</div>
 </div>
 
-<div class="modal fade" id="editIncomeModal" tabindex="-1" role="dialog" aria-labelledby="editIncomeModalLabel"
+<div class="modal fade" id="editIncomeModal" tabindex="-1" role="dialog" aria-labelledby="editIncomeModalLabel" 
 	 aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -205,23 +205,26 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<form method="post" asp-page-handler="EditIncome">
+				<form method="post" asp-page-handler="EditIncome" onsubmit="return validateEditIncomeForm()">
 					<input type="hidden" id="editIncomeId" name="id" value="" />
 					<div class="form-group" method="post">
 						<label for="editIncomeTitle">Title</label>
-						<input asp-for="EditIncome.Title" name="EditIncomeTitle" type="text" class="form-control" id="editIncomeTitle" required>
+						<input asp-for="EditIncome.Title" name="EditIncomeTitle" type="text" class="form-control" id="editIncomeTitle">
+						<span id="editIncomeTitleError" class="text-danger"></span>
 					</div>
 					<div class="form-group" method="post">
 						<label for="editIncomeAmount">Amount</label>
-						<input asp-for="EditIncome.Amount" name="EditIncomeAmount" step="0.01" min="0.01" type="number" class="form-control" id="editIncomeAmount" required>
+						<input asp-for="EditIncome.Amount" name="EditIncomeAmount" step="0.01" min="0.01" type="number" class="form-control" id="editIncomeAmount">
+						<span id="editIncomeAmountError" class="text-danger"></span>
 					</div>
 					<div class="form-group" method="post">
 						<label for="editIncomeDescription">Description</label>
-						<input asp-for="EditIncome.Description" name="EditIncomeDescription" type="text" class="form-control" id="editIncomeDescription" required>
+						<input asp-for="EditIncome.Description" name="EditIncomeDescription" type="text" class="form-control" id="editIncomeDescription">
 					</div>
 					<div class="form-group" method="post">
 						<label for="editIncomeTime">Time</label>
-						<input asp-for="EditIncome.Time" name="EditIncomeTime" type="datetime" class="form-control" id="editIncomeTime" required>
+						<input asp-for="EditIncome.Time" name="EditIncomeTime" type="datetime-local" class="form-control" id="editIncomeTime">
+						<span id="editIncomeTimeError" class="text-danger"></span>
 					</div>
 					<div class="form-group">
 						<label for="editIncomeType">Income Type</label>
@@ -265,23 +268,26 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<form method="post" asp-page-handler="EditExpense">
+				<form method="post" asp-page-handler="EditExpense" onsubmit="return validateEditExpenseForm()">
 					<input type="hidden" id="editExpenseId" name="id" value="" />
 					<div class="form-group" method="post">
 						<label for="editExpenseTitle">Title</label>
-						<input asp-for="EditExpense.Title" name="EditExpenseTitle" type="text" class="form-control" id="editExpenseTitle" required>
+						<input asp-for="EditExpense.Title" name="EditExpenseTitle" type="text" class="form-control" id="editExpenseTitle" >
+						<span id="editExpenseTitleError" class="text-danger"></span>
 					</div>
 					<div class="form-group" method="post">
 						<label for="editExpenseAmount">Amount</label>
-						<input asp-for="EditExpense.Amount" name="EditExpenseAmount" type="number" step="0.01" min="0.01" class="form-control" id="editExpenseAmount" required>
+						<input asp-for="EditExpense.Amount" name="EditExpenseAmount" type="number" step="0.01" min="0.01" class="form-control" id="editExpenseAmount">
+						<span id="editExpenseAmountError" class="text-danger"></span>
 					</div>
 					<div class="form-group" method="post">
 						<label for="editExpenseDescription">Description</label>
-						<input asp-for="EditExpense.Description" name="EditExpenseDescription" type="text" class="form-control" id="editExpenseDescription" required>
+						<input asp-for="EditExpense.Description" name="EditExpenseDescription" type="text" class="form-control" id="editExpenseDescription">
 					</div>
 					<div class="form-group" method="post">
 						<label for="editExpenseTime">Time</label>
-						<input asp-for="EditExpense.Time" name="EditExpenseTime" type="datetime" class="form-control" id="editExpenseTime" required>
+						<input asp-for="EditExpense.Time" name="EditExpenseTime" type="datetime-local" class="form-control" id="editExpenseTime">
+						<span id="editExpenseTimeError" class="text-danger"></span>
 					</div>
 					<div class="form-group">
 						<label for="editExpenseType">Expense Type</label>
@@ -321,7 +327,75 @@
 		</div>
 	</div>
 </div>
+<script>
+	function validateEditIncomeForm() {
+		var title = $('#editIncomeTitle').val();
+		var amount = $('#editIncomeAmount').val();
+		var time = $('#editIncomeTime').val();
 
+		var isValid = true;
+
+		if (title.trim() === '') {
+			$('#editIncomeTitleError').text('Title is required');
+			isValid = false;
+		} else {
+			$('#editIncomeTitleError').text('');
+		}
+
+		if (amount.trim() === '') {
+			$('#editIncomeAmountError').text('Amount is required');
+			isValid = false;
+		} else if (parseFloat(amount) <= 0) {
+			$('#editIncomeAmountError').text('Amount must be greater than 0');
+			isValid = false;
+		} else {
+			$('#editIncomeAmountError').text('');
+		}
+
+		if (time.trim() === '') {
+			$('#editIncomeTimeError').text('Time is required');
+			isValid = false;
+		} else {
+			$('#editIncomeTimeError').text('');
+		}
+
+		return isValid;
+	}
+
+	function validateEditExpenseForm() {
+		var title = $('#editExpenseTitle').val();
+		var amount = $('#editExpenseAmount').val();
+		var time = $('#editExpenseTime').val();
+
+		var isValid = true;
+
+		if (title.trim() === '') {
+			$('#editExpenseTitleError').text('Title is required');
+			isValid = false;
+		} else {
+			$('#editExpenseTitleError').text('');
+		}
+
+		if (amount.trim() === '') {
+			$('#editExpenseAmountError').text('Amount is required');
+			isValid = false;
+		} else if (parseFloat(amount) <= 0) {
+			$('#editExpenseAmountError').text('Amount must be greater than 0');
+			isValid = false;
+		} else {
+			$('#editExpenseAmountError').text('');
+		}
+
+		if (time.trim() === '') {
+			$('#editExpenseTimeError').text('Time is required');
+			isValid = false;
+		} else {
+			$('#editExpenseTimeError').text('');
+		}
+
+		return isValid;
+	}
+</script>
 <script>
 	$(document).ready(function () {
 		$('.btnDelete').click(function () {

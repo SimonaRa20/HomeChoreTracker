@@ -80,17 +80,11 @@
                                             <button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
                                                 <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                                             </button>
-                                            @if (choreBase.IsActive)
-                                            {
                                             <button class='btn btn-sm' onclick="DisplayEditModal('@choreBase.Id')">
                                                 <i class='fa fa-pencil-alt'></i>
                                             </button>
-                                            }
-                                            @if (!choreBase.WasEarnedPoints && choreBase.IsActive)
-                                            {
-                                                <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
-                                            }
-
+                                            <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
+                        
                                             <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
