@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Net;
 using System.Security.Claims;
 
 
@@ -239,6 +240,14 @@ namespace HomeChoreTracker.Api.Controllers
 		{
 			try
 			{
+				if(expenseRequest.ExpenseImage == null)
+				{
+					return new ObjectResult("Upload image is required")
+					{
+						StatusCode = (int)HttpStatusCode.UnprocessableEntity
+					};
+				}
+
 				using (var memoryStream = new MemoryStream())
 				{
 					await expenseRequest.ExpenseImage.CopyToAsync(memoryStream);
@@ -249,7 +258,7 @@ namespace HomeChoreTracker.Api.Controllers
 
 					if (parsedResult.OCRExitCode != 1)
 					{
-						return BadRequest($"OCR API error: {result}. Please try later.");
+						return BadRequest(parsedResult.ErrorMessage.First());
 					}
 
 

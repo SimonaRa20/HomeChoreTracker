@@ -27,7 +27,7 @@
 
 		<div class="card mb-4 py-3 mt-2 border-left-primary">
 			<div class="card-body">
-				<form method="post" asp-action="Index" enctype="multipart/form-data">
+				<form method="post" enctype="multipart/form-data" >
 
 					<div class="form-group">
 						<label for="Type">Expense Type</label>
@@ -54,23 +54,21 @@
 						<label for="ExpenseImage">Expense Image</label>
 						<input type="file" class="form-control-file" accept="image/*" id="ExpenseImage" name="ExpenseImage" asp-for="CreateNewExpense.ExpenseImage">
 					</div>
-					<div class="text-danger" style="padding-left: 0; margin-left: 0;">
+					<div class="text-danger">
 						@if (!ModelState.IsValid)
 						{
 							<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
-								@foreach (var modelStateKey in ViewData.ModelState.Keys)
+								@foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
 								{
-									foreach (var error in ViewData.ModelState[modelStateKey].Errors)
-									{
-										<li>@error.ErrorMessage</li>
-									}
+									<li>@error.ErrorMessage</li>
 								}
 							</ul>
 						}
 					</div>
-					<button type="submit" class="btn btn-primary">Create</button>
+
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary">Create</button>
+					</div>
 				</form>
 			</div>
 		</div>
-	</div>
-</div>
