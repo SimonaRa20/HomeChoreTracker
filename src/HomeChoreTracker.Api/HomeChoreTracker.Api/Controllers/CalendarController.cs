@@ -127,13 +127,27 @@ public class CalendarController : Controller
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
             User user = await _userRepository.GetUserById(userId);
 
+            if(assignedHomeMember.HomeMemberId == null)
+            {
+                TaskAssignment taskAs = await _homeChoreRepository.GetTaskAssigment(assignedHomeMember.TaskId);
+                taskAs.HomeMemberId = null;
+                await _homeChoreRepository.UpdateTaskAssignment(taskAs);
+                await _homeChoreRepository.Save();
+                return Ok();
+            }
+
 
             TaskAssignment taskAssignment = await _homeChoreRepository.GetTaskAssigment(assignedHomeMember.TaskId);
             taskAssignment.HomeMemberId = assignedHomeMember.HomeMemberId;
 
             HomeChoreTask task = await _homeChoreRepository.Get(taskAssignment.TaskId);
 
-            List<TaskAssignment> userTasksAssigned = await _homeChoreRepository.GetAssignedTasks(assignedHomeMember.HomeMemberId);
+            List<TaskAssignment> userTasksAssigned = new List<TaskAssignment>();
+
+            if (assignedHomeMember.HomeMemberId != null)
+            {
+                userTasksAssigned = await _homeChoreRepository.GetAssignedTasks((int)assignedHomeMember.HomeMemberId);
+            }
 
             List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, taskAssignment.StartDate, user.CalendarEvents, task.Time, userTasksAssigned);
 

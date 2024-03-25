@@ -93,13 +93,25 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var apiUrl = _config["ApiUrl"] + $"/Calendar/{homeId}";
 
-                var selectedMemberId = int.Parse(Request.Form["AssignedHomeMember.HomeMemberId"]);
+                var selectedMemberId = Request.Form["AssignedHomeMember.HomeMemberId"];
 
-                AssignedHomeMember = new AssignedHomeMember
+                if (string.IsNullOrEmpty(selectedMemberId))
                 {
-                    TaskId = taskId,
-                    HomeMemberId = selectedMemberId
-                };
+                    
+                    AssignedHomeMember = new AssignedHomeMember
+                    {
+                        TaskId = taskId,
+                        HomeMemberId = null,
+                    };
+                }
+                else
+                {
+                    AssignedHomeMember = new AssignedHomeMember
+                    {
+                        TaskId = taskId,
+                        HomeMemberId = int.Parse(selectedMemberId)
+                    };
+                }
 
                 var response = await httpClient.PutAsJsonAsync(apiUrl, AssignedHomeMember);
                 if (response.IsSuccessStatusCode)

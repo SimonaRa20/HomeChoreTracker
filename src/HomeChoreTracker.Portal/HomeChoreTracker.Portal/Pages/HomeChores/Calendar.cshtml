@@ -132,6 +132,7 @@ else
                     <div class="form-group">
                         <label for="assigned-person">Assign To:</label>
                         <select class="form-control" id="assigned-person" name="AssignedHomeMember.HomeMemberId">
+                            <option value="">Unassigned</option>
                             @foreach (var member in Model.HomeMembers)
                             {
                                 <option value="@member.HomeMemberId">@member.UserName</option>
