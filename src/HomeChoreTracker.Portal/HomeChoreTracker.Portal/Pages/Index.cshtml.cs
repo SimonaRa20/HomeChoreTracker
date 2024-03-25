@@ -1,6 +1,7 @@
 using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Calendar;
 using HomeChoreTracker.Portal.Models.HomeChore;
+using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,6 +20,7 @@ namespace HomeChoreTracker.Portal.Pages
 
         public List<Event> Events { get; set; }
         public List<TaskAssignmentResponse> HomeChoreResponse { get; set; }
+        public HomeChoreEventResponse GetTaskAssignment { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -154,5 +156,26 @@ namespace HomeChoreTracker.Portal.Pages
             }
         }
 
+        public async Task<IActionResult> OnGetDetailHomeChoreAsync(int id)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/Calendar/Chore/{id}";
+                var response = await httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    GetTaskAssignment = await response.Content.ReadFromJsonAsync<HomeChoreEventResponse>();
+                    return new JsonResult(GetTaskAssignment);
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
+                }
+            }
+        }
     }
 }

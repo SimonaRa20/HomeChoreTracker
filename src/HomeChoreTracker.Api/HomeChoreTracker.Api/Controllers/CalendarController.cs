@@ -117,6 +117,30 @@ public class CalendarController : Controller
         return Ok(taskAssignments);
     }
 
+    [HttpGet("Chore/{id}")]
+    [Authorize]
+    public async Task<IActionResult> GetHomeChoreFromCalendar(int id)
+    {
+        TaskAssignment task = await _homeChoreRepository.GetTaskAssigment(id);
+
+        HomeChoreTask homeChoreTask = await _homeChoreRepository.Get(task.TaskId);
+
+        HomeChoreEventResponse homeChoreEventResponse = new HomeChoreEventResponse
+        {
+            Id = task.Id,
+            StartDate = task.StartDate,
+            EndDate = task.EndDate,
+            Name = homeChoreTask.Name,
+            ChoreType = homeChoreTask.ChoreType.ToString(),
+            Description = homeChoreTask.Description.ToString(),
+            Points = homeChoreTask.Points,
+            LevelType = homeChoreTask.LevelType.ToString(),
+            Time = homeChoreTask.Time.ToString(),
+            IsDone = task.IsDone
+        };
+
+        return Ok(homeChoreEventResponse);
+    }
 
     [HttpPut("{id}")]
     [Authorize]

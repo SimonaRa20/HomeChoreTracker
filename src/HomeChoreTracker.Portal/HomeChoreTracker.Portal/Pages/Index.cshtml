@@ -53,6 +53,34 @@ else
                     </div>
                 </div>
 
+                <div class="modal" tabindex="-1" role="dialog" id="exampleModal">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Selected home chore</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <p><strong>Name:</strong> <span id="modalTitle"></span></p>
+                                <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+                                <p><strong>Home chore type:</strong> <span id="modalChoreType"></span></p>
+                                <p><strong>Points:</strong> <span id="modalPoints"></span></p>
+                                <p><strong>Level Type:</strong> <span id="modalLevelType"></span></p>
+                                <p><strong>How long have to take:</strong> <span id="modalTime"></span></p>
+                                <p><strong>Date:</strong> <span id="modalStartDate"></span> / <span id="modalEndDate"></span></p>
+
+                            </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="calendar" class="m-2"></div>
             </div>
         </div>
@@ -78,8 +106,8 @@ else
                         title: '@chore.Summary',
                         start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                         end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                        color: "#858796",
-                        textColor: 'white'
+                        color: "#d3d3d3",
+                        textColor: 'black'
                     },
         </text>
     }
@@ -100,7 +128,40 @@ else
             eventRender: function (event, element) {
             },
             eventClick: function (calEvent, jsEvent, view) {
-                $('#myModal').modal('show');
+                // Fetch detailed information of the selected event
+                if (calEvent.color === "#d3d3d3") {
+                    // Do nothing for events from Model.Events collection
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Page("/Index")?handler=DetailHomeChore&id=' + calEvent.id,
+                    type: 'GET',
+                    success: function (response) {
+
+                        console.log(response)
+                        // Populate modal with event details
+                        
+                        $('#modalTitle').text(response.name);
+                        $('#modalDescription').text(response.description);
+                        $('#modalPoints').text(response.points);
+                        $('#modalLevelType').text(response.levelType);
+                        $('#modalChoreType').text(response.choreType);
+
+                        var startDate = moment(response.startDate).format('YYYY-MM-DD HH:mm');
+                        var endDate = moment(response.endDate).format('YYYY-MM-DD HH:mm');
+
+                        $('#modalStartDate').text(startDate);
+                        $('#modalEndDate').text(endDate);
+                        $('#modalTime').text(response.time);
+
+                        $('#exampleModal').modal('show');
+                        // Add more fields as needed
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Failed to fetch event details:", error);
+                        alert("Failed to fetch event details. Please try again.");
+                    }
+                });
             }
         });
     }).fail(function (jqxhr, settings, exception) {
