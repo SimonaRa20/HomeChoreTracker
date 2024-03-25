@@ -91,19 +91,34 @@ else
             },
             eventClick: function (calEvent, jsEvent, view) {
                 $('#myModal').modal('show');
-                // Display detailed task data in the modal
 
-                var task = calEvent.task; // Assuming you're passing task details as part of the event data
-
-                console.log(calEvent.description)
-
+                var task = calEvent.task;
                 $('#event-id').text(calEvent.id);
                 $('#task-name').text(calEvent.title);
                 $('#task-description').text(calEvent.description);
                 $('#task-type').text(calEvent.type);
                 $('#task-long-type').text(calEvent.time);
-                $('#task-assigned').text(calEvent.assigned);
-                // Dynamically set taskId
+
+                var assignedMemberId = calEvent.assigned;
+                var assignedMemberName = '';
+
+                if (assignedMemberId == '') {
+                    assignedMemberName = '-';
+                }
+                else {
+                    var assignedMemberName = '';
+                    var homeMembersData = @Html.Raw(Json.Serialize(Model.HomeMembers));
+                    for (var i = 0; i < homeMembersData.length; i++) {
+                        if (homeMembersData[i].homeMemberId == assignedMemberId) {
+
+                            assignedMemberName = homeMembersData[i].userName;
+                            break;
+                        }
+                    }
+                }
+                
+                $('#task-assigned').text(assignedMemberName);
+
                 $('#task-id').val(calEvent.id);
             }
         });
