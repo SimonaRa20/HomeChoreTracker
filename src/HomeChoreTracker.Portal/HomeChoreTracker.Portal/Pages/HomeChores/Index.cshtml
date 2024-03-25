@@ -30,13 +30,7 @@
             <div class="card mb-4 py-3 border-left-primary">
 
                 <div class="card-body">
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
-                        <div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal"
-                             data-target="#createHomeChoreModal">
-                            <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
-                        </div>
-                    </div>
+                    
                     @if (Model.HomeChoreResponse != null && Model.HomeChoreResponse.Any())
                     {
                         <table class="table">
