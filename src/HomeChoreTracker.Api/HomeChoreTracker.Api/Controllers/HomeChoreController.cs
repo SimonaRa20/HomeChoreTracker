@@ -138,6 +138,31 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
+        [HttpPost("ChoreIsDone/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetHomeChore(int id, bool isDone)
+        {
+            try
+            {
+                var homeChore = await _homeChoreRepository.GetTaskAssigment(id);
+                homeChore.IsDone = isDone;
+
+                await _homeChoreRepository.UpdateTaskAssignment(homeChore);
+                await _homeChoreRepository.Save();
+
+                if (homeChore == null)
+                {
+                    return NotFound("No home chore found");
+                }
+
+                return Ok(homeChore);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while fetching home chore bases: {ex.Message}");
+            }
+        }
+
         private int GetMinutesFromTimeLong(TimeLong timeLong)
         {
             switch (timeLong)

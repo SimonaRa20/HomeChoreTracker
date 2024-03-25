@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace HomeChoreTracker.Portal.Pages
 {
@@ -21,6 +24,9 @@ namespace HomeChoreTracker.Portal.Pages
         public List<Event> Events { get; set; }
         public List<TaskAssignmentResponse> HomeChoreResponse { get; set; }
         public HomeChoreEventResponse GetTaskAssignment { get; set; }
+
+        [BindProperty]
+        public bool SetIsDone { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -175,6 +181,43 @@ namespace HomeChoreTracker.Portal.Pages
                 {
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
+            }
+        }
+
+        public async Task<IActionResult> OnPostIsDoneAsync(int id)
+        {
+            var token = User.FindFirstValue("Token");
+            try
+            {
+                using (var httpClient = _httpClientFactory.CreateClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                   
+
+                    bool isDone = bool.Parse(Request.Form["modalIsDone"]);
+
+                    var apiUrl = $"{_config["ApiUrl"]}/HomeChore/ChoreIsDone/{id}?isDone={isDone}";
+
+
+                    var response = await httpClient.PostAsync(apiUrl, null);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToPage(); // Redirect to the same page
+                    }
+                    else
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        ModelState.AddModelError(string.Empty, $"Failed to update IsDone status: {errorContent}");
+                        return Page();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                return Page();
             }
         }
     }
