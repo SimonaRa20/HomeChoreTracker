@@ -119,7 +119,7 @@ else
                         title: '@chore.Task.Name',
                         start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                         end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                        color: "#4e73df",
+                        color: '@GetTextColor(@chore.Task.ChoreType.ToString())',
                         textColor: 'white'
                     },
         </text>
@@ -201,3 +201,30 @@ else
     });
 
 </script>
+
+<style>
+    @functions {
+        string GetTextColor(string type)
+        {
+            switch (type.ToLower())
+            {
+                case "cleaning":
+                    return "#4e73df";
+                case "laundry":
+                    return "#1cc88a";
+                case "kitchen":
+                    return "#36b9cc";
+                case "bathroom":
+                    return "#f6c23e";
+                case "bedroom":
+                    return "#e74a3b";
+                case "outdoors":
+                    return "#858796";
+                case "organize":
+                    return "#5a5c69";
+                default:
+                    return "black";
+            }
+        }
+    }
+</style>
