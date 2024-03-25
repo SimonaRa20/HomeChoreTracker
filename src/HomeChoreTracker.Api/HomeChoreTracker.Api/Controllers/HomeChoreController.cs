@@ -98,7 +98,16 @@ namespace HomeChoreTracker.Api.Controllers
                 {
                     await _homeChoreRepository.DeleteAssignedTasks(taskId);
                     await _homeChoreRepository.Save();
+
+                    TaskAssignment findLastAssignedTask = await _homeChoreRepository.GetLastAssigmentTask(taskId);
+
+                    HomeChoreTask getTask = await _homeChoreRepository.Get(taskId);
+                    getTask.EndDate = findLastAssignedTask.EndDate;
+                    await _homeChoreRepository.Update(getTask);
+                    await _homeChoreRepository.Save();
                 }
+
+                
 
                 return Ok($"Home chore base with ID {taskId} deleted successfully");
             }

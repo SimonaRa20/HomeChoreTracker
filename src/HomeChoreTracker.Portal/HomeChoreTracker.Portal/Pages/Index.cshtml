@@ -86,7 +86,6 @@ else
         </div>
     </div>
 }
-
 <script>
     $.getScript("https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js").done(function () {
         $('#calendar').fullCalendar({
@@ -98,34 +97,50 @@ else
                 right: 'month,agendaWeek,agendaDay'
             },
             events: [
-    @foreach (var chore in Model.Events)
-    {
-        <text>
-                    {
-                        id: '@chore.Id',
-                        title: '@chore.Summary',
-                        start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                        end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                        color: "#d3d3d3",
-                        textColor: 'black'
-                    },
-        </text>
-    }
-    @foreach (var chore in Model.HomeChoreResponse)
-    {
-        <text>
-                    {
-                        id: '@chore.Id',
-                        title: '@chore.Task.Name',
-                        start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                        end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                        color: '@GetTextColor(@chore.Task.ChoreType.ToString())',
-                        textColor: 'white'
-                    },
-        </text>
-    }
-                ],
-            eventRender: function (event, element) {
+                @foreach (var chore in Model.Events)
+                {
+                    <text>
+                        {
+                            id: '@chore.Id',
+                            title: '@chore.Summary',
+                            start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                            end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                            color: "#d3d3d3",
+                            textColor: 'black',
+                            editable: false // Set events from Model.Events as non-editable
+                        },
+                    </text>
+                }
+                @foreach (var chore in Model.HomeChoreResponse)
+                {
+                    <text>
+                        {
+                            id: '@chore.Id',
+                            title: '@chore.Task.Name',
+                            start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                            end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                            color: '@GetTextColor(@chore.Task.ChoreType.ToString())',
+                            textColor: 'white'
+                        },
+                    </text>
+                }
+            ],
+           eventRender: function (event, element) {
+                // Set the background color and border color for each event
+                element.css('background-color', event.color);
+                element.css('border-color', event.color);
+                element.css('opacity', '0.8'); // Optional: Set opacity for better visibility
+
+                // Ensure proper rendering of event titles and times in day and week views
+                if (event.start.format('HH:mm') !== '00:00' || event.end.format('HH:mm') !== '23:59') {
+                    // Display event title only for non-all-day events
+                    var eventText = '<div class="fc-content">' +
+                                        '<span class="fc-title">' + event.title + '</span>' +
+                                    '</div>';
+                    element.find('.fc-time').remove(); // Remove default time display
+                    element.find('.fc-title').remove(); // Remove default title display
+                    element.append(eventText); // Append custom event text
+                }
             },
             eventClick: function (calEvent, jsEvent, view) {
                 // Fetch detailed information of the selected event
@@ -137,10 +152,7 @@ else
                     url: '@Url.Page("/Index")?handler=DetailHomeChore&id=' + calEvent.id,
                     type: 'GET',
                     success: function (response) {
-
-                        console.log(response)
                         // Populate modal with event details
-                        
                         $('#modalTitle').text(response.name);
                         $('#modalDescription').text(response.description);
                         $('#modalPoints').text(response.points);
@@ -155,7 +167,6 @@ else
                         $('#modalTime').text(response.time);
 
                         $('#exampleModal').modal('show');
-                        // Add more fields as needed
                     },
                     error: function (xhr, status, error) {
                         console.error("Failed to fetch event details:", error);
@@ -168,6 +179,7 @@ else
         console.error("Failed to load FullCalendar:", exception);
     });
 </script>
+
 <script>
     $('#btnExport').click(function () {
         $.ajax({

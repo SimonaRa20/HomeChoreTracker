@@ -201,15 +201,8 @@ namespace HomeChoreTracker.Api.Repositories
             {
                 if (task.TaskId.Equals(id) && task.HomeMemberId == null)
                 {
-                    if (task.StartDate > DateTime.Now)
-                    {
-                        _dbContext.TaskAssignments.Remove(task);
-                    }
-                    else
-                    {
-                        task.EndDate = DateTime.Now;
-                        _dbContext.Entry(task).State = EntityState.Modified;
-                    }
+                    _dbContext.TaskAssignments.Remove(task);
+                    await _dbContext.SaveChangesAsync();
                 }
             }
         }
@@ -254,6 +247,11 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task<List<TaskAssignment>> GetHomeChoresUserCalendar(int id)
         {
             return await _dbContext.TaskAssignments.Where(x => x.HomeMemberId.Equals(id)).ToListAsync();
+        }
+
+        public async Task<TaskAssignment> GetLastAssigmentTask(int id)
+        {
+            return await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).OrderByDescending(x => x.EndDate).FirstAsync();
         }
     }
 }

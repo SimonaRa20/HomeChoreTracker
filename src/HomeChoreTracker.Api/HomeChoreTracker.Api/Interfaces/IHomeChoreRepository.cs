@@ -16,6 +16,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task Delete(int id);
         Task<HomeChoreTask> Get(int id);
         Task<TaskAssignment> GetTaskAssigment(int id);
+        Task<TaskAssignment> GetLastAssigmentTask(int id);
         Task UpdateTaskAssignment(TaskAssignment taskAssignment);
         Task<int> GetTotalPointsAssigned(int memberId);
         Task<List<TaskAssignment>> GetUnassignedTasks(int homeId);

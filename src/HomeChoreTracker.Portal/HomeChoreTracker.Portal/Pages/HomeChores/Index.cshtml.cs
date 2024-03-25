@@ -71,7 +71,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 }
                 else
                 {
-                    // Handle deletion failure
                     ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
                     return Page();
                 }
@@ -161,6 +160,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     EditHomeChore.Name = Request.Form["editName"];
                     EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
+                    EditHomeChore.Time = (int)Enum.Parse<TimeLong>(Request.Form["editTimeLong"]);
                     EditHomeChore.Description = Request.Form["editDescription"];
                     EditHomeChore.StartDate = DateTime.Parse(Request.Form["editStartDate"]);
                     EditHomeChore.EndDate = DateTime.Parse(Request.Form["editEndDate"]);
