@@ -135,18 +135,15 @@
 }
 <script>
     $(document).ready(function () {
-        // Function to add months to a date
         function addMonths(date, months) {
             var d = new Date(date);
             d.setMonth(d.getMonth() + months);
-            return d.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+            return d.toISOString().slice(0, 10);
         }
 
-        // Set start date to today
         var today = new Date().toISOString().slice(0, 10);
         $('#StartDate').val(today);
 
-        // Calculate and set end date to one month from today
         var oneMonthFromToday = addMonths(today, 1);
         $('#EndDate').val(oneMonthFromToday);
 
