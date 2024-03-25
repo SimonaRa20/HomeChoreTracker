@@ -107,7 +107,7 @@ else
                             end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                             color: "#d3d3d3",
                             textColor: 'black',
-                            editable: false // Set events from Model.Events as non-editable
+                            editable: false
                         },
                     </text>
                 }
@@ -120,39 +120,36 @@ else
                             start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                             end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                             color: '@GetTextColor(@chore.Task.ChoreType.ToString())',
-                            textColor: 'white'
+                            textColor: 'white',
+                  
                         },
                     </text>
                 }
             ],
            eventRender: function (event, element) {
-                // Set the background color and border color for each event
+               var startTime = moment(event.start._i).format('HH:mm');
+
                 element.css('background-color', event.color);
                 element.css('border-color', event.color);
-                element.css('opacity', '0.8'); // Optional: Set opacity for better visibility
+                element.css('opacity', '0.8');
 
-                // Ensure proper rendering of event titles and times in day and week views
-                if (event.start.format('HH:mm') !== '00:00' || event.end.format('HH:mm') !== '23:59') {
-                    // Display event title only for non-all-day events
-                    var eventText = '<div class="fc-content">' +
-                                        '<span class="fc-title">' + event.title + '</span>' +
+                var eventText = '<div class="fc-content">' +
+                                        '<span class="fc-title" style="height: 32px;">' + startTime + ' ' + event.title + '</span>' +
                                     '</div>';
-                    element.find('.fc-time').remove(); // Remove default time display
-                    element.find('.fc-title').remove(); // Remove default title display
-                    element.append(eventText); // Append custom event text
-                }
+               element.css('min-height', '16px');
+
+               element.find('.fc-time').remove();
+                    element.find('.fc-title').remove();
+                    element.append(eventText);
             },
             eventClick: function (calEvent, jsEvent, view) {
-                // Fetch detailed information of the selected event
                 if (calEvent.color === "#d3d3d3") {
-                    // Do nothing for events from Model.Events collection
                     return;
                 }
                 $.ajax({
                     url: '@Url.Page("/Index")?handler=DetailHomeChore&id=' + calEvent.id,
                     type: 'GET',
                     success: function (response) {
-                        // Populate modal with event details
                         $('#modalTitle').text(response.name);
                         $('#modalDescription').text(response.description);
                         $('#modalPoints').text(response.points);
