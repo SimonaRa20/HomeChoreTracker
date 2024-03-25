@@ -61,6 +61,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         description = chore.Task.Description,
                         type = chore.Task.ChoreType.ToString(),
                         time = chore.Task.Time.ToString(),
+                        isDone = chore.IsDone,
                     });
 
 

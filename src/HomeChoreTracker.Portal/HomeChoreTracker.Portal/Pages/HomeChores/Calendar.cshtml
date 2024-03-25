@@ -82,7 +82,8 @@ else
                         time: '@chore.Task.Time',
                         assigned: '@chore.HomeMemberId',
                         color: '@(chore.HomeMemberId == null ? "#4e73df" : "#1cc88a")',
-                        textColor: 'white'
+                        textColor: 'white',
+                        isDone: '@chore.IsDone'
                     },
         </text>
     }
@@ -90,6 +91,11 @@ else
             eventRender: function (event, element) {
             },
             eventClick: function (calEvent, jsEvent, view) {
+                if (calEvent.isDone === 'True') {
+                    $('#assign-to-selection').hide();
+                } else {
+                    $('#assign-to-selection').show();
+                }
                 $('#myModal').modal('show');
 
                 var task = calEvent.task;
@@ -98,7 +104,8 @@ else
                 $('#task-description').text(calEvent.description);
                 $('#task-type').text(calEvent.type);
                 $('#task-long-type').text(calEvent.time);
-
+                $('#task-isDone').text(calEvent.isDone);
+                console.log(calEvent.isDone)
                 var assignedMemberId = calEvent.assigned;
                 var assignedMemberName = '';
 
@@ -140,22 +147,23 @@ else
                 <p>Type: <span id="task-type"></span></p>
                 <p>Long Type: <span id="task-long-type"></span></p>
                 <p>Assigned member: <span id="task-assigned"></span></p>
-                <form id="assign-person-form" method="post" asp-page-handler="Assign">
-                    <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
-                    <input type="hidden" id="task-id" name="taskId" value="" />
-                    <div class="form-group">
-                        <label for="assigned-person">Assign To:</label>
-                        <select class="form-control" id="assigned-person" name="AssignedHomeMember.HomeMemberId">
-                            <option value="">Unassigned</option>
-                            @foreach (var member in Model.HomeMembers)
-                            {
-                                <option value="@member.HomeMemberId">@member.UserName</option>
-                            }
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </form>
-
+                <div id="assign-to-selection">
+                    <form id="assign-person-form" method="post" asp-page-handler="Assign">
+                        <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
+                        <input type="hidden" id="task-id" name="taskId" value="" />
+                        <div class="form-group" id="assign-to-selection">
+                            <label for="assigned-person">Assign To:</label>
+                            <select class="form-control" id="assigned-person" name="AssignedHomeMember.HomeMemberId">
+                                <option value="">Unassigned</option>
+                                @foreach (var member in Model.HomeMembers)
+                                {
+                                    <option value="@member.HomeMemberId">@member.UserName</option>
+                                }
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
