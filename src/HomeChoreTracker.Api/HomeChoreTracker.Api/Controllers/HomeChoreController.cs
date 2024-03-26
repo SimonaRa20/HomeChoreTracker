@@ -2,12 +2,14 @@
 using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.HomeChore;
 using HomeChoreTracker.Api.Contracts.HomeChoreBase;
+using HomeChoreTracker.Api.Contracts.User;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using HomeChoreTracker.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Security.Claims;
 using System.Text;
 using DayOfWeek = HomeChoreTracker.Api.Constants.DayOfWeek;
 
@@ -18,14 +20,16 @@ namespace HomeChoreTracker.Api.Controllers
     public class HomeChoreController : Controller
     {
         private readonly IHomeChoreRepository _homeChoreRepository;
+        private readonly IHomeRepository _homeRepository;
         private readonly IHomeChoreBaseRepository _homeChoreBaseRepository;
         private readonly IMapper _mapper;
 
-        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IMapper mapper, IHomeChoreBaseRepository homeChoreBaseRepository)
+        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IMapper mapper, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
         {
             _homeChoreRepository = homeChoreRepository;
             _mapper = mapper;
             _homeChoreBaseRepository = homeChoreBaseRepository;
+            _homeRepository  = homeRepository;
         }
 
         [HttpPost("{homeId}")]
@@ -369,6 +373,7 @@ namespace HomeChoreTracker.Api.Controllers
                     HomeMemberId = taskAssignment.HomeMemberId,
                     HomeId = taskAssignment.HomeId,
                     IsDone = taskAssignment.IsDone,
+                    TotalVotes = await _homeChoreRepository.GetTotalVotes(taskAssignment.Id),
                     IsApproved = taskAssignment.IsApproved,
                 };
 
@@ -582,6 +587,52 @@ namespace HomeChoreTracker.Api.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"An error occurred while updating the home chore base: {ex.Message}");
+            }
+        }
+
+        [HttpPut("VoteTask/{taskId}/{voteValue}")]
+        [Authorize]
+        public async Task<IActionResult> VoteArticle(int taskId, int voteValue)
+        {
+            try
+            {
+                int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+                var voteTask = await _homeChoreRepository.VoteArtical(taskId, userId, voteValue);
+
+                TaskAssignment assignment = await _homeChoreRepository.GetTaskAssigment(taskId);
+                HomeChoreTask task = await _homeChoreRepository.Get(assignment.TaskId);
+
+                List<UserGetResponse> homeMembers = await _homeRepository.GetHomeMembers(assignment.HomeId);
+
+                int votes = await _homeChoreRepository.GetTotalVotes(taskId);
+                int halfHomes = homeMembers.Count / 2;
+
+                if (votes >= halfHomes)
+                {
+                    assignment.Points = -10;
+                    await _homeChoreRepository.UpdateTaskAssignment(assignment);
+                    await _homeChoreRepository.Save();
+                }
+                else
+                {
+                    assignment.Points = task.Points;
+                    await _homeChoreRepository.UpdateTaskAssignment(assignment);
+                    await _homeChoreRepository.Save();
+                }
+
+
+                if (voteTask)
+                {
+                    return Ok(voteTask);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

@@ -26,5 +26,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<bool> CheckOrHomeChoreWasAssigned(int id);
         Task DeleteAssignedTasks(int id);
         Task DeleteNotAssignedTasks(int id);
+        Task<bool> VoteArtical(int taskId, int userId, int voteValue);
+        Task<int> GetTotalVotes(int taskId);
     }
 }

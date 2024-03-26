@@ -10,6 +10,7 @@
 		public int HomeId { get; set; }
 		public int? Points { get; set; }
 		public bool IsDone { get; set; }
-		public bool IsApproved { get; set; }
+        public List<TaskVote> TaskVotes { get; set; }
+        public bool IsApproved { get; set; }
 	}
 }

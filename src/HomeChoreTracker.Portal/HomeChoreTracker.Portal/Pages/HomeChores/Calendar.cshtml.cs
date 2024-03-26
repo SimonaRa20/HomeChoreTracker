@@ -33,11 +33,17 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         public int Id { get; set; }
 
         [BindProperty]
+        public int UserId { get; set; }
+
+
+        [BindProperty]
         public AssignedHomeMember AssignedHomeMember { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Id = id;
+
+            UserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var token = User.FindFirstValue("Token");
             using (var httpClient = _httpClientFactory.CreateClient())
             {
@@ -62,6 +68,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         type = chore.Task.ChoreType.ToString(),
                         time = chore.Task.Time.ToString(),
                         isDone = chore.IsDone,
+                        votes = chore.TotalVotes,
                     });
 
 
@@ -126,6 +133,35 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     return Page();
                 }
 
+            }
+        }
+
+        public async Task<IActionResult> OnPostVoteAsync(int taskId, int vote, int homeId)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                try
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                    var voteApiUrl = $"{_config["ApiUrl"]}/HomeChore/VoteTask/{taskId}/{vote}";
+
+                    var response = await httpClient.PutAsync(voteApiUrl, null);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
+                    }
+                    else
+                    {
+                        return BadRequest($"Failed to vote: {response.ReasonPhrase}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest($"An error occurred: {ex.Message}");
+                }
             }
         }
 

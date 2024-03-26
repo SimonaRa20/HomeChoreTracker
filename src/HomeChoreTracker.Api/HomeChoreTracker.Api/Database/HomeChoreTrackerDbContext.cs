@@ -27,6 +27,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<TaskSchedule> TaskSchedules { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<TaskVote> TaskVotes { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

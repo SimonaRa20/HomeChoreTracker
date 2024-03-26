@@ -10,6 +10,7 @@
         public int? HomeMemberId { get; set; }
         public int HomeId { get; set; }
         public bool IsDone { get; set; }
+        public int TotalVotes { get; set; }
         public bool IsApproved { get; set; }
     }
 }

@@ -83,7 +83,8 @@ else
                         assigned: '@chore.HomeMemberId',
                         color: '@(chore.HomeMemberId == null ? "#4e73df" : "#1cc88a")',
                         textColor: 'white',
-                        isDone: '@chore.IsDone'
+                        isDone: '@chore.IsDone',
+                        votes: '@chore.TotalVotes'
                     },
         </text>
     }
@@ -91,10 +92,29 @@ else
             eventRender: function (event, element) {
             },
             eventClick: function (calEvent, jsEvent, view) {
+
+                var userId = @Html.Raw(Json.Serialize(Model.UserId));
+                console.log(userId)
+                console.log(calEvent.assigned)
                 if (calEvent.isDone === 'True') {
-                    $('#assign-to-selection').hide();
+                    
+                    if (userId != calEvent.assigned)
+                    {
+                        console.log('1')
+                        $('#assign-to-selection').hide();
+                        $('#vote-to-selection').show();
+                    }
+                    else
+                    {
+                        console.log('11')
+                        $('#assign-to-selection').hide();
+                        $('#vote-to-selection').hide();
+                    }
+                    
                 } else {
+                    console.log('111')
                     $('#assign-to-selection').show();
+                    $('#vote-to-selection').hide();
                 }
                 $('#myModal').modal('show');
 
@@ -105,10 +125,14 @@ else
                 $('#task-type').text(calEvent.type);
                 $('#task-long-type').text(calEvent.time);
                 $('#task-isDone').text(calEvent.isDone);
+                $('#task-totalVotes').text(calEvent.votes);
+
+                $('#vote-to-selection form').find('input[name="taskId"]').val(calEvent.id);
                 console.log(calEvent.isDone)
                 var assignedMemberId = calEvent.assigned;
                 var assignedMemberName = '';
 
+               
                 if (assignedMemberId == '') {
                     assignedMemberName = '-';
                 }
@@ -147,6 +171,25 @@ else
                 <p>Type: <span id="task-type"></span></p>
                 <p>Long Type: <span id="task-long-type"></span></p>
                 <p>Assigned member: <span id="task-assigned"></span></p>
+               
+
+                <div id="vote-to-selection">
+                    <p>Total votes: <span id="task-totalVotes"></span> (if half of the household members agree, assigned user receive a penalty of -10 points)</p>
+                    <p class="mb-1">Vote if the task was well done</p>
+                    <form method="post" asp-page-handler="Vote" class="d-inline">
+                        <button type="submit" class="btn btn-success mx-1">Vote</button>
+                        <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
+                        <input type="hidden" id="vote" name="vote" value="1">
+                        <input type="hidden" id="task-id" name="taskId" value="" />
+                </form>
+
+                    <form method="post" asp-page-handler="Vote" class="d-inline">
+                        <button type="submit" class="btn btn-primary mx-1">Clean vote</button>
+                        <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
+                        <input type="hidden" id="vote" name="vote" value="0">
+                        <input type="hidden" id="task-id" name="taskId" value="" />
+                </form>
+                </div>
                 <div id="assign-to-selection">
                     <form id="assign-person-form" method="post" asp-page-handler="Assign">
                         <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
