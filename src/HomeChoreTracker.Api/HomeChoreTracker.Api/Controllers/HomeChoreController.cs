@@ -145,8 +145,18 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 var homeChore = await _homeChoreRepository.GetTaskAssigment(id);
-                homeChore.IsDone = isDone;
+                var task = await _homeChoreRepository.Get(homeChore.TaskId);
 
+                homeChore.IsDone = isDone;
+                if (isDone)
+                {
+                    homeChore.Points = task.Points;
+                }
+                else
+                {
+                    homeChore.Points = 0;
+                }
+                
                 await _homeChoreRepository.UpdateTaskAssignment(homeChore);
                 await _homeChoreRepository.Save();
 

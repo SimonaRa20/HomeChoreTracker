@@ -269,7 +269,6 @@ public class CalendarController : Controller
 
         if (events == null || events.Count == 0)
         {
-            // If there are no events, assume the user has a free day
             DateTime dayStart = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.StartDayHour, user.StartDayMinutes, 0);
             DateTime dayEnd = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.EndDayHour, user.EndDayMinutes, 0);
             suitableIntervals.Add((dayStart, dayEnd));
@@ -298,17 +297,14 @@ public class CalendarController : Controller
         {
             suitableIntervals = suitableIntervals.SelectMany(interval =>
             {
-                // If the assigned task overlaps with the interval, adjust the interval accordingly
                 if (assignedTask.StartDate < interval.end && assignedTask.EndDate > interval.start)
                 {
                     if (assignedTask.StartDate <= interval.start && assignedTask.EndDate >= interval.end)
                     {
-                        // Task fully encompasses the interval, remove it
                         return Enumerable.Empty<(DateTime start, DateTime end)>();
                     }
                     else if (assignedTask.StartDate <= interval.start)
                     {
-                        // Task overlaps the start of the interval
                         return new[]
                         {
                         (assignedTask.EndDate, interval.end)
@@ -316,7 +312,6 @@ public class CalendarController : Controller
                     }
                     else if (assignedTask.EndDate >= interval.end)
                     {
-                        // Task overlaps the end of the interval
                         return new[]
                         {
                         (interval.start, assignedTask.StartDate)
@@ -324,7 +319,6 @@ public class CalendarController : Controller
                     }
                     else
                     {
-                        // Task is in the middle of the interval
                         return new[]
                         {
                         (interval.start, assignedTask.StartDate),
@@ -332,7 +326,6 @@ public class CalendarController : Controller
                     };
                     }
                 }
-                // If there's no overlap, keep the interval as is
                 return new[] { interval };
             }).ToList();
         }
