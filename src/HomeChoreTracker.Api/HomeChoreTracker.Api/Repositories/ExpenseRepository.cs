@@ -29,7 +29,7 @@ namespace HomeChoreTracker.Api.Repositories
 				Time = expense.Time,
 				Type = expense.Type,
 				SubscriptionDuration = expense.SubscriptionDuration ?? 0,
-				HomeId = expense.HomeId
+				HomeId = expense.HomeId,
             };
 
 			return expenseResponse;

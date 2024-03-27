@@ -22,6 +22,9 @@ namespace HomeChoreTracker.Api.Models
         public DateTime? EndDate { get; set; }
         public bool WasEarnedPoints { get; set; }
         public bool IsActive { get; set; }
-		public int HomeId { get; set; }
+
+        public int HomeId { get; set; }
+        public Home? Home { get; set; }
+        public List<TaskAssignment>? TaskAssignments { get; set; }
 	}
 }

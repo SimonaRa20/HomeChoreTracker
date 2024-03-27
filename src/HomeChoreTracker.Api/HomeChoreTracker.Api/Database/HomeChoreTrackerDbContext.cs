@@ -34,7 +34,57 @@ namespace HomeChoreTracker.Api.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserHomes>()
-        .HasKey(uh => new { uh.UserId, uh.HomeId });
+                .HasKey(uh => new { uh.UserId, uh.HomeId });
+
+            modelBuilder.Entity<Home>()
+                .HasMany(h => h.Purchases)
+                .WithOne(p => p.Home)
+                .HasForeignKey(p => p.HomeId);
+
+            modelBuilder.Entity<Home>()
+                .HasMany(h => h.Tasks)
+                .WithOne(t => t.Home)
+                .HasForeignKey(t => t.HomeId);
+
+            modelBuilder.Entity<HomeChoreTask>()
+                .HasMany(t => t.TaskAssignments)
+                .WithOne(ta => ta.Task)
+                .HasForeignKey(ta => ta.TaskId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Incomes)
+                .WithOne(i => i.User)
+                .HasForeignKey(i => i.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Expenses)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.CalendarEvents)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.UserHomes)
+                .WithOne(uh => uh.User)
+                .HasForeignKey(uh => uh.UserId);
+
+            modelBuilder.Entity<Home>()
+                .HasMany(h => h.UserHomes)
+                .WithOne(uh => uh.Home)
+                .HasForeignKey(uh => uh.HomeId);
+
+            modelBuilder.Entity<Home>()
+                .HasMany(h => h.Tasks)
+                .WithOne(t => t.Home)
+                .HasForeignKey(t => t.HomeId);
+
+            modelBuilder.Entity<TaskAssignment>()
+                .HasMany(ta => ta.TaskVotes)
+                .WithOne(tv => tv.TaskAssignment)
+                .HasForeignKey(tv => tv.TaskAssignmentId);
         }
 
     }

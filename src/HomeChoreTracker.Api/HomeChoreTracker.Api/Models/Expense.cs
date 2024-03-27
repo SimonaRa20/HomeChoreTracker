@@ -11,8 +11,9 @@ namespace HomeChoreTracker.Api.Models
 		public DateTime Time { get; set; }
 		public ExpenseType Type { get; set; }
 		public int? SubscriptionDuration { get; set; }
-		public int? HomeId { get; set; } 
 
+		public int? HomeId { get; set; } 
 		public int UserId { get; set; }
+		public User? User { get; set; }
 	}
 }

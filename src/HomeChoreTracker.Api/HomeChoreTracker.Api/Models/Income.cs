@@ -14,5 +14,6 @@ namespace HomeChoreTracker.Api.Models
 		public int? HomeId { get; set; }
 
 		public int UserId { get; set; }
+		public User? User { get; set; }
 	}
 }

@@ -20,9 +20,9 @@
         public int EndDayHour { get; set; }
         public int EndDayMinutes { get; set; }
 
-
-        public List<Income> Incomes { get; set; }
-		public List<Expense> Expenses { get; set; }
-        public List<Event> CalendarEvents { get; set; }
+        public List<UserHomes>? UserHomes { get; set; }
+        public List<Income>? Incomes { get; set; }
+		public List<Expense>? Expenses { get; set; }
+        public List<Event>? CalendarEvents { get; set; }
 	}
 }
