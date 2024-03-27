@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
@@ -101,6 +102,42 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.Incomes
                 .Where(i => i.UserId.Equals(userId) && i.Time >= startDate && i.Time <= endDate)
                 .ToListAsync();
+        }
+
+        public async Task<decimal> GetCurrentMonthTotalHomeIncome(int id)
+        {
+            DateTime currentDate = DateTime.Now;
+            DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+            DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+            return await _dbContext.Incomes
+                .Where(i => i.HomeId.Equals(id) && i.Time >= startOfMonth && i.Time <= endOfMonth)
+                .SumAsync(i => i.Amount);
+        }
+
+        public async Task<List<Income>> GetHomeAll(int id)
+        {
+            return await _dbContext.Incomes.Where(x => x.HomeId.Equals(id)).ToListAsync();
+        }
+
+        public async Task<decimal> GetTotalHomeIncomeForMonth(DateTime month, int id)
+        {
+            // Get the start and end dates of the month
+            DateTime startDate = new DateTime(month.Year, month.Month, 1);
+            DateTime endDate = startDate.AddMonths(1).AddDays(-1);
+
+            // Query the database for total income within the specified month
+            decimal totalIncome = await _dbContext.Incomes
+                .Where(i => i.HomeId.Equals(id) && i.Time >= startDate && i.Time <= endDate)
+                .SumAsync(i => i.Amount);
+
+            return totalIncome;
+        }
+
+        public async Task<int> GetHomeIncomeCountByCategory(IncomeType category, int id)
+        {
+            return await _dbContext.Incomes.Where(x => x.HomeId.Equals(id))
+                .CountAsync(e => e.Type == category);
         }
     }
 }

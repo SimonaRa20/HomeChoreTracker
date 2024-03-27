@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
@@ -101,6 +102,40 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.Expenses
                 .Where(e => e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
                 .ToListAsync();
+        }
+
+        public async Task<decimal> GetCurrentMonthTotalHomeExpense(int id)
+        {
+            DateTime currentDate = DateTime.Now;
+            DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+            DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+            return await _dbContext.Expenses
+                .Where(e => e.HomeId.Equals(id) && e.Time >= startOfMonth && e.Time <= endOfMonth)
+                .SumAsync(e => e.Amount);
+        }
+
+        public async Task<List<Expense>> GetHomeAll(int id)
+        {
+            return await _dbContext.Expenses.Where(x => x.HomeId.Equals(id)).ToListAsync();
+        }
+
+        public async Task<decimal> GetTotalHomeExpenseForMonth(DateTime month, int id)
+        {
+            DateTime startDate = new DateTime(month.Year, month.Month, 1);
+            DateTime endDate = startDate.AddMonths(1).AddDays(-1);
+
+            decimal totalExpense = await _dbContext.Expenses
+                .Where(e => e.HomeId.Equals(id) && e.Time >= startDate && e.Time <= endDate)
+                .SumAsync(e => e.Amount);
+
+            return totalExpense;
+        }
+
+        public async Task<int> GetHomeExpenseCountByCategory(ExpenseType category, int id)
+        {
+            return await _dbContext.Expenses.Where(x => x.HomeId.Equals(id))
+                .CountAsync(e => e.Type == category);
         }
     }
 }

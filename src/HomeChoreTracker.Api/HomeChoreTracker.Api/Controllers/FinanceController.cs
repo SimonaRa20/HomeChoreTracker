@@ -41,7 +41,15 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(totalIncome);
 		}
 
-		[HttpPost("income")]
+        [HttpGet("totalIncome/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentMonthTotalIncome(int id)
+        {
+            decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalHomeIncome(id);
+            return Ok(totalIncome);
+        }
+
+        [HttpPost("income")]
 		[Authorize]
 		public async Task<IActionResult> AddIncome(IncomeRequest incomeRequest)
 		{
@@ -127,6 +135,14 @@ namespace HomeChoreTracker.Api.Controllers
             decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalExpense(userId);
 			return Ok(totalExpense);
 		}
+
+        [HttpGet("totalExpense/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentMonthTotalExpense(int id)
+        {
+            decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalHomeExpense(id);
+            return Ok(totalExpense);
+        }
 
         [HttpGet("transferHistory/skip{skip}/take{take}")]
         [Authorize]
@@ -234,7 +250,58 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok(transferHistory);
         }
 
-		[HttpPost("expenseimage")]
+        [HttpGet("transferHistory/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetTransferHistory(int id)
+        {
+            var incomes = await _incomeRepository.GetHomeAll(id);
+            var expenses = await _expenseRepository.GetHomeAll(id);
+
+            var transferHistory = new List<TransferHistoryItem>();
+
+            foreach (var income in incomes)
+            {
+                transferHistory.Add(new TransferHistoryItem
+                {
+                    Type = "Income",
+                    Data = new TransferData
+                    {
+                        Id = income.Id,
+                        Title = income.Title,
+                        Amount = income.Amount,
+                        Description = income.Description,
+                        Time = income.Time,
+                        Type = (int)income.Type,
+                        UserId = income.UserId
+                    }
+                });
+            }
+
+            foreach (var expense in expenses)
+            {
+                transferHistory.Add(new TransferHistoryItem
+                {
+                    Type = "Expense",
+                    Data = new TransferData
+                    {
+                        Id = expense.Id,
+                        Title = expense.Title,
+                        Amount = expense.Amount,
+                        Description = expense.Description,
+                        Time = expense.Time,
+                        Type = (int)expense.Type,
+                        SubscriptionDuration = expense.SubscriptionDuration,
+                        UserId = expense.UserId
+                    }
+                });
+            }
+
+            transferHistory = transferHistory.OrderByDescending(item => item.Data.Time).ToList();
+
+            return Ok(transferHistory);
+        }
+
+        [HttpPost("expenseimage")]
 		[Authorize]
 		public async Task<IActionResult> AddExpenseFromImage([FromForm]ExpenseImageRequest expenseRequest)
 		{
@@ -443,7 +510,18 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(totalBalance);
 		}
 
-		[HttpGet("monthlySummary")]
+        [HttpGet("totalBalance/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentMonthTotalBalance(int id)
+        {
+            decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalHomeIncome(id);
+            decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalHomeExpense(id);
+            decimal totalBalance = totalIncome - totalExpense;
+
+            return Ok(totalBalance);
+        }
+
+        [HttpGet("monthlySummary")]
 		[Authorize]
 		public async Task<IActionResult> GetMonthlySummary()
 		{
@@ -471,6 +549,33 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(monthlySummaries);
 		}
 
+        [HttpGet("monthlySummary/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetMonthlySummary(int id)
+        {
+            DateTime currentDate = DateTime.UtcNow;
+            DateTime startDate = currentDate.AddMonths(-12).Date;
+            List<MonthlySummary> monthlySummaries = new List<MonthlySummary>();
+
+            while (startDate < currentDate)
+            {
+                DateTime endDate = new DateTime(startDate.Year, startDate.Month, DateTime.DaysInMonth(startDate.Year, startDate.Month)).Date;
+                decimal totalIncome = await _incomeRepository.GetTotalHomeIncomeForMonth(startDate, id);
+                decimal totalExpense = await _expenseRepository.GetTotalHomeExpenseForMonth(startDate, id);
+                MonthlySummary summary = new MonthlySummary
+                {
+                    MonthYear = startDate.ToString("yyyy-MM"),
+                    TotalIncome = totalIncome,
+                    TotalExpense = totalExpense
+                };
+
+                monthlySummaries.Add(summary);
+                startDate = startDate.AddMonths(1);
+            }
+
+            return Ok(monthlySummaries);
+        }
+
         [HttpGet("expenseCategories")]
         [Authorize]
         public async Task<IActionResult> GetExpenseCategories()
@@ -482,6 +587,38 @@ namespace HomeChoreTracker.Api.Controllers
             foreach (var category in categories)
             {
                 var count = await _expenseRepository.GetExpenseCountByCategory(category, userId);
+                categoryCounts.Add(category, count);
+            }
+
+            return Ok(categoryCounts);
+        }
+
+        [HttpGet("expenseCategories/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetExpenseCategories(int id)
+        {
+            var categories = Enum.GetValues(typeof(ExpenseType)).Cast<ExpenseType>();
+            var categoryCounts = new Dictionary<ExpenseType, int>();
+
+            foreach (var category in categories)
+            {
+                var count = await _expenseRepository.GetHomeExpenseCountByCategory(category, id);
+                categoryCounts.Add(category, count);
+            }
+
+            return Ok(categoryCounts);
+        }
+
+        [HttpGet("incomeCategories/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetIncomeCategories(int id)
+        {
+            var categories = Enum.GetValues(typeof(IncomeType)).Cast<IncomeType>();
+            var categoryCounts = new Dictionary<IncomeType, int>();
+
+            foreach (var category in categories)
+            {
+                var count = await _incomeRepository.GetHomeIncomeCountByCategory(category, id);
                 categoryCounts.Add(category, count);
             }
 
