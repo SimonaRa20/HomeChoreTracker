@@ -37,7 +37,6 @@ namespace HomeChoreTracker.Api.Repositories
             {
                 UserId = userId,
                 HomeId = home.Id,
-                HomeRole = HomeRole.HomeAdmin,
             };
 
             _dbContext.UserHomes.Add(userHome);
@@ -57,7 +56,7 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task<string> InviteUserToHome(int inviterUserId, int homeId, string inviteeEmail)
         {
             var isAdmin = await _dbContext.UserHomes
-                .AnyAsync(uh => uh.UserId == inviterUserId && uh.HomeId == homeId && uh.HomeRole == HomeRole.HomeAdmin);
+                .AnyAsync(uh => uh.UserId == inviterUserId && uh.HomeId == homeId);
 
             if (!isAdmin)
             {
@@ -128,7 +127,6 @@ namespace HomeChoreTracker.Api.Repositories
                    HomeMemberId = uh.UserId,
                    UserName = uh.User.UserName,
                    Email = uh.User.Email,
-                   Role = uh.HomeRole
                })
                .ToListAsync();
 

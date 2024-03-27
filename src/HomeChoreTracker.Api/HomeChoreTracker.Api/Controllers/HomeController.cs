@@ -158,7 +158,6 @@ namespace HomeChoreTracker.Api.Controllers
 				{
 					UserId = user.Id,
 					HomeId = existingInvitation.HomeId,
-					HomeRole = HomeRole.HomeUser,
 				};
 
 				await _homeRepository.AddToHome(userHome);

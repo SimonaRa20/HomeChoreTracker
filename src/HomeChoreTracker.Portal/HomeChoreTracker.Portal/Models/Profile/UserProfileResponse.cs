@@ -4,7 +4,6 @@
     {
         public string? UserName { get; set; }
         public string? Email { get; set; }
-        public string? Role { get; set; }
         public int StartDayHour { get; set; }
         public int StartDayMinutes { get; set; }
         public int StartLunchHour { get; set; }
