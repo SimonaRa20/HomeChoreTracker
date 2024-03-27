@@ -19,6 +19,14 @@
           rel="stylesheet" asp-append-version="true">
     <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
 
+    <style>
+        .bg-login-image {
+            background-image: url('/img/authimage.png'); /* Update the path to your image */
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+
 
 </head>
 
@@ -30,8 +38,8 @@
             <div class="card-body p-0">
                 <!-- Nested Row within Card Body -->
                 <div class="row">
-                    <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
-                    <div class="col-lg-7">
+                    <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                    <div class="col-lg-6">
                         <div class="p-5">
                             <div class="text-center">
                                 <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
