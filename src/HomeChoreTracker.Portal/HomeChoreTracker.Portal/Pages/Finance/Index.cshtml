@@ -79,7 +79,7 @@
             <div class="card-body text-center">
                 <h5>Report</h5>
                 <div class="chart-bar">
-                    <canvas id="monthlyChart"></canvas>
+                    <canvas id="monthlyChart" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
@@ -91,7 +91,7 @@
             <div class="card-body">
                 <h5>Expense Categories</h5>
                 <div class="chart-pie">
-                    <canvas id="expenseChart"></canvas>
+                    <canvas id="expenseChart" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
@@ -101,7 +101,7 @@
             <div class="card-body">
                 <h5>Income Categories</h5>
                 <div class="chart-pie">
-                    <canvas id="incomeChart"></canvas>
+                    <canvas id="incomeChart" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
@@ -131,14 +131,16 @@
                     datasets: [{
                         label: 'Income',
                         data: incomeData,
-                        backgroundColor: '#1cc88a' // Green color for income
+                        backgroundColor: '#1cc88a'
                     }, {
                         label: 'Expense',
                         data: expenseData,
-                        backgroundColor: '#e74a3b' // Red color for expense
+                        backgroundColor: '#e74a3b'
                     }]
                 },
                 options: {
+                    responsive: true, // Make the chart responsive
+                    maintainAspectRatio: false, // Don't maintain aspect ratio
                     scales: {
                         yAxes: [{
                             ticks: {
@@ -148,7 +150,7 @@
                     }
                 }
             });
-
+            chart.canvas.parentNode.style.height = '400px';
             // Update canvas size whenever the window is resized
             window.addEventListener('resize', function () {
                 chart.canvas.parentNode.style.width = '100%';
@@ -158,6 +160,7 @@
             console.error("Monthly summaries data is null, undefined, or empty.");
         }
     }
+
     // Call the function after the page is loaded
     document.addEventListener("DOMContentLoaded", function () {
         createBarChart();
@@ -243,3 +246,9 @@
         createChart();
     });
 </script>
+<style>
+    .chart-canvas {
+        max-width: 100%;
+        height: auto;
+    }
+</style>

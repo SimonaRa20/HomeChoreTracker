@@ -66,7 +66,7 @@
             <div class="card-body text-center">
                 <h5>Report</h5>
                 <div class="chart-bar">
-                    <canvas id="monthlyChart"></canvas>
+                    <canvas id="monthlyChart" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
             <div class="card-body">
                 <h5>Expense Categories</h5>
                 <div class="chart-pie">
-                    <canvas id="expenseChart"></canvas>
+                    <canvas id="expenseChart" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
@@ -88,7 +88,7 @@
             <div class="card-body">
                 <h5>Income Categories</h5>
                 <div class="chart-pie">
-                    <canvas id="incomeChart"></canvas>
+                    <canvas id="incomeChart" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
@@ -100,7 +100,6 @@
 <script src="js/sb-admin-2.min.js"></script>
 <script src="vendor/chart.js/Chart.min.js"></script>
 <script src="js/demo/chart-bar-demo.js"></script>
-
 <script>
     function createBarChart() {
         var monthlySummaries = @Html.Raw(Json.Serialize(Model.MonthlySummaries));
@@ -119,14 +118,16 @@
                     datasets: [{
                         label: 'Income',
                         data: incomeData,
-                        backgroundColor: '#1cc88a' // Green color for income
+                        backgroundColor: '#1cc88a'
                     }, {
                         label: 'Expense',
                         data: expenseData,
-                        backgroundColor: '#e74a3b' // Red color for expense
+                        backgroundColor: '#e74a3b'
                     }]
                 },
                 options: {
+                    responsive: true, // Make the chart responsive
+                    maintainAspectRatio: false, // Don't maintain aspect ratio
                     scales: {
                         yAxes: [{
                             ticks: {
@@ -136,7 +137,7 @@
                     }
                 }
             });
-
+            chart.canvas.parentNode.style.height = '400px';
             // Update canvas size whenever the window is resized
             window.addEventListener('resize', function () {
                 chart.canvas.parentNode.style.width = '100%';
@@ -146,6 +147,7 @@
             console.error("Monthly summaries data is null, undefined, or empty.");
         }
     }
+
     // Call the function after the page is loaded
     document.addEventListener("DOMContentLoaded", function () {
         createBarChart();
@@ -156,8 +158,6 @@
         var expenseCategories = @Html.Raw(Json.Serialize(Model.ExpenseCategories));
         var incomeCategories = @Html.Raw(Json.Serialize(Model.IncomeCategories));
 
-        console.log(expenseCategories)
-        console.log(incomeCategories)
         // Expense pie chart
         if (expenseCategories) {
             var expenseLabels = Object.keys(expenseCategories);
@@ -190,9 +190,13 @@
                 options: {
                     legend: {
                         position: 'right' // Move legend to the right
-                    }
+                    },
+                    aspectRatio: 1,
+                    responsive: true, // Make the chart responsive
+                    maintainAspectRatio: false // Don't maintain aspect ratio
                 }
             });
+
         }
 
         // Income pie chart
@@ -223,13 +227,26 @@
                 options: {
                     legend: {
                         position: 'right' // Move legend to the right
-                    }
+                    },
+                    aspectRatio: 1,
+                    responsive: true, // Make the chart responsive
+                    maintainAspectRatio: false // Don't maintain aspect ratio
                 }
             });
+
         }
     }
+
 
     document.addEventListener("DOMContentLoaded", function () {
         createChart();
     });
 </script>
+
+
+<style>
+    .chart-canvas {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
