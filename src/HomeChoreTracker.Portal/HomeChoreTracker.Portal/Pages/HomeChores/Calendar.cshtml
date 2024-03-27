@@ -18,7 +18,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+    <style>
+        .circle {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: white;
+            color: black;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+        }
 
+        .event-details {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        .event-time,
+        .event-title {
+            display: block;
+        }
+
+    </style>
 }
 @if (User.Identity.IsAuthenticated)
 {
@@ -75,9 +99,10 @@ else
                     {
                         id: @chore.Id,
                         title: '@chore.Task.Name',
+                        name: '@chore.Task.Name',
                         description: '@chore.Task.Description',
-                        start: '@chore.StartDate.ToString("yyyy-MM-dd")',
-                        end: '@chore.EndDate.ToString("yyyy-MM-dd")',
+                        start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                        end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                         type: '@chore.Task.ChoreType',
                         time: '@chore.Task.Time',
                         assigned: '@chore.HomeMemberId',
@@ -90,6 +115,53 @@ else
     }
                     ],
             eventRender: function (event, element) {
+                var assignedMemberId = event.assigned;
+                var assignedMemberInitials = '';
+
+                if (assignedMemberId == '') {
+                    assignedMemberInitials = '-';
+                } else {
+                    var homeMembersData = @Html.Raw(Json.Serialize(Model.HomeMembers));
+                    for (var i = 0; i < homeMembersData.length; i++) {
+                        if (homeMembersData[i].homeMemberId == assignedMemberId) {
+                            var userName = homeMembersData[i].userName;
+                            assignedMemberInitials = userName.substring(0, 2).toUpperCase();
+                            break;
+                        }
+                    }
+                }
+
+                var startTime = moment(event.start._i).format('HH:mm');
+
+                element.css('background-color', event.color);
+                element.css('opacity', '0.8');
+
+                if (assignedMemberInitials == '-') {
+                    var eventText = '<div class="fc-content">'+
+                    '<div class="event-details">' +
+                        '<span class="event-time">' + startTime + '</span>' +
+                        '<span class="event-title">' + event.title + '</span>' +
+                        '</div>' +
+                        '</div>';
+                    element.css('min-height', '16px');
+                }
+                else {
+                    var eventText = '<div class="fc-content">' +
+                        '<div class="circle">' + assignedMemberInitials + '</div>' +
+                        '<div class="event-details">' +
+                        '<span class="event-time">' + startTime + '</span>' +
+                        '<span class="event-title">' + event.title + '</span>' +
+                        '</div>' +
+                        '</div>';
+                }
+                
+                element.css('min-height', '16px');
+
+                element.find('.fc-time').remove();
+                element.find('.fc-title').remove();
+                element.append(eventText);
+
+                
             },
             eventClick: function (calEvent, jsEvent, view) {
 
@@ -120,7 +192,7 @@ else
 
                 var task = calEvent.task;
                 $('#event-id').text(calEvent.id);
-                $('#task-name').text(calEvent.title);
+                $('#task-name').text(calEvent.name);
                 $('#task-description').text(calEvent.description);
                 $('#task-type').text(calEvent.type);
                 $('#task-long-type').text(calEvent.time);
