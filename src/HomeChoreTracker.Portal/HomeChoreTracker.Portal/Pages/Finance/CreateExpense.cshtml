@@ -57,22 +57,22 @@
 					</div>
 
 					<div class="form-group">
-						<label for="Type">Expense Type</label>
-						<select class="form-control" id="Type" name="CreateNewExpense.Type" asp-for="CreateNewExpense.Type" required>
-							@foreach (var type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.ExpenseType)))
+						<label for="TypeId">Type</label>
+						<select class="form-control" id="TypeId" name="CreateNewExpense.FinancialCategoryId" asp-for="CreateNewExpense.FinancialCategoryId">
+							<option value="0">Create new type</option>
+							@if (Model.FinancialCategories != null)
 							{
-								<option value="@((int)type)">@type</option>
+								@foreach (var category in Model.FinancialCategories)
+								{
+									<option value="@category.Id">@category.Name</option>
+								}
 							}
 						</select>
-						<span asp-validation-for="CreateNewExpense.Type" class="text-danger"></span>
 					</div>
-
-					<div class="form-group">
-						<label for="Subscription">Subscription (write month count)</label>
-						<input type="number" class="form-control" id="SubscriptionDuration" name="CreateNewExpense.SubscriptionDuration" asp-for="CreateNewExpense.SubscriptionDuration" min="0" step="1" value="0" required>
-						<span asp-validation-for="CreateNewExpense.SubscriptionDuration" class="text-danger"></span>
+					<div class="form-group" id="newTypeField">
+						<label for="NewType">New Type</label>
+						<input type="text" class="form-control" id="NewType" name="CreateNewExpense.NewFinancialCategory" asp-for="CreateNewExpense.NewFinancialCategory">
 					</div>
-
 
 					<div class="form-group">
 						<label for="HomeId">Select Home</label>
@@ -91,6 +91,22 @@
 		</div>
 	</div>
 </div>
+
+
+<script>
+	document.getElementById('TypeId').addEventListener('change', function () {
+		var selectedCategoryId = this.value;
+		var newTypeField = document.getElementById('newTypeField');
+
+		// If the selected category ID is "0" (string), show the new type field; otherwise, hide it
+		if (selectedCategoryId === "0") {
+			newTypeField.style.display = 'block';
+		} else {
+			newTypeField.style.display = 'none';
+		}
+	});
+</script>
+
 <script>
 	// Function to get today's date and time in the required format
 	function getTodayISOString() {

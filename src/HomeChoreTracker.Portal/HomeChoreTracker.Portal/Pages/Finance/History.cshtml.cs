@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -19,8 +20,9 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 		public List<TransferHistoryItem> TransferHistory { get; set; }
 
         public List<HomeResponse> Homes { get; set; }
-
-        [BindProperty]
+		public List<FinancialCategory> FinancialCategoriesIncome { get; set; }
+		public List<FinancialCategory> FinancialCategoriesExpense { get; set; }
+		[BindProperty]
         public string DeleteItemType { get; set; }
 
         [BindProperty(SupportsGet = true)]
@@ -85,7 +87,25 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                         TotalPages = (int)Math.Ceiling((double)Count / pageSize);
                     }
 
-                    return Page();
+					var apiUrlICategories = $"{_config["ApiUrl"]}/Finance/CategoriesIncome";
+
+					var responseICategories = await httpClient.GetAsync(apiUrlICategories);
+
+					if (responseICategories.IsSuccessStatusCode)
+					{
+						FinancialCategoriesIncome = await responseICategories.Content.ReadFromJsonAsync<List<FinancialCategory>>();
+					}
+
+					var apiUrlECategories = $"{_config["ApiUrl"]}/Finance/CategoriesExpense";
+
+					var responseECategories = await httpClient.GetAsync(apiUrlECategories);
+
+					if (responseECategories.IsSuccessStatusCode)
+					{
+						FinancialCategoriesExpense = await responseECategories.Content.ReadFromJsonAsync<List<FinancialCategory>>();
+					}
+
+					return Page();
 				}
 				else
 				{
@@ -132,8 +152,21 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					EditIncome.Amount = decimal.Parse(Request.Form["EditIncomeAmount"]);
 					EditIncome.Description = Request.Form["EditIncomeDescription"];
 					EditIncome.Time = DateTime.Parse(Request.Form["EditIncomeTime"]);
-					EditIncome.Type = Enum.Parse<IncomeType>(Request.Form["EditIncomeType"]);
-
+					if (!string.IsNullOrEmpty(Request.Form["EditIncomeType"]))
+					{
+						if (int.TryParse(Request.Form["EditIncomeType"], out int editIncomeCategoryId))
+						{
+							if(editIncomeCategoryId == 0)
+							{
+								EditIncome.NewFinancialCategory = Request.Form["NewIncomeFinancialCategory"];
+								EditIncome.FinancialCategoryId = 0;
+							}
+							else
+							{
+								EditIncome.FinancialCategoryId = editIncomeCategoryId;
+							}
+						}
+					}
 					if (!string.IsNullOrEmpty(Request.Form["EditIncomeHome"]))
 					{
 						if (int.TryParse(Request.Form["EditIncomeHome"], out int editIncomeHomeId))
@@ -200,15 +233,29 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					EditExpense.Amount = decimal.Parse(Request.Form["EditExpenseAmount"]);
 					EditExpense.Description = Request.Form["EditExpenseDescription"];
 					EditExpense.Time = DateTime.Parse(Request.Form["EditExpenseTime"]);
-					EditExpense.Type = Enum.Parse<ExpenseType>(Request.Form["EditExpenseType"]);
-					EditExpense.SubscriptionDuration = int.Parse(Request.Form["EditExpenseSubscriptionDuration"]);
-					if (!string.IsNullOrEmpty(Request.Form["EditExpenseHome"]))
+					if (!string.IsNullOrEmpty(Request.Form["EditExpenseType"]))
 					{
-						if (int.TryParse(Request.Form["EditExpenseHome"], out int editExpenseHomeId))
+						if (int.TryParse(Request.Form["EditExpenseType"], out int editExpenseTypeId))
 						{
-							EditExpense.HomeId = editExpenseHomeId;
+							if (editExpenseTypeId == 0)
+							{
+								EditExpense.NewFinancialCategory = Request.Form["NewExpenseFinancialCategory"];
+								EditExpense.FinancialCategoryId = 0;
+							}
+							else
+							{
+								EditExpense.FinancialCategoryId = editExpenseTypeId;
+							}
 						}
 					}
+					if (!string.IsNullOrEmpty(Request.Form["EditExpenseHome"]))
+					{
+						if (int.TryParse(Request.Form["EditExpenseHome"], out int editExpenseId))
+						{
+							EditExpense.HomeId = editExpenseId;
+						}
+					}
+
 					var response = await httpClient.PutAsJsonAsync(apiUrl, EditExpense);
 
 					if (response.IsSuccessStatusCode)
@@ -297,6 +344,8 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 							description = descriptionText,
 							time = incomeDetails.Time,
 							type = incomeDetails.Type.ToString(),
+							financialCategory = incomeDetails.FinancialCategory,
+							financialCategoryId = incomeDetails.FinancialCategoryId,
 							home = home?.Title ?? "-", // Include home title in the response
 							homeId = home?.Id,
 						});
@@ -352,8 +401,9 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                             description = descriptionText,
                             time = expenseDetails.Time,
                             type = expenseDetails.Type.ToString(),
-                            subscriptionDuration = expenseDetails.SubscriptionDuration,
-                            home = home?.Title ?? "-",
+							financialCategory = expenseDetails.FinancialCategory,
+							financialCategoryId = expenseDetails.FinancialCategoryId,
+							home = home?.Title ?? "-",
 							homeId = home?.Id
                         });
                     }
@@ -395,6 +445,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 						if (homesResponse.IsSuccessStatusCode)
 						{
 							Homes = await homesResponse.Content.ReadFromJsonAsync<List<HomeResponse>>();
+							return Page();
 						}
 						else
 						{
@@ -418,7 +469,56 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			}
 		}
 
+		public async Task<IActionResult> OnGetEditExpenseAsync(int id)
+		{
+			if (!ModelState.IsValid)
+			{
+				await OnGetAsync(); // Refresh the data
+				return Page();
+			}
 
+			try
+			{
+				var token = User.FindFirstValue("Token");
+				using (var httpClient = _httpClientFactory.CreateClient())
+				{
+					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+					var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
+
+					var response = await httpClient.GetAsync(apiUrl);
+
+					if (response.IsSuccessStatusCode)
+					{
+						EditExpense = await response.Content.ReadFromJsonAsync<ExpenseRequest>();
+						// Fetch homes
+						var homesResponse = await httpClient.GetAsync($"{_config["ApiUrl"]}/Home");
+						if (homesResponse.IsSuccessStatusCode)
+						{
+							Homes = await homesResponse.Content.ReadFromJsonAsync<List<HomeResponse>>();
+							return Page();
+						}
+						else
+						{
+							ModelState.AddModelError(string.Empty, $"Failed to retrieve homes: {homesResponse.ReasonPhrase}");
+						}
+
+						return Page();
+					}
+					else
+					{
+						ModelState.AddModelError(string.Empty, $"Failed to retrieve income: {response.ReasonPhrase}");
+						return Page();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+				await OnGetAsync(); // Refresh the data
+				return Page();
+			}
+		}
 		private void ClearFieldErrors(Func<string, bool> predicate)
 		{
 			foreach (var field in ModelState)

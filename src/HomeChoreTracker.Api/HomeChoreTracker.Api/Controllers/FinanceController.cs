@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.ExtendedProperties;
+using DocumentFormat.OpenXml.Spreadsheet;
 using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Interfaces;
@@ -8,13 +9,16 @@ using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
+using iText.StyledXmlParser.Node;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
+using Table = iText.Layout.Element.Table;
 
 
 namespace HomeChoreTracker.Api.Controllers
@@ -54,16 +58,45 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<IActionResult> AddIncome(IncomeRequest incomeRequest)
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-			var income = new Income
-			{
-				Title = incomeRequest.Title,
-				Amount = incomeRequest.Amount,
-				Description = incomeRequest.Description,
-				Time = incomeRequest.Time,
-				Type = incomeRequest.Type,
-				HomeId = incomeRequest.HomeId,
-				UserId = userId,
-			};
+            var income = new FinancialRecord();
+            if (incomeRequest.FinancialCategoryId == 0)
+            {
+                FinancialCategory newfinancialCategory = new FinancialCategory
+                {
+                    Name = incomeRequest.NewFinancialCategory,
+                    Type = FinancialType.Income,
+                    UserId = userId,
+                    HomeId = incomeRequest.HomeId
+                };
+
+                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+
+                income = new FinancialRecord
+                {
+                    Title = incomeRequest.Title,
+                    Amount = incomeRequest.Amount,
+                    Description = incomeRequest.Description,
+                    Time = incomeRequest.Time,
+                    Type = FinancialType.Income,
+					FinancialCategoryId = addedCategory.Id,
+                    HomeId = incomeRequest.HomeId,
+                    UserId = userId,
+                };
+            }
+            else
+            {
+                income = new FinancialRecord
+                {
+                    Title = incomeRequest.Title,
+                    Amount = incomeRequest.Amount,
+                    Description = incomeRequest.Description,
+                    Time = incomeRequest.Time,
+                    Type = FinancialType.Income,
+					FinancialCategoryId = incomeRequest.FinancialCategoryId,
+                    HomeId = incomeRequest.HomeId,
+                    UserId = userId,
+                };
+            }
 
 			await _incomeRepository.AddIncome(income);
 			return Ok("Income added successfully");
@@ -74,19 +107,49 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<IActionResult> UpdateIncome(int id, IncomeRequest incomeRequest)
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-			var income = new Income
-			{
-				Id = id,
-				Title = incomeRequest.Title,
-				Amount = incomeRequest.Amount,
-				Description = incomeRequest.Description,
-				Time = incomeRequest.Time,
-				Type = incomeRequest.Type,
-				HomeId = incomeRequest?.HomeId,
-				UserId = userId
-			};
+            var income = new FinancialRecord();
+            if (incomeRequest.FinancialCategoryId == 0)
+            {
+                FinancialCategory newfinancialCategory = new FinancialCategory
+                {
+                    Name = incomeRequest.NewFinancialCategory,
+                    Type = FinancialType.Income,
+                    UserId = userId,
+                    HomeId = incomeRequest.HomeId
+                };
 
-			await _incomeRepository.Update(income);
+                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+
+                income = new FinancialRecord
+                {
+                    Id = id,
+                    Title = incomeRequest.Title,
+                    Amount = incomeRequest.Amount,
+                    Description = incomeRequest.Description,
+                    Time = incomeRequest.Time,
+                    Type = FinancialType.Income,
+                    FinancialCategoryId = addedCategory.Id,
+                    HomeId = incomeRequest.HomeId,
+                    UserId = userId,
+                };
+            }
+            else
+            {
+                income = new FinancialRecord
+                {
+                    Id = id,
+                    Title = incomeRequest.Title,
+                    Amount = incomeRequest.Amount,
+                    Description = incomeRequest.Description,
+                    Time = incomeRequest.Time,
+                    Type = FinancialType.Income,
+                    FinancialCategoryId = incomeRequest.FinancialCategoryId,
+                    HomeId = incomeRequest.HomeId,
+                    UserId = userId,
+                };
+            }
+
+            await _incomeRepository.Update(income);
 			return Ok("Income updated successfully");
 		}
 
@@ -167,7 +230,8 @@ namespace HomeChoreTracker.Api.Controllers
                         Description = income.Description,
                         Time = income.Time,
                         Type = (int)income.Type,
-                        UserId = income.UserId
+						Category = await _incomeRepository.GetIncomeCategory((int)income.FinancialCategoryId),
+						UserId = income.UserId,
                     }
                 });
             }
@@ -185,8 +249,8 @@ namespace HomeChoreTracker.Api.Controllers
                         Description = expense.Description,
                         Time = expense.Time,
                         Type = (int)expense.Type,
-                        SubscriptionDuration = expense.SubscriptionDuration,
-                        UserId = expense.UserId
+						Category = await _expenseRepository.GetExpenseCategory((int)expense.FinancialCategoryId),
+						UserId = expense.UserId,
                     }
                 });
             }
@@ -220,8 +284,9 @@ namespace HomeChoreTracker.Api.Controllers
                         Amount = income.Amount,
                         Description = income.Description,
                         Time = income.Time,
-                        Type = (int)income.Type,
-                        UserId = income.UserId
+						Category = await _incomeRepository.GetIncomeCategory((int)income.FinancialCategoryId),
+						Type = (int)income.Type,
+                        UserId = income.UserId,
                     }
                 });
             }
@@ -239,8 +304,8 @@ namespace HomeChoreTracker.Api.Controllers
                         Description = expense.Description,
                         Time = expense.Time,
                         Type = (int)expense.Type,
-                        SubscriptionDuration = expense.SubscriptionDuration,
-                        UserId = expense.UserId
+						Category = await _expenseRepository.GetExpenseCategory((int)expense.FinancialCategoryId),
+						UserId = expense.UserId,
                     }
                 });
             }
@@ -271,8 +336,9 @@ namespace HomeChoreTracker.Api.Controllers
                         Amount = income.Amount,
                         Description = income.Description,
                         Time = income.Time,
-                        Type = (int)income.Type,
-                        UserId = income.UserId
+						Category = await _incomeRepository.GetIncomeCategory((int)income.FinancialCategoryId),
+						Type = (int)income.Type,
+                        UserId = income.UserId,
                     }
                 });
             }
@@ -290,8 +356,8 @@ namespace HomeChoreTracker.Api.Controllers
                         Description = expense.Description,
                         Time = expense.Time,
                         Type = (int)expense.Type,
-                        SubscriptionDuration = expense.SubscriptionDuration,
-                        UserId = expense.UserId
+                        Category = await _expenseRepository.GetExpenseCategory((int)expense.FinancialCategoryId),
+						UserId = expense.UserId,
                     }
                 });
             }
@@ -334,16 +400,45 @@ namespace HomeChoreTracker.Api.Controllers
 					string title = ParseTitle(extractedText);
 					decimal amount = ParseAmount(extractedText);
 
-					var expense = new Expense
-					{
-						Title = title,
-						Amount = amount,
-						Description = extractedText,
-						Time = DateTime.Now,
-						Type = expenseRequest.Type,
-						HomeId = expenseRequest.HomeId,
-						UserId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value)
-					};
+                    var expense = new FinancialRecord();
+                    if (expenseRequest.FinancialCategoryId == 0)
+                    {
+                        FinancialCategory newfinancialCategory = new FinancialCategory
+                        {
+                            Name = expenseRequest.NewFinancialCategory,
+                            Type = FinancialType.Expense,
+                            UserId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value),
+                            HomeId = expenseRequest.HomeId
+                        };
+
+                        FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+
+                        expense = new FinancialRecord
+                        {
+                            Title = title,
+                            Amount = amount,
+                            Description = extractedText,
+                            Time = DateTime.Now,
+                            Type = FinancialType.Expense,
+                            FinancialCategoryId = addedCategory.Id,
+                            HomeId = expenseRequest.HomeId,
+                            UserId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value),
+                        };
+                    }
+                    else
+                    {
+                        expense = new FinancialRecord
+                        {
+                            Title = title,
+                            Amount = amount,
+                            Description = extractedText,
+                            Time = DateTime.Now,
+                            Type = FinancialType.Expense,
+                            FinancialCategoryId = expenseRequest.FinancialCategoryId,
+                            HomeId = expenseRequest.HomeId,
+                            UserId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value),
+                        };
+                    }
 
 					await _expenseRepository.AddExpense(expense);
 
@@ -437,18 +532,46 @@ namespace HomeChoreTracker.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> AddExpense(ExpenseRequest expenseRequest)
 		{
-			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-			var expense = new Expense
-			{
-				Title = expenseRequest.Title,
-				Amount = expenseRequest.Amount,
-				Description = expenseRequest.Description,
-				Time = expenseRequest.Time,
-				Type = expenseRequest.Type,
-				SubscriptionDuration = expenseRequest.SubscriptionDuration,
-				HomeId = expenseRequest.HomeId,
-				UserId = userId,
-			};
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            var expense = new FinancialRecord();
+            if (expenseRequest.FinancialCategoryId == 0)
+            {
+                FinancialCategory newfinancialCategory = new FinancialCategory
+                {
+                    Name = expenseRequest.NewFinancialCategory,
+                    Type = FinancialType.Expense,
+                    UserId = userId,
+                    HomeId = expenseRequest.HomeId
+                };
+
+                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+
+                expense = new FinancialRecord
+                {
+                    Title = expenseRequest.Title,
+                    Amount = expenseRequest.Amount,
+                    Description = expenseRequest.Description,
+                    Time = expenseRequest.Time,
+                    Type = FinancialType.Expense,
+					FinancialCategoryId = addedCategory.Id,
+                    HomeId = expenseRequest.HomeId,
+                    UserId = userId,
+                };
+            }
+            else
+            {
+                expense = new FinancialRecord
+                {
+                    Title = expenseRequest.Title,
+                    Amount = expenseRequest.Amount,
+                    Description = expenseRequest.Description,
+                    Time = expenseRequest.Time,
+                    Type = FinancialType.Expense,
+					FinancialCategoryId = expenseRequest.FinancialCategoryId,
+                    HomeId = expenseRequest.HomeId,
+                    UserId = userId,
+                };
+            }
 
 			await _expenseRepository.AddExpense(expense);
 			return Ok("Expense added successfully");
@@ -460,20 +583,50 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<IActionResult> UpdateExpense(int id, ExpenseRequest expenseRequest)
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-			var expense = new Expense
-			{
-				Id = id,
-				Title = expenseRequest.Title,
-				Amount = expenseRequest.Amount,
-				Description = expenseRequest.Description,
-				Time = expenseRequest.Time,
-				Type = expenseRequest.Type,
-				SubscriptionDuration = expenseRequest.SubscriptionDuration,
-				HomeId = expenseRequest.HomeId,
-				UserId = userId,
-			};
+            var expense = new FinancialRecord();
 
-			await _expenseRepository.Update(expense);
+            if (expenseRequest.FinancialCategoryId == 0)
+            {
+                FinancialCategory newfinancialCategory = new FinancialCategory
+                {
+                    Name = expenseRequest.NewFinancialCategory,
+                    Type = FinancialType.Expense,
+                    UserId = userId,
+                    HomeId = expenseRequest.HomeId
+                };
+
+                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+
+                expense = new FinancialRecord
+                {
+                    Id = id,
+                    Title = expenseRequest.Title,
+                    Amount = expenseRequest.Amount,
+                    Description = expenseRequest.Description,
+                    Time = expenseRequest.Time,
+                    Type = FinancialType.Expense,
+                    FinancialCategoryId = addedCategory.Id,
+                    HomeId = expenseRequest.HomeId,
+                    UserId = userId,
+                };
+            }
+            else
+            {
+                expense = new FinancialRecord
+                {
+                    Id = id,
+                    Title = expenseRequest.Title,
+                    Amount = expenseRequest.Amount,
+                    Description = expenseRequest.Description,
+                    Time = expenseRequest.Time,
+                    Type = FinancialType.Expense,
+					FinancialCategoryId = expenseRequest.FinancialCategoryId,
+                    HomeId = expenseRequest.HomeId,
+                    UserId = userId,
+                };
+            }
+
+            await _expenseRepository.Update(expense);
 			return Ok("Expense updated successfully");
 		}
 
@@ -581,13 +734,16 @@ namespace HomeChoreTracker.Api.Controllers
         public async Task<IActionResult> GetExpenseCategories()
         {
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-            var categories = Enum.GetValues(typeof(ExpenseType)).Cast<ExpenseType>();
-            var categoryCounts = new Dictionary<ExpenseType, int>();
+            var categories = await _expenseRepository.GetExpenseCategories();
+            var categoryCounts = new Dictionary<string, int>();
 
             foreach (var category in categories)
             {
-                var count = await _expenseRepository.GetExpenseCountByCategory(category, userId);
-                categoryCounts.Add(category, count);
+                var count = await _expenseRepository.GetExpenseCountByCategory(category.Id, userId);
+                if(count > 0)
+                {
+                    categoryCounts.Add(category.Name, count);
+                }
             }
 
             return Ok(categoryCounts);
@@ -597,13 +753,16 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetExpenseCategories(int id)
         {
-            var categories = Enum.GetValues(typeof(ExpenseType)).Cast<ExpenseType>();
-            var categoryCounts = new Dictionary<ExpenseType, int>();
+            var categories = await _expenseRepository.GetExpenseCategories();
+            var categoryCounts = new Dictionary<string, int>();
 
             foreach (var category in categories)
             {
-                var count = await _expenseRepository.GetHomeExpenseCountByCategory(category, id);
-                categoryCounts.Add(category, count);
+                var count = await _expenseRepository.GetHomeExpenseCountByCategory(category.Id, id);
+                if (count > 0)
+                {
+                    categoryCounts.Add(category.Name, count);
+                }
             }
 
             return Ok(categoryCounts);
@@ -613,13 +772,16 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetIncomeCategories(int id)
         {
-            var categories = Enum.GetValues(typeof(IncomeType)).Cast<IncomeType>();
-            var categoryCounts = new Dictionary<IncomeType, int>();
+            var categories = await _incomeRepository.GetIncomeCategories();
+            var categoryCounts = new Dictionary<string, int>();
 
             foreach (var category in categories)
             {
-                var count = await _incomeRepository.GetHomeIncomeCountByCategory(category, id);
-                categoryCounts.Add(category, count);
+                var count = await _incomeRepository.GetHomeIncomeCountByCategory(category.Id, id);
+                if (count > 0)
+                {
+                    categoryCounts.Add(category.Name, count);
+                }
             }
 
             return Ok(categoryCounts);
@@ -630,18 +792,37 @@ namespace HomeChoreTracker.Api.Controllers
         public async Task<IActionResult> GetIncomeCategories()
         {
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-            var categories = Enum.GetValues(typeof(IncomeType)).Cast<IncomeType>();
-            var categoryCounts = new Dictionary<IncomeType, int>();
+            var categories = await _incomeRepository.GetIncomeCategories();
+            var categoryCounts = new Dictionary<string, int>();
 
             foreach (var category in categories)
             {
-                var count = await _incomeRepository.GetIncomeCountByCategory(category, userId);
-                categoryCounts.Add(category, count);
-            }
+                var count = await _incomeRepository.GetIncomeCountByCategory(category.Id, userId);
+				if (count > 0)
+				{
+					categoryCounts.Add(category.Name, count);
+				}
+			}
 
             return Ok(categoryCounts);
         }
 
+        [HttpGet("CategoriesIncome")]
+        [Authorize]
+        public async Task<IActionResult> GetCategoriesIncome()
+        {
+            var categories = await _incomeRepository.GetIncomeCategories();
+
+            return Ok(categories);
+        }
+        [HttpGet("CategoriesExpense")]
+        [Authorize]
+        public async Task<IActionResult> GetCategoriesExpense()
+        {
+            var categories = await _expenseRepository.GetExpenseCategories();
+
+            return Ok(categories);
+        }
         [HttpGet("generateReport")]
         public async Task<IActionResult> GenerateFinanceReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {

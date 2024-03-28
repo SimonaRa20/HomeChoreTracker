@@ -19,7 +19,8 @@ namespace HomeChoreTracker.Api.Repositories
 
 		public async Task<ExpenseResponse> GetExpenseById(int id)
 		{
-			Expense expense = await _dbContext.Expenses.FindAsync(id);
+			FinancialRecord expense = await _dbContext.FinancialRecords.FindAsync(id);
+			FinancialCategory category = await _dbContext.FinancialCategories.FindAsync(expense.FinancialCategoryId);
 
 			ExpenseResponse expenseResponse = new ExpenseResponse
 			{
@@ -28,7 +29,8 @@ namespace HomeChoreTracker.Api.Repositories
 				Description = expense?.Description ?? "-",
 				Time = expense.Time,
 				Type = expense.Type,
-				SubscriptionDuration = expense.SubscriptionDuration ?? 0,
+                FinancialCategory = category.Name,
+                FinancialCategoryId = category.Id,
 				HomeId = expense.HomeId,
             };
 
@@ -36,14 +38,14 @@ namespace HomeChoreTracker.Api.Repositories
 
 		}
 
-		public async Task<List<Expense>> GetAll(int userId)
+		public async Task<List<FinancialRecord>> GetAll(int userId)
 		{
-			return await _dbContext.Expenses.Where(x=>x.UserId.Equals(userId)).ToListAsync();
+			return await _dbContext.FinancialRecords.Where(x=> x.Type.Equals(FinancialType.Expense) && x.UserId.Equals(userId)).ToListAsync();
 		}
 
-		public async Task AddExpense(Expense expense)
+		public async Task AddExpense(FinancialRecord expense)
 		{
-			await _dbContext.Expenses.AddAsync(expense);
+			await _dbContext.FinancialRecords.AddAsync(expense);
 			await Save();
 		}
 
@@ -52,7 +54,7 @@ namespace HomeChoreTracker.Api.Repositories
 			await _dbContext.SaveChangesAsync();
 		}
 
-		public async Task Update(Expense expense)
+		public async Task Update(FinancialRecord expense)
 		{
 			_dbContext.Entry(expense).State = EntityState.Modified;
 			await Save();
@@ -60,10 +62,10 @@ namespace HomeChoreTracker.Api.Repositories
 
 		public async Task Delete(int id)
 		{
-			Expense expense = await _dbContext.Expenses.FindAsync(id);
+			FinancialRecord expense = await _dbContext.FinancialRecords.FindAsync(id);
 			if (expense != null)
 			{
-				_dbContext.Expenses.Remove(expense);
+				_dbContext.FinancialRecords.Remove(expense);
 			}
 			await Save();
 		}
@@ -74,8 +76,8 @@ namespace HomeChoreTracker.Api.Repositories
 			DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
 			DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-			return await _dbContext.Expenses
-				.Where(e => e.UserId.Equals(userId) && e.Time >= startOfMonth && e.Time <= endOfMonth)
+			return await _dbContext.FinancialRecords
+				.Where(e => e.Type.Equals(FinancialType.Expense) && e.UserId.Equals(userId) && e.Time >= startOfMonth && e.Time <= endOfMonth)
 				.SumAsync(e => e.Amount);
 		}
 
@@ -84,23 +86,23 @@ namespace HomeChoreTracker.Api.Repositories
 			DateTime startDate = new DateTime(month.Year, month.Month, 1);
 			DateTime endDate = startDate.AddMonths(1).AddDays(-1);
 
-			decimal totalExpense = await _dbContext.Expenses
-				.Where(e => e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
+			decimal totalExpense = await _dbContext.FinancialRecords
+				.Where(e => e.Type.Equals(FinancialType.Expense) && e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
 				.SumAsync(e => e.Amount);
 
 			return totalExpense;
 		}
 
-        public async Task<int> GetExpenseCountByCategory(ExpenseType category, int userId)
+        public async Task<int> GetExpenseCountByCategory(int category, int userId)
         {
-            return await _dbContext.Expenses.Where(x=>x.UserId.Equals(userId))
-                .CountAsync(e => e.Type == category);
+            return await _dbContext.FinancialRecords.Where(x=> x.Type.Equals(FinancialType.Expense) && x.UserId.Equals(userId))
+                .CountAsync(e => e.FinancialCategoryId == category);
         }
 
-        public async Task<List<Expense>> GetExpensesByDateRange(DateTime startDate, DateTime endDate, int userId)
+        public async Task<List<FinancialRecord>> GetExpensesByDateRange(DateTime startDate, DateTime endDate, int userId)
         {
-            return await _dbContext.Expenses
-                .Where(e => e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
+            return await _dbContext.FinancialRecords
+                .Where(e => e.Type.Equals(FinancialType.Expense) && e.UserId.Equals(userId) && e.Time >= startDate && e.Time <= endDate)
                 .ToListAsync();
         }
 
@@ -110,14 +112,14 @@ namespace HomeChoreTracker.Api.Repositories
             DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            return await _dbContext.Expenses
-                .Where(e => e.HomeId.Equals(id) && e.Time >= startOfMonth && e.Time <= endOfMonth)
+            return await _dbContext.FinancialRecords
+                .Where(e => e.Type.Equals(FinancialType.Expense) && e.HomeId.Equals(id) && e.Time >= startOfMonth && e.Time <= endOfMonth)
                 .SumAsync(e => e.Amount);
         }
 
-        public async Task<List<Expense>> GetHomeAll(int id)
+        public async Task<List<FinancialRecord>> GetHomeAll(int id)
         {
-            return await _dbContext.Expenses.Where(x => x.HomeId.Equals(id)).ToListAsync();
+            return await _dbContext.FinancialRecords.Where(x => x.Type.Equals(FinancialType.Expense) && x.HomeId.Equals(id)).ToListAsync();
         }
 
         public async Task<decimal> GetTotalHomeExpenseForMonth(DateTime month, int id)
@@ -125,17 +127,27 @@ namespace HomeChoreTracker.Api.Repositories
             DateTime startDate = new DateTime(month.Year, month.Month, 1);
             DateTime endDate = startDate.AddMonths(1).AddDays(-1);
 
-            decimal totalExpense = await _dbContext.Expenses
-                .Where(e => e.HomeId.Equals(id) && e.Time >= startDate && e.Time <= endDate)
+            decimal totalExpense = await _dbContext.FinancialRecords
+                .Where(e => e.Type.Equals(FinancialType.Expense) && e.HomeId.Equals(id) && e.Time >= startDate && e.Time <= endDate)
                 .SumAsync(e => e.Amount);
 
             return totalExpense;
         }
 
-        public async Task<int> GetHomeExpenseCountByCategory(ExpenseType category, int id)
+        public async Task<int> GetHomeExpenseCountByCategory(int category, int id)
         {
-            return await _dbContext.Expenses.Where(x => x.HomeId.Equals(id))
-                .CountAsync(e => e.Type == category);
+            return await _dbContext.FinancialRecords.Where(x => x.Type.Equals(FinancialType.Expense) && x.HomeId.Equals(id))
+                .CountAsync(e => e.FinancialCategoryId == category);
         }
-    }
+
+		public async Task<List<FinancialCategory>> GetExpenseCategories()
+		{
+            return await _dbContext.FinancialCategories.Where(x=>x.Type.Equals(FinancialType.Expense)).ToListAsync();
+        }
+
+		public async Task<FinancialCategory> GetExpenseCategory(int id)
+		{
+			return await _dbContext.FinancialCategories.Where(x => x.Type.Equals(FinancialType.Expense) && x.Id.Equals(id)).FirstOrDefaultAsync();
+		}
+	}
 }

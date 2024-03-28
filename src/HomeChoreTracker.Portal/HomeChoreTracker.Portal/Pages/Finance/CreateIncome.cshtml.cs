@@ -16,6 +16,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 		public IncomeRequest CreateNewIncome { get; set; }
 
 		public List<HomeResponse> Homes { get; set; }
+		public List<FinancialCategory> FinancialCategories { get; set; }
 
 		public CreateIncomeModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
 		{
@@ -38,7 +39,20 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				if (response.IsSuccessStatusCode)
 				{
 					Homes = await response.Content.ReadFromJsonAsync<List<HomeResponse>>();
-					return Page();
+					var apiUrlCategories = $"{_config["ApiUrl"]}/Finance/CategoriesIncome";
+
+					var responseCategories = await httpClient.GetAsync(apiUrlCategories);
+
+					if (responseCategories.IsSuccessStatusCode)
+					{
+						FinancialCategories = await responseCategories.Content.ReadFromJsonAsync<List<FinancialCategory>>();
+						return Page();
+					}
+					else
+					{
+						ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {response.ReasonPhrase}");
+						return Page();
+					}
 				}
 				else
 				{

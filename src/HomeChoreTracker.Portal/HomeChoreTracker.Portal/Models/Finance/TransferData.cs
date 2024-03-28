@@ -8,7 +8,8 @@
         public string Description { get; set; }
         public DateTime Time { get; set; }
         public int Type { get; set; } // You might want to change this to enum or string based on your IncomeType and ExpenseType
-        public int? SubscriptionDuration { get; set; }
+		public FinancialCategory Category { get; set; }
+		public int? SubscriptionDuration { get; set; }
         public int? HomeId { get; set; }
         public int UserId { get; set; }
     }

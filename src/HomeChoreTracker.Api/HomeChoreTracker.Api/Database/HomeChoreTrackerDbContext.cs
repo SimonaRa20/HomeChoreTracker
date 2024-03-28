@@ -15,9 +15,8 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<Home> Homes { get; set; }
         public DbSet<UserHomes> UserHomes { get; set; }
         public DbSet<HomeInvitation> HomeInvitations { get; set; }
-		public DbSet<Income> Incomes { get; set; }
-		public DbSet<Expense> Expenses { get; set; }
-        public DbSet<Advice> Advices { get; set; }
+		public DbSet<FinancialRecord> FinancialRecords { get; set; }
+		public DbSet<FinancialCategory> FinancialCategories { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<ShoppingItem> ShoppingItems { get; set; }
         public DbSet<HomeChoreTask> HomeChoreTasks { get; set; }
@@ -28,6 +27,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<Event> Events { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<TaskVote> TaskVotes { get; set; }
+        public DbSet<Advice> Advices { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,19 +52,15 @@ namespace HomeChoreTracker.Api.Database
                 .HasForeignKey(ta => ta.TaskId);
 
             modelBuilder.Entity<User>()
-                .HasMany(u => u.Incomes)
-                .WithOne(i => i.User)
-                .HasForeignKey(i => i.UserId);
-
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.Expenses)
-                .WithOne(e => e.User)
-                .HasForeignKey(e => e.UserId);
-
-            modelBuilder.Entity<User>()
                 .HasMany(u => u.CalendarEvents)
                 .WithOne(e => e.User)
                 .HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.FinancialRecords)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserId);
+
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.UserHomes)
@@ -86,6 +82,5 @@ namespace HomeChoreTracker.Api.Database
                 .WithOne(tv => tv.TaskAssignment)
                 .HasForeignKey(tv => tv.TaskAssignmentId);
         }
-
     }
 }

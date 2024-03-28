@@ -87,7 +87,35 @@ namespace HomeChoreTracker.Api.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("HomeChoreTracker.Api.Models.Expense", b =>
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.FinancialCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("HomeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FinancialCategories");
+                });
+
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.FinancialRecord", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -101,10 +129,10 @@ namespace HomeChoreTracker.Api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("HomeId")
+                    b.Property<int?>("FinancialCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SubscriptionDuration")
+                    b.Property<int?>("HomeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Time")
@@ -124,7 +152,7 @@ namespace HomeChoreTracker.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Expenses");
+                    b.ToTable("FinancialRecords");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Home", b =>
@@ -290,43 +318,6 @@ namespace HomeChoreTracker.Api.Migrations
                     b.HasIndex("InviterUserId");
 
                     b.ToTable("HomeInvitations");
-                });
-
-            modelBuilder.Entity("HomeChoreTracker.Api.Models.Income", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HomeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Incomes");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.PointsHistory", b =>
@@ -628,10 +619,21 @@ namespace HomeChoreTracker.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("HomeChoreTracker.Api.Models.Expense", b =>
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.FinancialCategory", b =>
                 {
                     b.HasOne("HomeChoreTracker.Api.Models.User", "User")
-                        .WithMany("Expenses")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.FinancialRecord", b =>
+                {
+                    b.HasOne("HomeChoreTracker.Api.Models.User", "User")
+                        .WithMany("FinancialRecords")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -667,17 +669,6 @@ namespace HomeChoreTracker.Api.Migrations
                     b.Navigation("Home");
 
                     b.Navigation("InviterUser");
-                });
-
-            modelBuilder.Entity("HomeChoreTracker.Api.Models.Income", b =>
-                {
-                    b.HasOne("HomeChoreTracker.Api.Models.User", "User")
-                        .WithMany("Incomes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Purchase", b =>
@@ -780,9 +771,7 @@ namespace HomeChoreTracker.Api.Migrations
                 {
                     b.Navigation("CalendarEvents");
 
-                    b.Navigation("Expenses");
-
-                    b.Navigation("Incomes");
+                    b.Navigation("FinancialRecords");
 
                     b.Navigation("UserHomes");
                 });

@@ -46,7 +46,7 @@
 							@foreach (var transfer in Model.TransferHistory)
 							{
 								<tr class="text-center">
-									<td>@transfer.Type</td>
+									<td>@transfer.Data.Category.Name</td>
 									<td>@transfer.Data.Title</td>
 									<td>@transfer.Data.Time.ToString("MM/dd/yyyy")</td>
 									<td class="@((transfer.Type == "Expense") ? "text-danger" : "text-success")">
@@ -184,7 +184,6 @@
 				<p id="expenseDescription"></p>
 				<p id="expenseTime"></p>
 				<p id="expenseType"></p>
-				<p id="expenseSubscriptionDuration"></p>
 				<p id="expenseHome"></p>
 			</div>
 			<div class="modal-footer">
@@ -226,23 +225,27 @@
 						<input asp-for="EditIncome.Time" name="EditIncomeTime" type="datetime-local" class="form-control" id="editIncomeTime">
 						<span id="editIncomeTimeError" class="text-danger"></span>
 					</div>
-					<div class="form-group">
-						<label for="editIncomeType">Income Type</label>
-						<select class="form-control" id="editIncomeType" name="EditIncomeType" asp-for="EditIncome.Type" required>
-							<option value="0">Salary</option>
-							<option value="1">Bonus</option>
-							<option value="2">Investment</option>
-							<option value="3">Rental</option>
-							<option value="4">Freelance</option>
-							<option value="5">Gift</option>
-							<option value="6">Pension</option>
-							<option value="7">DailyAllowance</option>
-							<option value="8">Other</option>
-						</select>
+					@if (Model.FinancialCategoriesIncome != null)
+					{
+						<div class="form-group">
+							<label for="editIncomeType">Type</label>
+							<select class="form-control" id="editIncomeType" name="EditIncomeType" onchange="toggleIncomeNewTypeField()">
+								<option value="0">Create new type</option>
+								@foreach (var home in Model.FinancialCategoriesIncome)
+								{
+									<option value="@home.Id">@home.Name</option>
+								}
+							</select>
+						</div>
+					}
+					<div class="form-group" id="newIncomeTypeField" style="display:none;">
+						<label for="NewType">New Type</label>
+						<input type="text" class="form-control" id="NewIncomeType" name="NewIncomeFinancialCategory">
 					</div>
+
 					<div class="form-group">
 						<label for="editIncomeHome">Home</label>
-						<select class="form-control" id="editIncomeHome" name="EditIncomeHome" required>
+						<select class="form-control" id="editIncomeHome" name="EditIncomeHome" >
 							<option value="">Select a home</option>
 							@foreach (var home in Model.Homes)
 							{
@@ -289,24 +292,26 @@
 						<input asp-for="EditExpense.Time" name="EditExpenseTime" type="datetime-local" class="form-control" id="editExpenseTime">
 						<span id="editExpenseTimeError" class="text-danger"></span>
 					</div>
-					<div class="form-group">
-						<label for="editExpenseType">Expense Type</label>
-						<select class="form-control" id="editExpenseType" name="EditExpenseType" asp-for="EditExpense.Type" required>
-							<option value="0">Shopping</option>
-							<option value="1">Rent</option>
-							<option value="2">Food</option>
-							<option value="3">Transport</option>
-							<option value="4">Utilities</option>
-							<option value="5">Entertainment</option>
-							<option value="6">DinnerOut</option>
-							<option value="7">Travel</option>
-							<option value="8">Health</option>
-							<option value="8">Education</option>
-							<option value="8">Subscription</option>
-							<option value="8">Other</option>
-							<option value="8">Transaction</option>
-						</select>
+
+					@if (Model.FinancialCategoriesExpense != null)
+					{
+						<div class="form-group">
+							<label for="editExpenseType">Type</label>
+							<select class="form-control" id="editExpenseType" name="EditExpenseType" onchange="toggleExpenseNewTypeField()">
+								<option value="0">Create new type</option>
+								@foreach (var home in Model.FinancialCategoriesExpense)
+								{
+									<option value="@home.Id">@home.Name</option>
+								}
+							</select>
+						</div>
+					}
+
+					<div class="form-group" id="newExpenseTypeField" style="display:none;">
+						<label for="NewType">New Type</label>
+						<input type="text" class="form-control" id="NewExpenseType" name="NewExpenseFinancialCategory">
 					</div>
+			
 					<div class="form-group">
 						<label for="editExpenseHome">Home</label>
 						<select class="form-control" id="editExpenseHome" name="EditExpenseHome">
@@ -317,16 +322,39 @@
 							}
 						</select>
 					</div>
-					<div class="form-group" method="post">
-						<label for="editExpenseSubscriptionDuration">Subscription Duration (count of month)</label>
-						<input asp-for="EditExpense.SubscriptionDuration" name="EditExpenseSubscriptionDuration" min="0" step="1" type="number" class="form-control" id="editExpenseSubscriptionDuration" required>
-					</div>
+				
 					<button type="submit" class="btn btn-primary">Save changes</button>
 				</form>
 			</div>
 		</div>
 	</div>
 </div>
+<script>
+	function toggleIncomeNewTypeField() {
+		var selectedValue = $('#editIncomeType').val();
+		var newTypeField = $('#newIncomeTypeField');
+
+		if (selectedValue === "0") {
+			newTypeField.show();
+		} else {
+			newTypeField.hide();
+		}
+	}
+
+	function toggleExpenseNewTypeField() {
+		var selectedValue = $('#editExpenseType').val();
+		var newTypeField = $('#newExpenseTypeField');
+
+		if (selectedValue === "0") {
+			newTypeField.show();
+		} else {
+			newTypeField.hide();
+		}
+	}
+</script>
+
+
+
 <script>
 	function validateEditIncomeForm() {
 		var title = $('#editIncomeTitle').val();
@@ -418,7 +446,7 @@
 				$('#incomeAmount').text("Amount: " + data.amount);
 				$('#incomeDescription').text("Description: " + (data.description || "-"));
 				$('#incomeTime').text("Time: " + data.time);
-				$('#incomeType').text("Type: " + data.type);
+				$('#incomeType').text("Type: " + data.financialCategory);
 				$('#incomeHome').text("Home: " + data.home);
 
 				$('#detailIncomeModal').modal('show');
@@ -434,13 +462,13 @@
 			url: '/Finance/History?handler=ExpenseDetail&id=' + choreId,
 			type: 'GET',
 			success: function (data) {
+				console.log(data)
 				$('#detailExpenseModalLabel').text("Detailed info: " + data.title);
 				$('#expenseTitle').text("Title: " + data.title);
 				$('#expenseAmount').text("Amount: " + data.amount);
 				$('#expenseDescription').text("Description: " + data.description);
 				$('#expenseTime').text("Time: " + data.time);
-				$('#expenseType').text("Type: " + data.type);
-				$('#expenseSubscriptionDuration').text("SubscriptionDuration (month count): " + data.subscriptionDuration);
+				$('#expenseType').text("Type: " + data.financialCategory);
 				$('#expenseHome').text("Home: " + data.home);
 				$('#detailExpenseModal').modal('show');
 			},
@@ -463,14 +491,22 @@
 					$('#editIncomeAmount').val(data.amount);
 					$('#editIncomeTime').val(data.time);
 
-					var incomeTypeText = data.type;
 					$('#editIncomeType option').filter(function () {
-						return $(this).text() === incomeTypeText;
+						return $(this).val() == data.financialCategoryId;
 					}).prop('selected', true);
 
 					$('#editIncomeHome option').filter(function () {
 						return $(this).val() == data.homeId;
 					}).prop('selected', true);
+
+					var newTypeField = document.getElementById('newIncomeTypeField');
+
+					// If the selected category ID is "0" (string), show the new type field; otherwise, hide it
+					if (data.financialCategoryId === "0") {
+						newTypeField.style.display = 'block';
+					} else {
+						newTypeField.style.display = 'none';
+					}
 
 					$('#editIncomeModal').modal('show');
 				} else {
@@ -496,16 +532,24 @@
 					$('#editExpenseDescription').val(data.description);
 					$('#editExpenseAmount').val(data.amount);
 					$('#editExpenseTime').val(data.time);
-					$('#editExpenseSubscriptionDuration').val(data.subscriptionDuration);
-
-					var expenseTypeText = data.type;
-					$('#editIncomeType option').filter(function () {
-						return $(this).text() === expenseTypeText;
-					}).prop('selected', true);
 
 					$('#editExpenseHome option').filter(function () {
 						return $(this).val() == data.homeId;
 					}).prop('selected', true);
+
+					$('#editExpenseType option').filter(function () {
+						return $(this).val() == data.financialCategoryId;
+					}).prop('selected', true);
+					
+
+					var newTypeField = document.getElementById('newExpenseTypeField');
+
+					// If the selected category ID is "0" (string), show the new type field; otherwise, hide it
+					if (data.financialCategoryId === "0") {
+						newTypeField.style.display = 'block';
+					} else {
+						newTypeField.style.display = 'none';
+					}
 
 					$('#editExpenseModal').modal('show');
 				} else {

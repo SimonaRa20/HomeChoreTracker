@@ -23,6 +23,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 		public ExpenseImageRequest CreateNewExpense { get; set; }
 
 		public List<HomeResponse> Homes { get; set; }
+		public List<FinancialCategory> FinancialCategories { get; set; }
 
 		public CreateExpenseFromImageModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
 		{
@@ -50,7 +51,15 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 
 				if (response.IsSuccessStatusCode)
 				{
-					Homes = await JsonSerializer.DeserializeAsync<List<HomeResponse>>(await response.Content.ReadAsStreamAsync());
+					Homes = await response.Content.ReadFromJsonAsync<List<HomeResponse>>();
+					var apiUrlCategories = $"{_config["ApiUrl"]}/Finance/CategoriesExpense";
+
+					var responseCategories = await httpClient.GetAsync(apiUrlCategories);
+
+					if (responseCategories.IsSuccessStatusCode)
+					{
+						FinancialCategories = await responseCategories.Content.ReadFromJsonAsync<List<FinancialCategory>>();
+					}
 				}
 				else
 				{
@@ -79,11 +88,16 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 
 					using (var content = new MultipartFormDataContent())
 					{
-						content.Add(new StringContent(((int)CreateNewExpense.Type).ToString()), "Type");
-
 						if (CreateNewExpense.HomeId.HasValue)
 						{
 							content.Add(new StringContent(CreateNewExpense.HomeId.Value.ToString()), "HomeId");
+						}
+
+						// Add FinancialCategoryId and NewFinancialCategory to the form data
+						content.Add(new StringContent(CreateNewExpense.FinancialCategoryId.ToString()), "FinancialCategoryId");
+						if (CreateNewExpense.FinancialCategoryId == 0 && !string.IsNullOrEmpty(CreateNewExpense.NewFinancialCategory))
+						{
+							content.Add(new StringContent(CreateNewExpense.NewFinancialCategory), "NewFinancialCategory");
 						}
 
 						var imageFile = Request.Form.Files["ExpenseImage"];

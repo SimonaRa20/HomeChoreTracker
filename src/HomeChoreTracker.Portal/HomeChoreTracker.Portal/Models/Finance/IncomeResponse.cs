@@ -8,7 +8,9 @@ namespace HomeChoreTracker.Portal.Models.Finance
         public decimal Amount { get; set; }
         public string? Description { get; set; }
         public DateTime Time { get; set; }
-        public IncomeType Type { get; set; }
+        public FinancialType Type { get; set; }
+        public string? FinancialCategory { get; set; }
+        public int FinancialCategoryId { get; set; }
         public int? HomeId { get; set; }
     }
 }

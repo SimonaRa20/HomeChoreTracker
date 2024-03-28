@@ -56,14 +56,21 @@
 						<span id="timeErrorMessage" class="text-danger" style="display:none;">Time is required</span>
 					</div>
 					<div class="form-group">
-						<label for="Type">Income Type</label>
-						<select class="form-control" id="Type" name="CreateNewIncome.Type" asp-for="CreateNewIncome.Type" required>
-							@foreach (var type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.IncomeType)))
+						<label for="TypeId">Type</label>
+						<select class="form-control" id="TypeId" name="CreateNewIncome.FinancialCategoryId" asp-for="CreateNewIncome.FinancialCategoryId">
+							<option value="0">Create new type</option>
+							@if (Model.FinancialCategories != null)
 							{
-								<option value="@((int)type)">@type</option>
+								@foreach (var category in Model.FinancialCategories)
+								{
+									<option value="@category.Id">@category.Name</option>
+								}
 							}
 						</select>
-						<span asp-validation-for="CreateNewIncome.Type" class="text-danger"></span>
+					</div>
+					<div class="form-group" id="newTypeField">
+						<label for="NewType">New Type</label>
+						<input type="text" class="form-control" id="NewType" name="CreateNewIncome.NewFinancialCategory" asp-for="CreateNewIncome.NewFinancialCategory">
 					</div>
 
 					<div class="form-group">
@@ -83,6 +90,19 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	document.getElementById('TypeId').addEventListener('change', function () {
+		var selectedCategoryId = this.value;
+		var newTypeField = document.getElementById('newTypeField');
+
+		if (selectedCategoryId === "0") {
+			newTypeField.style.display = 'block';
+		} else {
+			newTypeField.style.display = 'none';
+		}
+	});
+</script>
 <script>
 	// Function to get today's date and time in the required format
 	function getTodayISOString() {
