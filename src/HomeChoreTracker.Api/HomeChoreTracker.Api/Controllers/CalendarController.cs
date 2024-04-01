@@ -263,21 +263,19 @@ public class CalendarController : Controller
     {
         List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
 
-        TimeSpan lunchStart = TimeSpan.FromHours(user.StartLunchHour);
-        TimeSpan lunchEnd = TimeSpan.FromHours(user.EndLunchHour);
-        TimeSpan nightEnd = TimeSpan.FromHours(user.EndDayHour);
+        TimeSpan nightEnd = TimeSpan.FromHours(user.EndDayTime.Hours);
 
         if (events == null || events.Count == 0)
         {
-            DateTime dayStart = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.StartDayHour, user.StartDayMinutes, 0);
-            DateTime dayEnd = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.EndDayHour, user.EndDayMinutes, 0);
+            DateTime dayStart = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.StartDayTime.Hours, user.StartDayTime.Minutes, 0);
+            DateTime dayEnd = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.EndDayTime.Hours, user.EndDayTime.Hours, 0);
             suitableIntervals.Add((dayStart, dayEnd));
         }
         else
         {
             events = events.Where(e => e.StartDate > StartTime).OrderBy(e => e.StartDate).ToList();
 
-            List<(DateTime start, DateTime end)> freeIntervals = GetFreeIntervals(events, StartTime, lunchStart, lunchEnd, nightEnd);
+            List<(DateTime start, DateTime end)> freeIntervals = GetFreeIntervals(events, StartTime, nightEnd);
 
             foreach (var interval in freeIntervals)
             {
@@ -290,7 +288,7 @@ public class CalendarController : Controller
 
         suitableIntervals = suitableIntervals
             .Where(i => (i.end - i.start).TotalMinutes >= GetMinutesFromTimeLong(choreTime))
-            .Where(i => i.start.TimeOfDay >= TimeSpan.FromHours(user.StartDayHour))
+            .Where(i => i.start.TimeOfDay >= TimeSpan.FromHours(user.StartDayTime.Hours))
             .ToList();
 
         foreach (var assignedTask in assignedTasks)
@@ -334,7 +332,7 @@ public class CalendarController : Controller
     }
 
 
-    private List<(DateTime start, DateTime end)> GetFreeIntervals(List<Event> events, DateTime startTime, TimeSpan lunchStart, TimeSpan lunchEnd, TimeSpan nightEnd)
+    private List<(DateTime start, DateTime end)> GetFreeIntervals(List<Event> events, DateTime startTime, TimeSpan nightEnd)
     {
         List<(DateTime start, DateTime end)> freeIntervals = new List<(DateTime start, DateTime end)>();
 
@@ -343,7 +341,7 @@ public class CalendarController : Controller
         {
             DateTime nextTime = currentTime.AddHours(1);
 
-            if (!(currentTime.TimeOfDay >= lunchStart && currentTime.TimeOfDay < lunchEnd) && currentTime.TimeOfDay < nightEnd)
+            if (currentTime.TimeOfDay < nightEnd)
             {
                 freeIntervals.Add((currentTime, nextTime));
             }
@@ -361,15 +359,15 @@ public class CalendarController : Controller
 
     private bool IsIntervalSuitable(DateTime start, DateTime end, User user)
     {
-        if (user.Morning && start.TimeOfDay < TimeSpan.FromHours(12))
+        if (start.TimeOfDay < TimeSpan.FromHours(12))
         {
             return true;
         }
-        if (user.MiddleDay && start.TimeOfDay >= TimeSpan.FromHours(12) && start.TimeOfDay < TimeSpan.FromHours(18))
+        if (start.TimeOfDay >= TimeSpan.FromHours(12) && start.TimeOfDay < TimeSpan.FromHours(18))
         {
             return true;
         }
-        if (user.Evening && end.TimeOfDay >= TimeSpan.FromHours(18))
+        if (end.TimeOfDay >= TimeSpan.FromHours(18))
         {
             return true;
         }

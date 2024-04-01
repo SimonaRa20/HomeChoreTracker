@@ -28,6 +28,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<TaskVote> TaskVotes { get; set; }
         public DbSet<Advice> Advices { get; set; }
+        public DbSet<BusyInterval> BusyIntervals { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,6 +62,10 @@ namespace HomeChoreTracker.Api.Database
                 .WithOne(e => e.User)
                 .HasForeignKey(e => e.UserId);
 
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.BusyIntervals)
+               .WithOne(e => e.User)
+               .HasForeignKey(e => e.UserId);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.UserHomes)

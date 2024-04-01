@@ -91,17 +91,9 @@ namespace HomeChoreTracker.Api.Controllers
 
                 user.UserName = updatedProfile.UserName;
                 user.Email = updatedProfile.Email;
-                user.StartDayHour = updatedProfile.StartDayHour;
-                user.StartDayMinutes = updatedProfile.StartDayMinutes;
-                user.StartLunchHour = updatedProfile.StartLunchHour;
-                user.StartLunchMinutes = updatedProfile.StartLunchMinutes;
-                user.EndLunchHour = updatedProfile.EndLunchHour;
-                user.EndLunchMinutes = updatedProfile.EndLunchMinutes;
-                user.EndDayHour = updatedProfile.EndDayHour;
-                user.EndDayMinutes = updatedProfile.EndDayMinutes;
-                user.Morning = updatedProfile.Morning;
-                user.MiddleDay = updatedProfile.MiddleDay;
-                user.Evening = updatedProfile.Evening;
+                user.StartDayTime = updatedProfile.StartDayTime;
+                user.EndDayTime = updatedProfile.EndDayTime;
+
 
                 await _userRepository.UpdateUser(user);
 

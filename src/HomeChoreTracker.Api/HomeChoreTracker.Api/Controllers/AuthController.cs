@@ -67,17 +67,8 @@ namespace HomeChoreTracker.Api.Controllers
 
                 User userDto = _mapper.Map<User>(user);
                 userDto.Role = Role.User;
-                userDto.Morning = true;
-                userDto.MiddleDay = true;
-                userDto.Evening = true;
-                userDto.StartDayHour = 8;
-                userDto.StartDayMinutes = 0;
-                userDto.StartLunchHour = 12;
-                userDto.StartLunchMinutes = 0;
-                userDto.EndLunchHour = 13;
-                userDto.EndLunchMinutes = 0;
-                userDto.EndDayHour = 22;
-                userDto.EndDayMinutes = 0;
+                userDto.StartDayTime = new TimeSpan(8, 0, 0);
+                userDto.EndDayTime = new TimeSpan(22, 0, 0);
                 await _authRepository.AddUser(userDto);
                 await _authRepository.Save();
 

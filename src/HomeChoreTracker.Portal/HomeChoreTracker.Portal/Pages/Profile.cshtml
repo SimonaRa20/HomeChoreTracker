@@ -13,72 +13,23 @@
                 <form method="post" asp-page="./Profile">
                     <div class="form-group">
                         <label for="UserName">User Name:</label>
-                        <input type="text" class="form-control" id="UserName" name="UserName" value="@Model.UserProfile.UserName" />
+                        <input type="text" class="form-control" id="UserName" name="UserProfile.UserName" value="@Model.UserProfile.UserName" />
                     </div>
                     <div class="form-group">
                         <label for="Email">Email:</label>
-                        <input type="text" class="form-control" id="Email" name="Email" value="@Model.UserProfile.Email" />
+                        <input type="text" class="form-control" id="Email" name="UserProfile.Email" value="@Model.UserProfile.Email" />
                     </div>
                     <div class="form-group">
-                        <label>Home Chore Settings:</label><br />
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="Morning" id="morningCheckbox" value="true" @(Model.UserProfile.Morning ? "checked" : "") />
-                            <label class="form-check-label" for="morningCheckbox">Morning</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="MiddleDay" id="middleDayCheckbox" value="true" @(Model.UserProfile.MiddleDay ? "checked" : "") />
-                            <label class="form-check-label" for="middleDayCheckbox">Middle Day</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="Evening" id="eveningCheckbox" value="true" @(Model.UserProfile.Evening ? "checked" : "") />
-                            <label class="form-check-label" for="eveningCheckbox">Evening</label>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Start Day:</label>
-                        <div class="col-sm-10">
+                        <label>Day start and end time:</label>
+                        <div>
                             <div class="input-group">
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartDayHour" min="0" max="23" step="1" style="width: 24px;" />
-                                <span class="text" style="margin-top: 2px;">h</span>
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartDayMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
-                                <span class="text" style="margin-top: 2px;">min</span>
+                                <span class="text" style="margin-top: 2px;">Start time:</span>
+                                <input type="time" class="form-control form-control-sm" id="StartDayTime" name="UserProfile.StartDayTime" value="@Model.UserProfile.StartDayTime.ToString(@"hh\:mm")" style="width: 24px;" />
+                                <span class="text" style="margin-top: 2px;">End time:</span>
+                                <input type="time" class="form-control form-control-sm" id="EndDayTime" name="UserProfile.EndDayTime" value="@Model.UserProfile.EndDayTime.ToString(@"hh\:mm")" style="width: 24px; margin-left: 24px;" />
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Start Lunch:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartLunchHour" min="0" max="23" step="1" style="width: 24px;" />
-                                <span class="text" style="margin-top: 2px;">h</span>
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.StartLunchMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
-                                <span class="text" style="margin-top: 2px;">min</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">End Lunch:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndLunchHour" min="0" max="23" step="1" style="width: 24px;" />
-                                <span class="text" style="margin-top: 2px;">h</span>
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndLunchMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
-                                <span class="text" style="margin-top: 2px;">min</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">End Day:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndDayHour" min="0" max="23" step="1" style="width: 24px;" />
-                                <span class="text" style="margin-top: 2px;">h</span>
-                                <input type="number" class="form-control form-control-sm" asp-for="UserProfile.EndDayMinutes" min="0" max="59" step="1" style="width: 24px; margin-left: 24px;" />
-                                <span class="text" style="margin-top: 2px;">min</span>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="text-danger" style="padding-left: 0; margin-left: 0;">
                         @if (!ModelState.IsValid)
                         {
@@ -95,6 +46,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Update Profile</button>
                 </form>
+
             </div>
         </div>
     </div>
