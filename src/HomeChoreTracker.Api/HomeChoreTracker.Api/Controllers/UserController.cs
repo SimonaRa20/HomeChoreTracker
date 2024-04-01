@@ -27,12 +27,13 @@ namespace HomeChoreTracker.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetUserData(int id)
+        public async Task<IActionResult> GetUserData()
         {
             try
             {
+                int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
                 var user = await _userRepository.GetUserById(id);
 
                 if (user == null)
@@ -50,12 +51,13 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        [HttpPut("Update/{id}")]
+        [HttpPut("Update")]
         [Authorize]
-        public async Task<IActionResult> UpdateUserData(int id, UserGetResponse updatedProfile)
+        public async Task<IActionResult> UpdateUserData(UserGetResponse updatedProfile)
         {
             try
             {
+                int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
                 var user = await _userRepository.GetUserById(id);
 
                 if (user == null)

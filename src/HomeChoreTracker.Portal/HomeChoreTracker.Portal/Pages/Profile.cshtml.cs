@@ -27,9 +27,8 @@ namespace HomeChoreTracker.Portal.Pages
                 using (var httpClient = _httpClientFactory.CreateClient())
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                    var apiUrl = _config["ApiUrl"] + "/User/" + userId;
+                    var apiUrl = _config["ApiUrl"] + "/User";
 
                     var response = await httpClient.GetAsync(apiUrl);
 
@@ -56,9 +55,8 @@ namespace HomeChoreTracker.Portal.Pages
                 using (var httpClient = _httpClientFactory.CreateClient())
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                    var apiUrl = _config["ApiUrl"] + "/User/Update/" + userId;
+                    var apiUrl = _config["ApiUrl"] + "/User/Update";
 
 
                     var response = await httpClient.PutAsJsonAsync(apiUrl, UserProfile);
