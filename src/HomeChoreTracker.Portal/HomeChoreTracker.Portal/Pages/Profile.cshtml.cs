@@ -1,4 +1,6 @@
+using HomeChoreTracker.Portal.Models.Forum;
 using HomeChoreTracker.Portal.Models.Profile;
+using HomeChoreTracker.Portal.Models.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
@@ -12,6 +14,11 @@ namespace HomeChoreTracker.Portal.Pages
 
         [BindProperty]
         public UserProfileResponse UserProfile { get; set; }
+
+        [BindProperty]
+        public BusyIntervalRequest CreateBusyInterval { get; set; }
+
+        public List<BusyIntervalResponse> BusyIntervals { get; set; }
 
         public ProfileModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -35,6 +42,15 @@ namespace HomeChoreTracker.Portal.Pages
                     if (response.IsSuccessStatusCode)
                     {
                         UserProfile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
+
+                        var apiUrlInterval = _config["ApiUrl"] + "/User/BusyIntervals";
+
+                        var responseInterval = await httpClient.GetAsync(apiUrlInterval);
+
+                        if (responseInterval.IsSuccessStatusCode)
+                        {
+                            BusyIntervals = await responseInterval.Content.ReadFromJsonAsync<List<BusyIntervalResponse>>();
+                        }
                     }
                     else
                     {
@@ -70,12 +86,68 @@ namespace HomeChoreTracker.Portal.Pages
                         var errorMessage = await response.Content.ReadAsStringAsync();
                         ModelState.AddModelError(string.Empty, errorMessage);
                     }
-                    return Page();
+                    return await OnGetAsync();
                 }
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> OnPostNewBusyIntervalAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            try
+            {
+                var token = User.FindFirstValue("Token");
+                using (var httpClient = _httpClientFactory.CreateClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var apiUrl = _config["ApiUrl"] + "/User/BusyInterval";
+
+                    var response = await httpClient.PostAsJsonAsync(apiUrl, CreateBusyInterval);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return await OnGetAsync();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
+                        return Page();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                return Page();
+            }
+        }
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var apiUrl = $"{_config["ApiUrl"]}/User/BusyInterval/{id}";
+
+                var response = await httpClient.DeleteAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToPage();
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
+                    return Page();
+                }
             }
         }
     }

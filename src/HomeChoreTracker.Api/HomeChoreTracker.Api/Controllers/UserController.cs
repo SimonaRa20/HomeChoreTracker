@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Contracts.Forum;
 using HomeChoreTracker.Api.Contracts.User;
 using HomeChoreTracker.Api.Interfaces;
+using HomeChoreTracker.Api.Models;
 using HomeChoreTracker.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +51,89 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("BusyIntervals")]
+        [Authorize]
+        public async Task<IActionResult>GetUserBusyItervals()
+        {
+            int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            List<BusyInterval> busyIntervals = await _userRepository.GetUserBusyIntervals(id);
+
+            List<BusyIntervalResponse> results = new List<BusyIntervalResponse>();
+
+            foreach(BusyInterval busyInterval in busyIntervals)
+            {
+                BusyIntervalResponse response = new BusyIntervalResponse
+                {
+                    Id = busyInterval.Id,
+                    Day = busyInterval.Day,
+                    StartTime = busyInterval.StartTime,
+                    EndTime = busyInterval.EndTime,
+                };
+                results.Add(response);
+            }
+
+            return Ok(results);
+        }
+
+        [HttpPost("BusyInterval")]
+        [Authorize]
+        public async Task<IActionResult> AddBusyInterval(BusyIntervalRequest interval)
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            var user = await _userRepository.GetUserById(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var busyInterval = new BusyInterval
+            {
+                Day = interval.Day,
+                StartTime = interval.StartTime,
+                EndTime  = interval.EndTime,
+                UserId = userId,
+                User = user,
+            };
+
+            await _userRepository.AddBusyInterval(busyInterval);
+            return Ok("Interval added successfully");
+        }
+
+        [HttpDelete("BusyInterval/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteBusyIntervalById(int id)
+        {
+            await _userRepository.DeleteInterval(id);
+            return Ok($"Busy interval with ID {id} deleted successfully");
+        }
+
+        [HttpPut("BusyInterval/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateBusyInterval(int id, BusyIntervalRequest adviceRequest)
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            var intervalToUpdate = await _userRepository.GetBusyIntervalById(id);
+
+            if (intervalToUpdate == null)
+            {
+                return NotFound($"Advice with ID {id} not found");
+            }
+
+            if (intervalToUpdate.UserId != userId)
+            {
+                return Unauthorized("You do not have permission to update this advice");
+            }
+
+            intervalToUpdate.Day = adviceRequest.Day;
+            intervalToUpdate.StartTime = adviceRequest.StartTime;
+            intervalToUpdate.EndTime = adviceRequest.EndTime;
+
+            await _userRepository.UpdateInterval(intervalToUpdate);
+
+            return Ok("Advice updated successfully");
         }
 
         [HttpPut("Update")]

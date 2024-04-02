@@ -24,7 +24,7 @@ namespace HomeChoreTracker.Api.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<IActionResult> AddIncome(AdviceRequest adviceRequest)
+		public async Task<IActionResult> AddAdvice(AdviceRequest adviceRequest)
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 			var advice = new Advice

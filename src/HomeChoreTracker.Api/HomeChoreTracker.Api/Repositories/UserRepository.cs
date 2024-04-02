@@ -40,5 +40,41 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<List<BusyInterval>> GetUserBusyIntervals(int userId)
+        {
+            var user = await _dbContext.Users
+                .Include(u => u.BusyIntervals)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            return user.BusyIntervals.ToList();
+        }
+
+        public async Task AddBusyInterval (BusyInterval interval)
+        {
+            await _dbContext.BusyIntervals.AddAsync(interval);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteInterval(int id)
+        {
+            BusyInterval interval = await _dbContext.BusyIntervals.FindAsync(id);
+            if (interval != null)
+            {
+                _dbContext.BusyIntervals.Remove(interval);
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<BusyInterval> GetBusyIntervalById(int id)
+        {
+            return await _dbContext.BusyIntervals.FindAsync(id);
+        }
+
+
+        public async Task UpdateInterval(BusyInterval interval)
+        {
+            _dbContext.BusyIntervals.Update(interval);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

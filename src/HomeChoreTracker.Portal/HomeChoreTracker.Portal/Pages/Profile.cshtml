@@ -44,10 +44,177 @@
                             </ul>
                         }
                     </div>
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-sm float-left mb-2">Update Profile</button>
+                    </div>
                 </form>
+                </div>
+                </div>
+                </div>
 
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card border-left-secondary">
+                            <div class="card-body">
+                <h4>For home chores assignment busy intervals</h4>
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary btn-sm float-right mb-2" data-toggle="modal" data-target="#addIntervalModal">Add new busy interval</button>
+                </div>
+                <div class="modal fade" id="addIntervalModal" tabindex="-1" role="dialog" aria-labelledby="addIntervalModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addIntervalModalLabel">Add New Busy Interval</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="modal-body">
+                                    <form method="post" asp-page-handler="NewBusyInterval" id="newBusyIntervalForm">
+                                        <div class="form-group">
+                                            <label for="DayOfWeek">Day of Week:</label>
+                                            <select class="form-control" id="DayOfWeek" name="CreateBusyInterval.Day">
+                                                <option value="1">Monday</option>
+                                                <option value="2">Tuesday</option>
+                                                <option value="3">Wednesday</option>
+                                                <option value="4">Thursday</option>
+                                                <option value="5">Friday</option>
+                                                <option value="6">Saturday</option>
+                                                <option value="0">Sunday</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="StartTime">Start Time:</label>
+                                            <input type="time" class="form-control" id="StartTime" name="CreateBusyInterval.StartTime" asp-for="CreateBusyInterval.StartTime" />
+                                            <span asp-validation-for="CreateBusyInterval.StartTime" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="EndTime">End Time:</label>
+                                            <input type="time" class="form-control" id="EndTime" name="CreateBusyInterval.EndTime" asp-for="CreateBusyInterval.EndTime" />
+                                            <span asp-validation-for="CreateBusyInterval.EndTime" class="text-danger"></span>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" id="addIntervalButton">Add</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="collapse show">
+                    <div class="card-body">
+
+                        @if (Model.BusyIntervals != null && Model.BusyIntervals.Any())
+                        {
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Start time</th>
+                                        <th>End time</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
+                                    {
+                                        <tr>
+                                            <td>@dayOfWeek</td>
+                                            <td>
+                                                @foreach (var interval in Model.BusyIntervals.Where(i => i.Day == dayOfWeek))
+                                                {
+                                                    @interval.StartTime <br />
+                                                }
+                                            </td>
+                                            <td>
+                                                @foreach (var interval in Model.BusyIntervals.Where(i => i.Day == dayOfWeek))
+                                                {
+                                                    @interval.EndTime <br />
+                                                }
+                                            </td>
+                                            <td>
+                                                @foreach (var interval in Model.BusyIntervals.Where(i => i.Day == dayOfWeek))
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-edit" style="margin-bottom:-8px; margin-top:-8px" data-target="#DeleteModal-@interval.Id"><i class="fas fa-pencil-alt"></i></button>
+
+
+                                                    <button type="button" class="btn btn-sm btn-delete" data-toggle="modal" data-target="#DeleteModal-@interval.Id"><i class="fas fa-trash-alt"></i></button>
+                                                    <div class="modal fade" id="DeleteModal-@interval.Id" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel-@interval.Id" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Delete Confirmation</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p>Are you sure you want to delete this '@interval.Day, @interval.StartTime / @interval.EndTime' busy interval?</p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                                    <form method="post" asp-page-handler="Delete" asp-route-id="@interval.Id">
+                                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br />
+                                                }
+                                            </td>
+                                          
+                                        </tr>
+                                      
+                                    }
+                                </tbody>
+                            </table>
+
+                        }
+                        else
+                        {
+                            <p>No home chore bases found.</p>
+                        }
+                        </div>
             </div>
         </div>
     </div>
 </div>
+
+
+    <script>
+        $(function () {
+            // Custom validation function
+            function validateForm() {
+                var isValid = true;
+                var startTime = $('#StartTime').val();
+                var endTime = $('#EndTime').val();
+
+                // Check if start time is greater than end time
+                if (startTime >= endTime) {
+                    $('#EndTime').next('.text-danger').text('End time must be greater than start time.');
+                    isValid = false;
+                } else {
+                    $('#EndTime').next('.text-danger').text('');
+                }
+
+                return isValid;
+            }
+
+            // On click of the Add button
+            $('#addIntervalButton').click(function () {
+                // Clear previous validation errors
+                $('.text-danger').text('');
+
+                // Validate the form
+                if (validateForm()) {
+                    // Submit the form
+                    $('#newBusyIntervalForm').submit();
+                }
+            });
+        });
+    </script>
+    In this script:
