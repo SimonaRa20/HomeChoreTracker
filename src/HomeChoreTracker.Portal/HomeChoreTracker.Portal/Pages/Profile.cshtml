@@ -139,8 +139,37 @@
                                             <td>
                                                 @foreach (var interval in Model.BusyIntervals.Where(i => i.Day == dayOfWeek))
                                                 {
-                                                    <button type="button" class="btn btn-sm btn-edit" style="margin-bottom:-8px; margin-top:-8px" data-target="#DeleteModal-@interval.Id"><i class="fas fa-pencil-alt"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-edit" style="margin-bottom:-8px; margin-top:-8px" data-toggle="modal" data-target="#EditModal-@interval.Id"><i class="fas fa-pencil-alt"></i></button>
+                                                    <div class="modal fade" id="EditModal-@interval.Id" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel-@interval.Id" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Edit Busy Interval</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form method="post" asp-page-handler="EditBusyIntervals" id="editBusyIntervalForm-@interval.Id" onsubmit="return validateEditForm('@interval.Id');">
 
+                                                                        <input type="hidden" name="EditDay" value="@interval.Day" />
+                                                                        <input type="hidden" name="intervalId" value="@interval.Id" />
+                                                                        <div class="form-group">
+                                                                            <label for="EditStartTime">Start Time:</label>
+                                                                            <input type="time" class="form-control" id="EditStartTime-@interval.Id" name="EditStartTime" value="@interval.StartTime" />
+                                                                            <span id="editStartError-@interval.Id" class="text-danger"></span>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label for="EditEndTime">End Time:</label>
+                                                                            <input type="time" class="form-control" id="EditEndTime-@interval.Id" name="EditEndTime" value="@interval.EndTime" />
+                                                                            <span id="editEndError-@interval.Id" class="text-danger"></span>
+                                                                        </div>
+                                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                     <button type="button" class="btn btn-sm btn-delete" data-toggle="modal" data-target="#DeleteModal-@interval.Id"><i class="fas fa-trash-alt"></i></button>
                                                     <div class="modal fade" id="DeleteModal-@interval.Id" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel-@interval.Id" aria-hidden="true">
@@ -190,6 +219,7 @@
 <script>
     // Custom validation function
     function validateForm() {
+        console.log(1)
         var isValid = true;
         var startTime = $('#StartTime').val();
         var endTime = $('#EndTime').val();
@@ -201,20 +231,59 @@
         if (startTime.trim() === '') {
             $('#startError').text('Start time is required.');
             return false;
+            console.log(1)
         }
 
         if (endTime.trim() === '') {
             $('#endError').text('End time is required.');
             return false;
+            console.log(1)
         }
 
         if (startTime >= endTime) {
             $('#endError').text('End time must be greater than start time.');
             return false;
+            console.log(1)
         }
 
         // If all validations pass, submit the form
         $('#newBusyIntervalForm').submit();
+    }
+</script>
+<script>
+    // Custom validation function for edit form
+    function validateEditForm(intervalId) {
+        console.log('Start edit.');
+        var isValid = true;
+
+        var editStartTime = $('#EditStartTime-' + intervalId).val();
+        var editEndTime = $('#EditEndTime-' + intervalId).val();
+
+        $('#editStartError-' + intervalId).text('');
+        $('#editEndError-' + intervalId).text('');
+
+        // Check if start time and end time are empty
+        if (editStartTime.trim() === '') {
+            $('#editStartError-' + intervalId).text('Start time is required.');
+            isValid = false;
+            console.log('Start time is required.');
+        }
+
+        if (editEndTime.trim() === '') {
+            $('#editEndError-' + intervalId).text('End time is required.');
+            isValid = false;
+            console.log('End time is required.');
+        }
+
+        if (editStartTime >= editEndTime) {
+            $('#editEndError-' + intervalId).text('End time must be greater than start time.');
+            isValid = false;
+            console.log('End time must be greater than start time.');
+        }
+        console.log('End edit.');
+
+        // If all validations pass, submit the form
+        return isValid;
     }
 </script>
 

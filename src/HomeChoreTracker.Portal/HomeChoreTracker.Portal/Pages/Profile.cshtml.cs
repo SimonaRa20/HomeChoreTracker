@@ -1,3 +1,4 @@
+using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Forum;
 using HomeChoreTracker.Portal.Models.Profile;
 using HomeChoreTracker.Portal.Models.User;
@@ -17,6 +18,9 @@ namespace HomeChoreTracker.Portal.Pages
 
         [BindProperty]
         public BusyIntervalRequest CreateBusyInterval { get; set; }
+
+        [BindProperty]
+        public BusyIntervalRequest EditBusyInterval { get; set; }
 
         public List<BusyIntervalResponse> BusyIntervals { get; set; }
 
@@ -62,7 +66,7 @@ namespace HomeChoreTracker.Portal.Pages
             return Redirect("/");
         }
 
-       
+
         public async Task<IActionResult> OnPostAsync()
         {
             try
@@ -148,6 +152,45 @@ namespace HomeChoreTracker.Portal.Pages
                     ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
                     return Page();
                 }
+            }
+        }
+
+        public async Task<IActionResult> OnPostEditBusyIntervalsAsync(int intervalId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            try
+            {
+                var token = User.FindFirstValue("Token");
+                using (var httpClient = _httpClientFactory.CreateClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var apiUrl = _config["ApiUrl"] + $"/User/BusyInterval/{intervalId}";
+
+                    EditBusyInterval.Day = Enum.Parse<System.DayOfWeek>(Request.Form["EditDay"]);
+                    EditBusyInterval.StartTime = TimeSpan.Parse(Request.Form["EditStartTime"]);
+                    EditBusyInterval.EndTime = TimeSpan.Parse(Request.Form["EditEndTime"]);
+
+                    var response = await httpClient.PutAsJsonAsync(apiUrl, EditBusyInterval);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return await OnGetAsync();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
+                        return Page();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                return Page();
             }
         }
     }
