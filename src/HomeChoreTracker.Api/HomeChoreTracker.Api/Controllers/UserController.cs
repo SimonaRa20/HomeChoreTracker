@@ -73,6 +73,7 @@ namespace HomeChoreTracker.Api.Controllers
                 };
                 results.Add(response);
             }
+            results = results.OrderBy(r => r.Day).ThenBy(r => r.StartTime).ToList();
 
             return Ok(results);
         }
