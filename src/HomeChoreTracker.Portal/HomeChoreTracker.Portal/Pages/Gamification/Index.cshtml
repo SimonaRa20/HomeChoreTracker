@@ -22,7 +22,7 @@
 {
     <div class="row">
         <div class="col-lg-12">
-                <a class="btn btn-secondary btn-sm mb-2" href="/HomeChores"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
+                <a class="btn btn-secondary btn-sm mb-2" href="/Gamification"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Level list</a>
                 <a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
                
             <div class="card mb-4 py-3 border-left-primary">
@@ -37,6 +37,7 @@
                                     <th>Level</th>
                                     <th>Points</th>
                                     <th>Image</th>
+                                        <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,12 +57,46 @@
 
                                        
                                         <td>
-                                                <button class='btn btn-sm' onclick="DisplayDetailModal('@level.Id')">
-                                                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                            </button>
-                                                <button class='btn btn-sm' onclick="DisplayEditModal('@level.Id')">
-                                                <i class='fa fa-pencil-alt'></i>
-                                            </button>
+                                                <button type="button" class="btn btn-sm btn-edit" style="margin-bottom:-8px; margin-top:-8px" data-toggle="modal" data-target="#EditModal-@level.Id"><i class="fas fa-pencil-alt"></i></button>
+                                                <div class="modal fade" id="EditModal-@level.Id" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel-@level.Id" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Edit Level</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form method="post" asp-page-handler="EditLevel" id="editLevelForm-@level.Id" data-level-id="@level.Id" onsubmit="return validateEditForm(this);" enctype="multipart/form-data">
+                                                                    <input type="hidden" name="id" value="@level.Id" />
+                                                                    <div class="form-group">
+                                                                        <label for="EditPointsRequired">Points:</label>
+                                                                        <input type="number" class="form-control" id="EditPointsRequired-@level.Id" name="EditPointsRequired"  value="@level.PointsRequired" />
+                                                                        <span id="editPointsRequiredError-@level.Id" class="text-danger"></span>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <div>
+                                                                            @if (level.Image != null && level.Image.Length > 0)
+                                                                            {
+                                                                                <label for="EditImage">Previous image:</label>
+                                                                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(level.Image)" alt="Previous Level Image" class="img-thumbnail" style="max-height: 100px;" />
+                                                                            }
+                                                                            <div class="form-group row">
+                                                                                <label for="EditImage" class="col-sm-6 col-form-label">Set new image:</label>
+                                                                                <div class="col-sm-6">
+                                                                                    <input type="file" class="form-control-file mt-2" id="EditImage-@level.Id" name="EditImage" />
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                         </td>
                                     </tr>
                                     }
@@ -77,3 +112,34 @@
         </div>
 }
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K+1ClXaRhPU17yAPQnQA4Gn4kKgdCjP/vt3kS2uF78w=" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    function validateEditForm(form) {
+        console.log('Start edit.');
+        var isValid = true;
+
+        var id = $(form).data('level-id'); // Fetch the id from data attribute
+        var editPointsRequiredTime = $('#EditPointsRequired-' + id).val();
+
+        $('#editPointsRequiredError-' + id).text('');
+
+        // Check if start time and end time are empty
+        if (editPointsRequiredTime.trim() === '') {
+            $('#editPointsRequiredError-' + id).text('Points are required.');
+            isValid = false;
+        }
+
+        if (editPointsRequiredTime < 0) {
+            $('#editPointsRequiredError-' + id).text('Points have to be more than 0');
+            isValid = false;
+        }
+        console.log('End edit.');
+
+        // If all validations pass, submit the form
+        return isValid;
+    }
+
+
+</script>
+

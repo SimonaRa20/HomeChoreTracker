@@ -18,8 +18,8 @@
     {
         <div class="row">
             <div class="col-lg-12">
-                <a class="btn btn-secondary btn-sm mb-2" href="/HomeChores"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
-                <a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
+                <a class="btn btn-light btn-sm mb-2" href="/Gamification"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Level list</a>
+                <a class="btn btn-secondary btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
 
                 <div class="card mb-4 py-3 border-left-primary">
 
@@ -33,14 +33,15 @@
                             <div class="form-group">
                                 <label for="Points">Points</label>
                                 <input type="number" class="form-control" id="Points" name="CreateLevel.PointsRequired" asp-for="CreateLevel.PointsRequired" min="0" step="1" value="1">
-                                <span asp-validation-for="CreateLevel.PointsRequired" class="text-danger"></span>
+                                <span class="text-danger" id="points-error"></span>
                             </div>
-
                             <div class="form-group">
                                 <label for="Image">Image</label>
                                 <input type="file" class="form-control-file" id="Image" name="Image" asp-for="CreateLevel.Image" accept="image/*" />
-                                <span asp-validation-for="CreateLevel.Image" class="text-danger"></span>
+                                <span class="text-danger" id="image-error"></span>
                             </div>
+
+
                             <button type="submit" class="btn btn-primary">Create</button>
                         </form>
                     </div>
@@ -49,3 +50,32 @@
         </div>
     }
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K+1ClXaRhPU17yAPQnQA4Gn4kKgdCjP/vt3kS2uF78w=" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('form').submit(function () {
+            var isValid = true;
+
+            // Validate Points
+            var points = $('#Points').val().trim();
+            if (points === '') {
+                $('#points-error').text('Points are required.');
+                isValid = false;
+            } else {
+                $('#points-error').text('');
+            }
+
+            // Validate Image
+            var image = $('#Image').val().trim();
+            if (image === '') {
+                $('#image-error').text('Image is required.');
+                isValid = false;
+            } else {
+                $('#image-error').text('');
+            }
+
+            return isValid;
+        });
+    });
+</script>

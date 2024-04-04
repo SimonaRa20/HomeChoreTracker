@@ -15,6 +15,9 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
 
         public List<GamificationLevelResponse> LevelResponse { get; set; }
 
+        [BindProperty]
+        public GamificationLevelUpdateRequest EditLevel { get; set; }
+
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
@@ -41,6 +44,62 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
                 {
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
+            }
+        }
+
+        public async Task<IActionResult> OnPostEditLevelAsync(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            try
+            {
+                var token = User.FindFirstValue("Token");
+                using (var httpClient = _httpClientFactory.CreateClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var apiUrl = _config["ApiUrl"] + $"/Gamification/{id}";
+
+                    using (var content = new MultipartFormDataContent())
+                    {
+                        var points = int.Parse(Request.Form["EditPointsRequired"]);
+                        if (points != null)
+                        {
+                            content.Add(new StringContent(points.ToString()), "PointsRequired");
+                        }
+
+                        var imageFile = Request.Form.Files["EditImage"];
+                        if (imageFile != null)
+                        {
+                            using (var stream = new MemoryStream())
+                            {
+                                await imageFile.CopyToAsync(stream);
+                                content.Add(new ByteArrayContent(stream.ToArray()), "Image", imageFile.FileName);
+                            }
+                        }
+
+                        var response = await httpClient.PutAsync(apiUrl, content);
+
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            return await OnGetAsync();
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
+                            return Page();
+                        }
+                    }
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                return Page();
             }
         }
     }
