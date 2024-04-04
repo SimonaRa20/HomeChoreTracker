@@ -182,6 +182,28 @@ namespace HomeChoreTracker.Api.Migrations
                     b.ToTable("FinancialRecords");
                 });
 
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.GamificationLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int?>("LevelId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PointsRequired")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GamificationLevels");
+                });
+
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Home", b =>
                 {
                     b.Property<int>("Id")
@@ -190,11 +212,17 @@ namespace HomeChoreTracker.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("GamificationLevelId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GamificationLevelId")
+                        .IsUnique();
 
                     b.ToTable("Homes");
                 });
@@ -650,6 +678,17 @@ namespace HomeChoreTracker.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.Home", b =>
+                {
+                    b.HasOne("HomeChoreTracker.Api.Models.GamificationLevel", "GamificationLevel")
+                        .WithOne()
+                        .HasForeignKey("HomeChoreTracker.Api.Models.Home", "GamificationLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GamificationLevel");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.HomeChoreTask", b =>

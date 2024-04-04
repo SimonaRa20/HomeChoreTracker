@@ -91,7 +91,7 @@ namespace HomeChoreTracker.Api
 			builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
             builder.Services.AddScoped<IHomeChoreRepository, HomeChoreRepository>();
             builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
-
+            builder.Services.AddScoped<IGamificationRepository, GamificationRepository>();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())

@@ -8,5 +8,7 @@
         public List<UserHomes>? UserHomes { get; set; }
         public List<Purchase>? Purchases { get; set; }
         public List<HomeChoreTask>? Tasks { get; set; }
+        public int GamificationLevelId { get; set; }
+        public GamificationLevel GamificationLevel { get; set;}
     }
 }

@@ -16,11 +16,13 @@ namespace HomeChoreTracker.Api.Repositories
     {
         private readonly HomeChoreTrackerDbContext _dbContext;
         private readonly IUserRepository _userRepository;
+        private readonly IGamificationRepository _gamificationRepository;
 
-        public HomeRepository(HomeChoreTrackerDbContext dbContext, IUserRepository userRepository)
+        public HomeRepository(HomeChoreTrackerDbContext dbContext, IUserRepository userRepository, IGamificationRepository gamificationRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
+            _gamificationRepository = gamificationRepository;
         }
 
         public async Task CreateHome(HomeRequest homeRequest, int userId)
@@ -28,6 +30,7 @@ namespace HomeChoreTracker.Api.Repositories
             Home home = new Home
             {
                 Title = homeRequest.Title,
+                GamificationLevel = await _gamificationRepository.GetGamificationLevel(1),
             };
 
             await _dbContext.Homes.AddAsync(home);

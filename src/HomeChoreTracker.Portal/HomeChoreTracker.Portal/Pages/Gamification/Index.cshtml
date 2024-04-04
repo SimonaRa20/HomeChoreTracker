@@ -1,0 +1,79 @@
+﻿@page
+@model HomeChoreTracker.Portal.Pages.Gamification.IndexModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Home";
+}
+@section HeadContent
+{
+    <title>@ViewData["Title"] - Home Chore Tracker</title>
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet" asp-append-version="true">
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+    <!-- Add the following lines to include required Bootstrap and jQuery files -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+<body>
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    <div class="row">
+        <div class="col-lg-12">
+                <a class="btn btn-secondary btn-sm mb-2" href="/HomeChores"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
+                <a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
+               
+            <div class="card mb-4 py-3 border-left-primary">
+
+                <div class="card-body">
+
+                        @if (Model.LevelResponse != null && Model.LevelResponse.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Level</th>
+                                    <th>Points</th>
+                                    <th>Image</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    @foreach (var level in Model.LevelResponse)
+                                {
+                                    <tr>
+                                            <td>@level.LevelId</td>
+                                            <td>@level.PointsRequired</td>
+                                        <td>
+                                                @if (level.Image != null && level.Image.Length > 0)
+                                                {
+                                                    <div style="overflow: hidden; height:200px">
+                                                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(level.Image)" alt="Level Image" class="card-img-top w-100" style="object-fit: cover; height:100%" />
+                                                    </div>
+                                                }
+                                        </td>
+
+                                       
+                                        <td>
+                                                <button class='btn btn-sm' onclick="DisplayDetailModal('@level.Id')">
+                                                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                                            </button>
+                                                <button class='btn btn-sm' onclick="DisplayEditModal('@level.Id')">
+                                                <i class='fa fa-pencil-alt'></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    }
+                            </tbody>
+                        </table>
+                    }
+                    else{
+                            <p>No level found.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        </div>
+}
+</body>

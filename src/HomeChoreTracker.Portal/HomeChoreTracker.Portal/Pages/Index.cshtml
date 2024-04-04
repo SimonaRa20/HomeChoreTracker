@@ -15,7 +15,7 @@
 {
     Response.Redirect("/Auth/Login");
 }
-else
+@if (User.IsInRole("User"))
 {
     <div class="row">
         <div class="col-lg-12">
@@ -92,6 +92,10 @@ else
             </div>
         </div>
     </div>
+}
+else
+{
+    Response.Redirect("/Gamification/Index");
 }
 <script>
     $.getScript("https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js").done(function () {

@@ -29,13 +29,20 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<TaskVote> TaskVotes { get; set; }
         public DbSet<Advice> Advices { get; set; }
         public DbSet<BusyInterval> BusyIntervals { get; set; }
+        public DbSet<GamificationLevel> GamificationLevels { get; set; }
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserHomes>()
                 .HasKey(uh => new { uh.UserId, uh.HomeId });
+
+            modelBuilder.Entity<Home>()
+                .HasOne(h => h.GamificationLevel)
+                .WithOne()
+                .HasForeignKey<Home>(h => h.GamificationLevelId);
 
             modelBuilder.Entity<Home>()
                 .HasMany(h => h.Purchases)

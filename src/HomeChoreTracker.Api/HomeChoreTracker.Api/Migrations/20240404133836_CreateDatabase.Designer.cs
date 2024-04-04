@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeChoreTracker.Api.Migrations
 {
     [DbContext(typeof(HomeChoreTrackerDbContext))]
-    [Migration("20240328192625_UpdateConnection")]
-    partial class UpdateConnection
+    [Migration("20240404133836_CreateDatabase")]
+    partial class CreateDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,6 +56,33 @@ namespace HomeChoreTracker.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Advices");
+                });
+
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.BusyInterval", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BusyIntervals");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Event", b =>
@@ -158,6 +185,28 @@ namespace HomeChoreTracker.Api.Migrations
                     b.ToTable("FinancialRecords");
                 });
 
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.GamificationLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int?>("LevelId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PointsRequired")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GamificationLevels");
+                });
+
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Home", b =>
                 {
                     b.Property<int>("Id")
@@ -166,11 +215,17 @@ namespace HomeChoreTracker.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("GamificationLevelId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GamificationLevelId")
+                        .IsUnique();
 
                     b.ToTable("Homes");
                 });
@@ -545,26 +600,8 @@ namespace HomeChoreTracker.Api.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EndDayHour")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EndDayMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EndLunchHour")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EndLunchMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Evening")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("MiddleDay")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Morning")
-                        .HasColumnType("bit");
+                    b.Property<TimeSpan>("EndDayTime")
+                        .HasColumnType("time");
 
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
@@ -572,17 +609,8 @@ namespace HomeChoreTracker.Api.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StartDayHour")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StartDayMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StartLunchHour")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StartLunchMinutes")
-                        .HasColumnType("int");
+                    b.Property<TimeSpan>("StartDayTime")
+                        .HasColumnType("time");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
@@ -605,6 +633,17 @@ namespace HomeChoreTracker.Api.Migrations
                     b.HasIndex("HomeId");
 
                     b.ToTable("UserHomes");
+                });
+
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.BusyInterval", b =>
+                {
+                    b.HasOne("HomeChoreTracker.Api.Models.User", "User")
+                        .WithMany("BusyIntervals")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Event", b =>
@@ -642,6 +681,17 @@ namespace HomeChoreTracker.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeChoreTracker.Api.Models.Home", b =>
+                {
+                    b.HasOne("HomeChoreTracker.Api.Models.GamificationLevel", "GamificationLevel")
+                        .WithOne()
+                        .HasForeignKey("HomeChoreTracker.Api.Models.Home", "GamificationLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GamificationLevel");
                 });
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.HomeChoreTask", b =>
@@ -772,6 +822,8 @@ namespace HomeChoreTracker.Api.Migrations
 
             modelBuilder.Entity("HomeChoreTracker.Api.Models.User", b =>
                 {
+                    b.Navigation("BusyIntervals");
+
                     b.Navigation("CalendarEvents");
 
                     b.Navigation("FinancialRecords");

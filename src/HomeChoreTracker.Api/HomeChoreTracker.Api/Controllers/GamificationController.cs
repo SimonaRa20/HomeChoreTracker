@@ -1,0 +1,120 @@
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Contracts.Forum;
+using HomeChoreTracker.Api.Contracts.Gamification;
+using HomeChoreTracker.Api.Interfaces;
+using HomeChoreTracker.Api.Models;
+using HomeChoreTracker.Api.Repositories;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace HomeChoreTracker.Api.Controllers
+{
+    [Route("[controller]")]
+    [ApiController]
+    public class GamificationController : ControllerBase
+    {
+        private readonly IGamificationRepository _gamificationRepository;
+
+        public GamificationController(IGamificationRepository gamificationRepository)
+        {
+            _gamificationRepository = gamificationRepository;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> GetGameLevels()
+        {
+            List<GamificationLevel> levels = await _gamificationRepository.GetGamificationLevels();
+            List<GamificationLevelResponse> responses = new List<GamificationLevelResponse>();
+
+            foreach (GamificationLevel level in levels)
+            {
+                GamificationLevelResponse levelResponse = new GamificationLevelResponse
+                {
+                    Id = level.Id,
+                    LevelId = level.LevelId,
+                    PointsRequired = level.PointsRequired,
+                    Image = level.Image,
+                };
+                responses.Add(levelResponse);
+            }
+
+            return Ok(responses);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> GetGameLevel(int id)
+        {
+            GamificationLevel level = await _gamificationRepository.GetGamificationLevelById(id);
+            GamificationLevelResponse levelResponse = new GamificationLevelResponse
+            {
+                Id = level.Id,
+                LevelId = level.LevelId,
+                PointsRequired = level.PointsRequired,
+                Image = level.Image,
+            };
+
+            return Ok(levelResponse);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> AddGamificationLevel(GamificationLevelRequest levelRequest)
+        {
+            if (levelRequest.Image != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await levelRequest.Image.CopyToAsync(memoryStream);
+
+                    var level = new GamificationLevel
+                    {
+                        Image = memoryStream.ToArray(),
+                        LevelId = (int)levelRequest.LevelId,
+                        PointsRequired = levelRequest.PointsRequired,
+                    };
+
+                    await _gamificationRepository.AddLevel(level);
+                }
+            }
+            
+            return Ok("Level added successfully");
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> UpdateGamificationLevel(int id, [FromForm] GamificationLevelUpdateRequest levelRequest)
+        {
+            try
+            {
+                GamificationLevel gamificationLevel = await _gamificationRepository.GetGamificationLevelById(id);
+
+                if (gamificationLevel == null)
+                {
+                    return NotFound($"Gamification level with ID {gamificationLevel} not found");
+                }
+
+                if (levelRequest.Image != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await levelRequest.Image.CopyToAsync(memoryStream);
+                        gamificationLevel.Image = memoryStream.ToArray();
+                    }
+                }
+
+                gamificationLevel.PointsRequired = levelRequest.PointsRequired;
+
+                await _gamificationRepository.Update(gamificationLevel);
+
+                return Ok($"Article with ID {id} updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while updating the article: {ex.Message}");
+            }
+        }
+    }
+}

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HomeChoreTracker.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDatabaseTables : Migration
+    public partial class CreateDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,21 @@ namespace HomeChoreTracker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GamificationLevels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LevelId = table.Column<int>(type: "int", nullable: true),
+                    PointsRequired = table.Column<int>(type: "int", nullable: true),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GamificationLevels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "HomeChoresBases",
                 columns: table => new
                 {
@@ -50,19 +65,6 @@ namespace HomeChoreTracker.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HomeChoresBases", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Homes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Homes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -133,17 +135,8 @@ namespace HomeChoreTracker.Api.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Morning = table.Column<bool>(type: "bit", nullable: false),
-                    MiddleDay = table.Column<bool>(type: "bit", nullable: false),
-                    Evening = table.Column<bool>(type: "bit", nullable: false),
-                    StartDayHour = table.Column<int>(type: "int", nullable: false),
-                    StartDayMinutes = table.Column<int>(type: "int", nullable: false),
-                    StartLunchHour = table.Column<int>(type: "int", nullable: false),
-                    StartLunchMinutes = table.Column<int>(type: "int", nullable: false),
-                    EndLunchHour = table.Column<int>(type: "int", nullable: false),
-                    EndLunchMinutes = table.Column<int>(type: "int", nullable: false),
-                    EndDayHour = table.Column<int>(type: "int", nullable: false),
-                    EndDayMinutes = table.Column<int>(type: "int", nullable: false)
+                    StartDayTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndDayTime = table.Column<TimeSpan>(type: "time", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,56 +144,43 @@ namespace HomeChoreTracker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HomeChoreTasks",
+                name: "Homes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ChoreType = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Points = table.Column<int>(type: "int", nullable: false),
-                    LevelType = table.Column<int>(type: "int", nullable: false),
-                    Time = table.Column<int>(type: "int", nullable: false),
-                    Interval = table.Column<int>(type: "int", nullable: false),
-                    Unit = table.Column<int>(type: "int", nullable: false),
-                    DaysOfWeek = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DayOfMonth = table.Column<int>(type: "int", nullable: true),
-                    MonthlyRepeatType = table.Column<int>(type: "int", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    WasEarnedPoints = table.Column<bool>(type: "bit", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    HomeId = table.Column<int>(type: "int", nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GamificationLevelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HomeChoreTasks", x => x.Id);
+                    table.PrimaryKey("PK_Homes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_HomeChoreTasks_Homes_HomeId",
-                        column: x => x.HomeId,
-                        principalTable: "Homes",
+                        name: "FK_Homes_GamificationLevels_GamificationLevelId",
+                        column: x => x.GamificationLevelId,
+                        principalTable: "GamificationLevels",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Purchases",
+                name: "BusyIntervals",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
-                    HomeId = table.Column<int>(type: "int", nullable: false)
+                    Day = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Purchases", x => x.Id);
+                    table.PrimaryKey("PK_BusyIntervals", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Purchases_Homes_HomeId",
-                        column: x => x.HomeId,
-                        principalTable: "Homes",
+                        name: "FK_BusyIntervals_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -277,7 +257,42 @@ namespace HomeChoreTracker.Api.Migrations
                         name: "FK_FinancialRecords_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HomeChoreTasks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChoreType = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Points = table.Column<int>(type: "int", nullable: false),
+                    LevelType = table.Column<int>(type: "int", nullable: false),
+                    Time = table.Column<int>(type: "int", nullable: false),
+                    Interval = table.Column<int>(type: "int", nullable: false),
+                    Unit = table.Column<int>(type: "int", nullable: false),
+                    DaysOfWeek = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DayOfMonth = table.Column<int>(type: "int", nullable: true),
+                    MonthlyRepeatType = table.Column<int>(type: "int", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    WasEarnedPoints = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    HomeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HomeChoreTasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HomeChoreTasks_Homes_HomeId",
+                        column: x => x.HomeId,
+                        principalTable: "Homes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -306,6 +321,27 @@ namespace HomeChoreTracker.Api.Migrations
                         name: "FK_HomeInvitations_Users_InviterUserId",
                         column: x => x.InviterUserId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Purchases",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    HomeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Purchases", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Purchases_Homes_HomeId",
+                        column: x => x.HomeId,
+                        principalTable: "Homes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -413,6 +449,11 @@ namespace HomeChoreTracker.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_BusyIntervals_UserId",
+                table: "BusyIntervals",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_ScheduleId",
                 table: "Events",
                 column: "ScheduleId");
@@ -446,6 +487,12 @@ namespace HomeChoreTracker.Api.Migrations
                 name: "IX_HomeInvitations_InviterUserId",
                 table: "HomeInvitations",
                 column: "InviterUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Homes_GamificationLevelId",
+                table: "Homes",
+                column: "GamificationLevelId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Purchases_HomeId",
@@ -483,6 +530,9 @@ namespace HomeChoreTracker.Api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Advices");
+
+            migrationBuilder.DropTable(
+                name: "BusyIntervals");
 
             migrationBuilder.DropTable(
                 name: "Events");
@@ -534,6 +584,9 @@ namespace HomeChoreTracker.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Homes");
+
+            migrationBuilder.DropTable(
+                name: "GamificationLevels");
         }
     }
 }
