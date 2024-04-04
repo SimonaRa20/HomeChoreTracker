@@ -76,13 +76,13 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
                                 content.Add(new StringContent(CreateLevel.PointsRequired.Value.ToString()), "PointsRequired");
                             }
 
-
-                            if (CreateLevel.Image != null)
+                            var imageFile = Request.Form.Files["Image"];
+                            if (imageFile != null)
                             {
                                 using (var stream = new MemoryStream())
                                 {
-                                    await CreateLevel.Image.CopyToAsync(stream);
-                                    content.Add(new ByteArrayContent(stream.ToArray()), "Image", CreateLevel.Image.FileName);
+                                    await imageFile.CopyToAsync(stream);
+                                    content.Add(new ByteArrayContent(stream.ToArray()), "Image", imageFile.FileName);
                                 }
                             }
 

@@ -25,16 +25,17 @@
 
                     <div class="card-body">
 
-                        <form method="post" asp-action="Create">
+                        <form method="post" asp-action="Create" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="LevelId">Level</label>
                                 <input type="number" class="form-control" asp-for="CreateLevel.LevelId" value="@Model.Level" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="Points">Points</label>
-                                <input type="number" class="form-control" id="Points" name="CreateHomeChore.PointsRequired" asp-for="CreateLevel.PointsRequired" min="0" step="1" value="1">
+                                <input type="number" class="form-control" id="Points" name="CreateLevel.PointsRequired" asp-for="CreateLevel.PointsRequired" min="0" step="1" value="1">
                                 <span asp-validation-for="CreateLevel.PointsRequired" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label for="Image">Image</label>
                                 <input type="file" class="form-control-file" id="Image" name="Image" asp-for="CreateLevel.Image" accept="image/*" />
