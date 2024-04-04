@@ -131,6 +131,11 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.TaskAssignments.Where(x => x.Id.Equals(id)).FirstOrDefaultAsync();
         }
 
+        public async Task<List<TaskAssignment>> GetDoneTaskAssigment(int id)
+        {
+            return await _dbContext.TaskAssignments.Where(x => x.HomeId.Equals(id) && x.IsDone).ToListAsync();
+        }
+
         public async Task<List<TaskAssignment>> GetAssignedTasks(int userId)
         {
             return await _dbContext.TaskAssignments.Where(x => x.HomeMemberId.Equals(userId)).ToListAsync();
@@ -276,7 +281,9 @@ namespace HomeChoreTracker.Api.Repositories
                 var newVote = new TaskVote
                 {
                     Value = voteValue,
-                    UserId = userId
+                    UserId = userId,
+                    TaskAssignmentId = task.Id,
+                    TaskAssignment = task
                 };
                 task.TaskVotes.Add(newVote);
             }

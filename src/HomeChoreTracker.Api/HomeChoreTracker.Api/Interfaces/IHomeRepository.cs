@@ -11,7 +11,7 @@ namespace HomeChoreTracker.Api.Interfaces
         
         Task<List<Home>> GetAll(int userId);
         Task<HomeInvitation> Get(int homeId);
-
+        Task<Home> GetHome(int homeId);
         Task<string> InviteUserToHome(int inviterUserId, int homeId, string inviteeEmail);
         Task<HomeInvitation> GetInvitationByToken(string token);
         Task AddToHome(UserHomes userHomes);

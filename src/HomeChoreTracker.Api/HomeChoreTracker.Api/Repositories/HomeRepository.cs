@@ -46,6 +46,12 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<Home> GetHome(int homeId)
+        {
+            return await _dbContext.Homes.FirstOrDefaultAsync(x => x.Id == homeId);
+        }
+
+
         public async Task<HomeInvitation> Get(int homeId)
         {
             return await _dbContext.HomeInvitations.FirstOrDefaultAsync(x => x.HomeId == homeId);

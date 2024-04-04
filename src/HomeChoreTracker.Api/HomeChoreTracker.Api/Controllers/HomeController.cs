@@ -22,11 +22,15 @@ namespace HomeChoreTracker.Api.Controllers
 		private readonly IConfiguration _config;
 		private readonly IHomeRepository _homeRepository;
 		private readonly IAuthRepository _authRepository;
+		private readonly IHomeChoreRepository _homeChoreRepository;
+		private readonly IGamificationRepository _gamificationRepository;
 
-		public HomeController(IHomeRepository homeRepository, IAuthRepository authRepository, IConfiguration config)
+		public HomeController(IHomeRepository homeRepository, IAuthRepository authRepository, IHomeChoreRepository homeChoreRepository, IGamificationRepository gamificationRepository, IConfiguration config)
 		{
 			_homeRepository = homeRepository;
 			_authRepository = authRepository;
+			_homeChoreRepository = homeChoreRepository;
+			_gamificationRepository = gamificationRepository;
 			_config = config;
 		}
 
@@ -59,7 +63,45 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(homes);
 		}
 
-		[Route("GenerateInvitation")]
+		[HttpGet("Level/{id}")]
+        [Authorize(Roles = Role.User)]
+        public async Task<IActionResult> GetHome(int id)
+		{
+			Home home = await _homeRepository.GetHome(id);
+
+			if(home == null)
+			{
+                return NotFound("This home not found.");
+            }
+
+			List<TaskAssignment> tasks = await _homeChoreRepository.GetDoneTaskAssigment(id);
+
+			int sum = 0;
+
+			foreach(var task in tasks)
+			{
+				sum += (int)task.Points;
+			}
+
+            GamificationLevel gamificationLevel = await _gamificationRepository.GetGamificationLevel(home.GamificationLevelId);
+
+            GamificationLevel gamificationNextLevel = await _gamificationRepository.GetGamificationLevel(home.GamificationLevelId + 1);
+
+            LevelRequest levelRequest = new LevelRequest
+			{
+				EarnedPoints = sum,
+				MaxPoints = (int)gamificationNextLevel.PointsRequired,
+                GamificationLevelId = home.GamificationLevelId,
+				GamificationLevel = gamificationLevel,
+
+            };
+
+			return Ok(levelRequest);
+
+
+        }
+
+        [Route("GenerateInvitation")]
 		[HttpPost]
 		public async Task<ActionResult> GenerateInvitation([FromBody] InviteUserRequest inviteUserRequest)
 		{
