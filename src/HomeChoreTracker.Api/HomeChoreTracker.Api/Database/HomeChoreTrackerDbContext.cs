@@ -30,7 +30,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<Advice> Advices { get; set; }
         public DbSet<BusyInterval> BusyIntervals { get; set; }
         public DbSet<GamificationLevel> GamificationLevels { get; set; }
-
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +66,11 @@ namespace HomeChoreTracker.Api.Database
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.FinancialRecords)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Notifications)
                 .WithOne(e => e.User)
                 .HasForeignKey(e => e.UserId);
 

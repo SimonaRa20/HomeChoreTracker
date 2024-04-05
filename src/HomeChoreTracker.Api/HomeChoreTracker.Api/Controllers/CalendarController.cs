@@ -132,7 +132,7 @@ public class CalendarController : Controller
             EndDate = task.EndDate,
             Name = homeChoreTask.Name,
             ChoreType = homeChoreTask.ChoreType.ToString(),
-            Description = homeChoreTask.Description.ToString(),
+            Description = homeChoreTask.Description?.ToString(),
             Points = homeChoreTask.Points,
             LevelType = homeChoreTask.LevelType.ToString(),
             Time = homeChoreTask.Time.ToString(),

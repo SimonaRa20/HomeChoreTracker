@@ -10,7 +10,7 @@ namespace HomeChoreTracker.Api.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class PurchaseController : ControllerBase
+    public class PurchaseController : Controller
     {
         private readonly IPurchaseRepository _purchaseRepository;
 

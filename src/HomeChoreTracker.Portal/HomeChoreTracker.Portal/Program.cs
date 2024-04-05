@@ -21,6 +21,7 @@ namespace HomeChoreTracker.Portal
             builder.Services.AddTransient<HomesListViewComponent>();
             builder.Services.AddTransient<PurchaseHomesListViewComponent>();
             builder.Services.AddTransient<HomeChoreListViewComponent>();
+            builder.Services.AddTransient<NotificationListViewComponent>();
             builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();

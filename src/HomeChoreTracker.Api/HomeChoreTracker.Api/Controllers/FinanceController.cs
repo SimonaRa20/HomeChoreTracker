@@ -25,8 +25,8 @@ namespace HomeChoreTracker.Api.Controllers
 {
 	[Route("[controller]")]
 	[ApiController]
-	public class FinanceController : ControllerBase
-	{
+	public class FinanceController : Controller
+    {
 		private readonly IIncomeRepository _incomeRepository;
 		private readonly IExpenseRepository _expenseRepository;
 

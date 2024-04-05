@@ -15,5 +15,6 @@
         public List<FinancialRecord>? FinancialRecords { get; set; }
         public List<Event>? CalendarEvents { get; set; }
         public List<BusyInterval> BusyIntervals { get; set; }
+        public List<Notification> Notifications { get; set; }
     }
 }

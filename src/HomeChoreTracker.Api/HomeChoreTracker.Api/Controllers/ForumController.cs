@@ -11,8 +11,8 @@ namespace HomeChoreTracker.Api.Controllers
 {
 	[Route("[controller]")]
 	[ApiController]
-	public class ForumController : ControllerBase
-	{
+	public class ForumController : Controller
+    {
 		private readonly IForumRepository _forumRepository;
 		private readonly IUserRepository _userRepository;
 

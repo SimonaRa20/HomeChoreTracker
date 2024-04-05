@@ -12,7 +12,7 @@ namespace HomeChoreTracker.Api.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class GamificationController : ControllerBase
+    public class GamificationController : Controller
     {
         private readonly IGamificationRepository _gamificationRepository;
 

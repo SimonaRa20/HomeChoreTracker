@@ -1,0 +1,48 @@
+﻿@page
+@model HomeChoreTracker.Portal.Pages.NotificationModel
+@{
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card mb-4 py-3 border-left-primary mt-2">
+            <div class="d-sm-flex align-items-center justify-content-between ml-4">
+                <h1 class="h3 text-gray-800">Notifications</h1>
+                <form method="post">
+                    <button type="submit" class="btn btn-secondary mr-4" asp-page="Notification" asp-page-handler="MarkAllAsRead">Mark all as read</button>
+                </form>
+            </div>
+            <div class="collapse show">
+                <div class="card-body">
+
+                    @if (Model.Notifications != null && Model.Notifications.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var notification in Model.Notifications)
+                                {
+                                    <tr class="@((notification.IsRead) ? "" : "table-success")">
+                                        <td>@notification.Time</td>
+                                        <td>@notification.Title</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+
+                    }
+                    else
+                    {
+                        <p>No home chore bases found.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

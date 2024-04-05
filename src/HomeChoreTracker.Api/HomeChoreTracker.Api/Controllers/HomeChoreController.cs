@@ -22,14 +22,18 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly IHomeChoreRepository _homeChoreRepository;
         private readonly IHomeRepository _homeRepository;
         private readonly IHomeChoreBaseRepository _homeChoreBaseRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IMapper _mapper;
 
-        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IMapper mapper, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
+        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IMapper mapper, IUserRepository userRepository, INotificationRepository notificationRepository, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
         {
             _homeChoreRepository = homeChoreRepository;
             _mapper = mapper;
             _homeChoreBaseRepository = homeChoreBaseRepository;
             _homeRepository  = homeRepository;
+            _notificationRepository = notificationRepository;
+            _userRepository = userRepository;
         }
 
         [HttpPost("{homeId}")]
@@ -150,11 +154,23 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 var homeChore = await _homeChoreRepository.GetTaskAssigment(id);
                 var task = await _homeChoreRepository.Get(homeChore.TaskId);
+                var user = await _userRepository.GetUserById((int)homeChore.HomeMemberId);
 
                 homeChore.IsDone = isDone;
                 if (isDone)
                 {
                     homeChore.Points = task.Points;
+                    Notification notification = new Notification
+                    {
+                        Title = $"Done '{task.Name}' and earned {task.Points} points",
+                        IsRead = false,
+                        Time = DateTime.Now,
+                        UserId = (int)homeChore.HomeMemberId,
+                        User = user,
+                    };
+
+                    await _notificationRepository.CreateNotification(notification);
+
                 }
                 else
                 {
