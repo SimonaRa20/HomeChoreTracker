@@ -193,9 +193,18 @@ namespace HomeChoreTracker.Portal.Pages
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                   
 
-                    bool isDone = bool.Parse(Request.Form["modalIsDone"]);
+                    var done = Request.Form["done"];
+                    bool isDone = false;
+                    if (done == "on")
+                    {
+                        isDone = true;
+                    }
+                    else
+                    {
+                        isDone = false;
+                    }
+                   
 
                     var apiUrl = $"{_config["ApiUrl"]}/HomeChore/ChoreIsDone/{id}?isDone={isDone}";
 
@@ -204,7 +213,7 @@ namespace HomeChoreTracker.Portal.Pages
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage(); // Redirect to the same page
+                        return await OnGetAsync();
                     }
                     else
                     {

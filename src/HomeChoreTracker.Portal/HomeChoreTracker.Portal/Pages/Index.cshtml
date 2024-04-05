@@ -73,7 +73,7 @@
                     <p><strong>Date:</strong> <span id="modalStartDate"></span> / <span id="modalEndDate"></span></p>
                    <div class="form-check">
     <input type="hidden" id="modalId" name="id" value="" />
-    <input type="checkbox" class="form-check-input" id="modalIsDone" name="modalIsDone" asp-for="SetIsDone">
+    <input type="checkbox" class="form-check-input" id="done" name="done" >
     <label class="form-check-label" for="isDoneCheckbox">Check if task is done</label>
 </div>
 
@@ -108,7 +108,9 @@ else
                 right: 'month,agendaWeek,agendaDay'
             },
             events: [
-                @foreach (var chore in Model.Events)
+    @if(Model.Events != null)
+    {
+        @foreach (var chore in Model.Events)
                 {
                     <text>
                         {
@@ -122,6 +124,8 @@ else
                         },
                     </text>
                 }
+    }
+    
                 @foreach (var chore in Model.HomeChoreResponse)
                 {
                     <text>
@@ -175,7 +179,7 @@ else
                         $('#modalTime').text(response.time);
 
 
-                        $('#modalIsDone').prop('checked', response.isDone);
+                        $('#done').prop('checked', response.isDone);
 
                         $('#modalId').val(response.id);
                         console.log(response)
