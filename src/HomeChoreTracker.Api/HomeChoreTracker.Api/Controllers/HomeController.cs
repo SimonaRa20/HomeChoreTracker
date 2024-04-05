@@ -24,13 +24,15 @@ namespace HomeChoreTracker.Api.Controllers
 		private readonly IAuthRepository _authRepository;
 		private readonly IHomeChoreRepository _homeChoreRepository;
 		private readonly IGamificationRepository _gamificationRepository;
+		private readonly INotificationRepository _notificationRepository;
 
-		public HomeController(IHomeRepository homeRepository, IAuthRepository authRepository, IHomeChoreRepository homeChoreRepository, IGamificationRepository gamificationRepository, IConfiguration config)
+		public HomeController(IHomeRepository homeRepository, INotificationRepository notificationRepository, IAuthRepository authRepository, IHomeChoreRepository homeChoreRepository, IGamificationRepository gamificationRepository, IConfiguration config)
 		{
 			_homeRepository = homeRepository;
 			_authRepository = authRepository;
 			_homeChoreRepository = homeChoreRepository;
 			_gamificationRepository = gamificationRepository;
+			_notificationRepository = notificationRepository;
 			_config = config;
 		}
 
@@ -204,7 +206,27 @@ namespace HomeChoreTracker.Api.Controllers
 				await _homeRepository.AddToHome(userHome);
 				await _homeRepository.RemoveInvitation(existingInvitation);
 
-				return Ok("Invitation accepted successfully.");
+                var members = await _homeRepository.GetHomeMembers(existingInvitation.HomeId);
+
+				foreach(var member in members)
+				{
+					if(member.HomeMemberId != user.Id)
+					{
+                        var getMember = await _authRepository.GetUserById((int)member.HomeMemberId);
+                        Notification notification = new Notification
+                        {
+                            Title = $"User '{user.UserName}' join to home",
+                            IsRead = false,
+                            Time = DateTime.Now,
+                            UserId = (int)member.HomeMemberId,
+                            User = getMember,
+                        };
+
+                        await _notificationRepository.CreateNotification(notification);
+                    }
+				}
+               
+                return Ok("Invitation accepted successfully.");
 			}
 			else
 			{
