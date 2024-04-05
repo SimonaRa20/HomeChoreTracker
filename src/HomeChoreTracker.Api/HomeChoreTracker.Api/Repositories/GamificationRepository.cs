@@ -21,6 +21,11 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.GamificationLevels.Where(x => x.Id.Equals(id)).FirstAsync();
         }
 
+        public async Task<List<PointsHistory>> GetGamificationLevelByHomeId(int homeId)
+        {
+            return await _dbContext.PointsHistory.Where(x => x.HomeId.Equals(homeId)).ToListAsync();
+        }
+
         public async Task<GamificationLevel> GetGamificationLevel(int level)
         {
             return await _dbContext.GamificationLevels.Where(x => x.LevelId.Equals(level)).FirstAsync();
@@ -40,6 +45,27 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task Update(GamificationLevel gamificationLevel)
         {
             _dbContext.Entry(gamificationLevel).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<PointsHistory> GetPointsHistoryByTaskId(int id)
+        {
+            return await _dbContext.PointsHistory.Where(x => x.TaskId.Equals(id)).FirstOrDefaultAsync();
+        }
+
+        public async Task AddPointsHistory(PointsHistory points)
+        {
+            await _dbContext.PointsHistory.AddAsync(points);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(int id)
+        {
+            PointsHistory points = await _dbContext.PointsHistory.FindAsync(id);
+            if (points != null)
+            {
+                _dbContext.PointsHistory.Remove(points);
+            }
             await _dbContext.SaveChangesAsync();
         }
     }

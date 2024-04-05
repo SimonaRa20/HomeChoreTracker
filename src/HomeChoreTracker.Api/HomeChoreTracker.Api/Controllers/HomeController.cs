@@ -74,13 +74,14 @@ namespace HomeChoreTracker.Api.Controllers
                 return NotFound("This home not found.");
             }
 
-			List<TaskAssignment> tasks = await _homeChoreRepository.GetDoneTaskAssigment(id);
+			List<PointsHistory> pointsHistory = await _gamificationRepository.GetGamificationLevelByHomeId(id);
 
 			int sum = 0;
 
-			foreach(var task in tasks)
+			foreach(var history in pointsHistory)
 			{
-				sum += (int)task.Points;
+				TaskAssignment taskAssignment = await _homeChoreRepository.GetTaskAssigment((int)history.TaskId);
+				sum += (int)taskAssignment.Points;
 			}
 
             GamificationLevel gamificationLevel = await _gamificationRepository.GetGamificationLevel(home.GamificationLevelId);
@@ -97,8 +98,6 @@ namespace HomeChoreTracker.Api.Controllers
             };
 
 			return Ok(levelRequest);
-
-
         }
 
         [Route("GenerateInvitation")]

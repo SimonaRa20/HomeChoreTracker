@@ -24,9 +24,10 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly IHomeChoreBaseRepository _homeChoreBaseRepository;
         private readonly IUserRepository _userRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IGamificationRepository _gamificationRepository;
         private readonly IMapper _mapper;
 
-        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IMapper mapper, IUserRepository userRepository, INotificationRepository notificationRepository, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
+        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IGamificationRepository gamificationRepository, IMapper mapper, IUserRepository userRepository, INotificationRepository notificationRepository, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
         {
             _homeChoreRepository = homeChoreRepository;
             _mapper = mapper;
@@ -34,6 +35,7 @@ namespace HomeChoreTracker.Api.Controllers
             _homeRepository  = homeRepository;
             _notificationRepository = notificationRepository;
             _userRepository = userRepository;
+            _gamificationRepository = gamificationRepository;
         }
 
         [HttpPost("{homeId}")]
@@ -156,8 +158,10 @@ namespace HomeChoreTracker.Api.Controllers
                 var task = await _homeChoreRepository.Get(homeChore.TaskId);
                 var user = await _userRepository.GetUserById((int)homeChore.HomeMemberId);
 
+                var pointHistory = await _gamificationRepository.GetPointsHistoryByTaskId(id);
+
                 homeChore.IsDone = isDone;
-                if (isDone)
+                if (isDone && pointHistory == null)
                 {
                     homeChore.Points = task.Points;
                     Notification notification = new Notification
@@ -171,9 +175,31 @@ namespace HomeChoreTracker.Api.Controllers
 
                     await _notificationRepository.CreateNotification(notification);
 
+                    PointsHistory pointsHistory = new PointsHistory
+                    {
+                        EarnedPoints = task.Points,
+                        HomeMemberId = (int)homeChore.HomeMemberId,
+                        TaskId = (int)id,
+                        HomeId = homeChore.HomeId,
+                        Text = $"Done '{task.Name}'",
+                        EarnedDate = DateTime.Now,
+                    };
+
+                    await _gamificationRepository.AddPointsHistory(pointsHistory);
                 }
                 else
                 {
+                    Notification notification = new Notification
+                    {
+                        Title = $"Removed '{task.Name}' earned {task.Points} points",
+                        IsRead = false,
+                        Time = DateTime.Now,
+                        UserId = (int)homeChore.HomeMemberId,
+                        User = user,
+                    };
+
+                    await _notificationRepository.CreateNotification(notification);
+                    await _gamificationRepository.Delete(pointHistory.Id);
                     homeChore.Points = 0;
                 }
                 
