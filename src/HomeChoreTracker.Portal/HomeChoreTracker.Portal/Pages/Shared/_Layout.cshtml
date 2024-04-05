@@ -20,14 +20,15 @@
     {
         <div id="wrapper">
             <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
-                    <div class="sidebar-brand-icon">
-                        <i class='fas fa-dice-d20 fa-9x' style='color:#ffffff'></i>
-                    </div>
-                    <div class="sidebar-brand-text mx-3">Home Chore Tracker</div>
-                </a>
+               
                 @if (User.IsInRole("Admin"))
                 {
+                    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="~/Gamification">
+                        <div class="sidebar-brand-icon">
+                            <i class='fas fa-dice-d20 fa-9x' style='color:#ffffff'></i>
+                        </div>
+                        <div class="sidebar-brand-text mx-3">Home Chore Tracker</div>
+                    </a>
                     <div class="sidebar-heading">Admin Actions</div>
                     <li class="nav-item">
                         <a class="nav-link" href="~/Gamification">
@@ -46,6 +47,12 @@
 
                 @if (User.IsInRole("User"))
                 {
+                    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+                        <div class="sidebar-brand-icon">
+                            <i class='fas fa-dice-d20 fa-9x' style='color:#ffffff'></i>
+                        </div>
+                        <div class="sidebar-brand-text mx-3">Home Chore Tracker</div>
+                    </a>
                     <hr class="sidebar-divider">
                     <div class="sidebar-heading">Homes actions</div>
                     @await Component.InvokeAsync("HomesList")

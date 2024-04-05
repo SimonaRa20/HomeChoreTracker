@@ -1,6 +1,9 @@
 ﻿@page
 @model HomeChoreTracker.Portal.Pages.Gamification.IndexModel
 @{
+    ViewData["Title"] = "Home Chores";
+}
+@* @{
     Layout = "~/Pages/Shared/_Layout.cshtml";
     ViewData["Title"] = "Home";
 }
@@ -16,8 +19,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-}
-<body>
+} *@
+
     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 {
     <div class="row">
@@ -111,9 +114,8 @@
         </div>
         </div>
 }
-</body>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K+1ClXaRhPU17yAPQnQA4Gn4kKgdCjP/vt3kS2uF78w=" crossorigin="anonymous"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function validateEditForm(form) {
         console.log('Start edit.');
