@@ -4,6 +4,7 @@ using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
+using HomeChoreTracker.Api.Repositories;
 using iText.IO.Image;
 using iText.Kernel.Pdf;
 using iText.Layout;
@@ -29,11 +30,17 @@ namespace HomeChoreTracker.Api.Controllers
     {
 		private readonly IIncomeRepository _incomeRepository;
 		private readonly IExpenseRepository _expenseRepository;
+        private readonly IGamificationRepository _gamificationRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly INotificationRepository _notificationRepository;
 
-		public FinanceController(IIncomeRepository incomeRepository, IExpenseRepository expenseRepository)
+		public FinanceController(IIncomeRepository incomeRepository, IExpenseRepository expenseRepository, IGamificationRepository gamificationRepository, IUserRepository userRepository, INotificationRepository notificationRepository)
 		{
 			_incomeRepository = incomeRepository;
 			_expenseRepository = expenseRepository;
+            _gamificationRepository = gamificationRepository;
+            _userRepository = userRepository;
+            _notificationRepository = notificationRepository;
 		}
 
 		[HttpGet("totalIncome")]
@@ -58,6 +65,7 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<IActionResult> AddIncome(IncomeRequest incomeRequest)
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            var user = await _userRepository.GetUserById(userId);
             var income = new FinancialRecord();
             if (incomeRequest.FinancialCategoryId == 0)
             {
@@ -99,7 +107,27 @@ namespace HomeChoreTracker.Api.Controllers
             }
 
 			await _incomeRepository.AddIncome(income);
-			return Ok("Income added successfully");
+
+            var hasBadge = await _gamificationRepository.UserHasCreateFirstIncomeBadge(userId);
+            if(!hasBadge)
+            {
+                BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(userId);
+                wallet.CreateFirstIncome = true;
+                await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                Notification notification = new Notification
+                {
+                    Title = $"You earned badge 'Create first income'",
+                    IsRead = false,
+                    Time = DateTime.Now,
+                    UserId = (int)userId,
+                    User = user,
+                };
+
+                await _notificationRepository.CreateNotification(notification);
+            }
+
+            return Ok("Income added successfully");
 		}
 
 		[HttpPut("income/{id}")]
@@ -373,7 +401,9 @@ namespace HomeChoreTracker.Api.Controllers
 		{
 			try
 			{
-				if(expenseRequest.ExpenseImage == null)
+                int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+                var user = await _userRepository.GetUserById(userId);
+                if (expenseRequest.ExpenseImage == null)
 				{
 					return new ObjectResult("Upload image is required")
 					{
@@ -442,7 +472,26 @@ namespace HomeChoreTracker.Api.Controllers
 
 					await _expenseRepository.AddExpense(expense);
 
-					return Ok("Expense added successfully");
+                    var hasBadge = await _gamificationRepository.UserHasCreateFirstExpenseBadge(userId);
+                    if (!hasBadge)
+                    {
+                        BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(userId);
+                        wallet.CreateFirstExpense = true;
+                        await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                        Notification notification = new Notification
+                        {
+                            Title = $"You earned badge 'Create first expense'",
+                            IsRead = false,
+                            Time = DateTime.Now,
+                            UserId = (int)userId,
+                            User = user,
+                        };
+
+                        await _notificationRepository.CreateNotification(notification);
+                    }
+
+                    return Ok("Expense added successfully");
 				}
 			}
 			catch (Exception ex)
@@ -533,6 +582,7 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<IActionResult> AddExpense(ExpenseRequest expenseRequest)
 		{
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            var user = await _userRepository.GetUserById(userId);
             var expense = new FinancialRecord();
             if (expenseRequest.FinancialCategoryId == 0)
             {
@@ -573,7 +623,27 @@ namespace HomeChoreTracker.Api.Controllers
                 };
             }
 
-			await _expenseRepository.AddExpense(expense);
+            var hasBadge = await _gamificationRepository.UserHasCreateFirstExpenseBadge(userId);
+            if (!hasBadge)
+            {
+                BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(userId);
+                wallet.CreateFirstExpense = true;
+                await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+
+                Notification notification = new Notification
+                {
+                    Title = $"You earned badge 'Create first expense'",
+                    IsRead = false,
+                    Time = DateTime.Now,
+                    UserId = (int)userId,
+                    User = user,
+                };
+
+                await _notificationRepository.CreateNotification(notification);
+            }
+
+            await _expenseRepository.AddExpense(expense);
 			return Ok("Expense added successfully");
 		}
 

@@ -96,5 +96,41 @@ namespace HomeChoreTracker.Api.Repositories
         {
             return await _dbContext.BadgeWallets.Where(x => x.UserId.Equals(userId)).FirstOrDefaultAsync();
         }
+
+        public async Task UpdateBadgeWallet(BadgeWallet wallet)
+        {
+            _dbContext.Entry(wallet).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> UserHasCreateFirstIncomeBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.CreateFirstIncome ?? false;
+        }
+
+        public async Task<bool> UserHasCreateFirstExpenseBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.CreateFirstExpense ?? false;
+        }
+
+        public async Task<bool> UserHasCreateFirstAdviceBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.CreateFirstAdvice ?? false;
+        }
+
+        public async Task<bool> UserHasCreateFirstPurchaseBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.CreateFirstPurchase ?? false;
+        }
+
+        public async Task<bool> UserHasCreatedTaskWasUsedOtherHomeBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.CreatedTaskWasUsedOtherHome ?? false;
+        }
     }
 }

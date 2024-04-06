@@ -16,5 +16,11 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<List<PointsHistory>> GetHomeThisWeekPointsHistory(int homeId);
         Task<List<PointsHistory>> GetHomePreviousWeekPointsHistory(int homeId);
         Task<BadgeWallet> GetUserBadgeWallet(int userId);
+        Task UpdateBadgeWallet(BadgeWallet wallet);
+        Task<bool> UserHasCreateFirstIncomeBadge(int userId);
+        Task<bool> UserHasCreateFirstExpenseBadge(int userId);
+        Task<bool> UserHasCreateFirstAdviceBadge(int userId);
+        Task<bool> UserHasCreateFirstPurchaseBadge(int userId);
+        Task<bool> UserHasCreatedTaskWasUsedOtherHomeBadge(int userId);
     }
 }

@@ -27,13 +27,10 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task CreateHome(HomeRequest homeRequest, int userId)
         {
-            // Fetch the GamificationLevel with ID 1
             GamificationLevel defaultGamificationLevel = await _gamificationRepository.GetGamificationLevel(1);
 
-            // Check if the GamificationLevel exists
             if (defaultGamificationLevel != null)
             {
-                // Create the new Home with the default GamificationLevel
                 Home home = new Home
                 {
                     Title = homeRequest.Title,

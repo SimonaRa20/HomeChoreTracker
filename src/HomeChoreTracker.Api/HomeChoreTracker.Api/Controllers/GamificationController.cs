@@ -161,5 +161,41 @@ namespace HomeChoreTracker.Api.Controllers
 
             return Ok(categoryCounts);
         }
+
+        [HttpGet("BadgeWallet")]
+        [Authorize]
+        public async Task<IActionResult> GetBadgeWallet()
+        {
+            int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            
+            BadgeWallet badgeWallet = await _gamificationRepository.GetUserBadgeWallet(id);
+
+            BadgeWalletResponse response = new BadgeWalletResponse
+            {
+                Id = badgeWallet.Id,
+                DoneFirstTask = badgeWallet.DoneFirstTask,
+                DoneFirstCleaningTask = badgeWallet.DoneFirstCleaningTask,
+                DoneFirstLaundryTask = badgeWallet.DoneFirstLaundryTask,
+                DoneFirstKitchenTask = badgeWallet.DoneFirstKitchenTask,
+                DoneFirstBathroomTask = badgeWallet.DoneFirstBathroomTask,
+                DoneFirstBedroomTask = badgeWallet.DoneFirstBedroomTask,
+
+                DoneFirstOutdoorsTask = badgeWallet.DoneFirstOutdoorsTask,
+                DoneFirstOrganizeTask = badgeWallet.DoneFirstOrganizeTask,
+                EarnedPerDayFiftyPoints = badgeWallet.EarnedPerDayFiftyPoints,
+                EarnedPerDayHundredPoints = badgeWallet.EarnedPerDayHundredPoints,
+                DoneFiveTaskPerWeek = badgeWallet.DoneFiveTaskPerWeek,
+                DoneTenTaskPerWeek = badgeWallet.DoneTenTaskPerWeek,
+
+                DoneTwentyFiveTaskPerWeek = badgeWallet.DoneTwentyFiveTaskPerWeek,
+                CreatedTaskWasUsedOtherHome = badgeWallet.CreatedTaskWasUsedOtherHome,
+                CreateFirstPurchase = badgeWallet.CreateFirstPurchase,
+                CreateFirstAdvice = badgeWallet.CreateFirstAdvice,
+                CreateFirstIncome = badgeWallet.CreateFirstIncome,
+                CreateFirstExpense = badgeWallet.CreateFirstExpense
+            };
+
+            return Ok(response);
+        }
     }
 }

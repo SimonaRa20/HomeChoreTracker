@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.HomeChore;
 using HomeChoreTracker.Api.Contracts.HomeChoreBase;
@@ -90,6 +91,25 @@ namespace HomeChoreTracker.Api.Controllers
                         };
 
                         await _notificationRepository.CreateNotification(notification);
+
+                        var hasBadge = await _gamificationRepository.UserHasCreatedTaskWasUsedOtherHomeBadge(id);
+                        if (!hasBadge)
+                        {
+                            BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(id);
+                            wallet.CreateFirstExpense = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first purchase'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
                     }
                 }
 

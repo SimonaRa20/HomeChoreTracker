@@ -1,10 +1,13 @@
-﻿using HomeChoreTracker.Api.Contracts.Finance;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Contracts.Purchase;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
+using HomeChoreTracker.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Security.Claims;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -13,10 +16,16 @@ namespace HomeChoreTracker.Api.Controllers
     public class PurchaseController : Controller
     {
         private readonly IPurchaseRepository _purchaseRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IGamificationRepository _gamificationRepository;
+        private readonly INotificationRepository _notificationRepository;
 
-        public PurchaseController(IPurchaseRepository purchaseRepository)
+        public PurchaseController(IPurchaseRepository purchaseRepository, IUserRepository userRepository, IGamificationRepository gamificationRepository, INotificationRepository notificationRepository)
         {
             _purchaseRepository = purchaseRepository;
+            _userRepository = userRepository;
+            _gamificationRepository = gamificationRepository;
+            _notificationRepository = notificationRepository;
         }
 
         [HttpPost]
@@ -25,6 +34,9 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
+                int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+                var user = await _userRepository.GetUserById(userId);
+
                 var purchase = new Purchase
                 {
                     HomeId = purchaseRequest.HomeId,
@@ -49,6 +61,25 @@ namespace HomeChoreTracker.Api.Controllers
 
                 await _purchaseRepository.AddPurchase(purchase);
                 await _purchaseRepository.Save();
+
+                var hasBadge = await _gamificationRepository.UserHasCreateFirstPurchaseBadge(userId);
+                if (!hasBadge)
+                {
+                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(userId);
+                    wallet.CreateFirstExpense = true;
+                    await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                    Notification notification = new Notification
+                    {
+                        Title = $"You earned badge 'Create first purchase'",
+                        IsRead = false,
+                        Time = DateTime.Now,
+                        UserId = (int)userId,
+                        User = user,
+                    };
+
+                    await _notificationRepository.CreateNotification(notification);
+                }
 
                 return Ok("Purchase added successfully");
             }

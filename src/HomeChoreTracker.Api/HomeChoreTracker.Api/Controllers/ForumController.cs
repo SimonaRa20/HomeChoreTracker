@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Contracts.Finance;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Contracts.Forum;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
@@ -15,11 +16,15 @@ namespace HomeChoreTracker.Api.Controllers
     {
 		private readonly IForumRepository _forumRepository;
 		private readonly IUserRepository _userRepository;
+		private readonly IGamificationRepository _gamificationRepository;
+		private readonly INotificationRepository _notificationRepository;
 
-        public ForumController(IForumRepository forumRepository, IUserRepository userRepository)
+        public ForumController(IForumRepository forumRepository, IUserRepository userRepository, IGamificationRepository gamificationRepository, INotificationRepository notificationRepository)
         {
             _forumRepository = forumRepository;
 			_userRepository = userRepository;
+			_gamificationRepository = gamificationRepository;
+			_notificationRepository = notificationRepository;
         }
 
 		[HttpPost]
@@ -27,6 +32,7 @@ namespace HomeChoreTracker.Api.Controllers
 		public async Task<IActionResult> AddAdvice(AdviceRequest adviceRequest)
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			var user = await _userRepository.GetUserById(userId);
 			var advice = new Advice
 			{
 				Title = adviceRequest.Title,
@@ -38,7 +44,26 @@ namespace HomeChoreTracker.Api.Controllers
 			};
 
 			await _forumRepository.AddAdvice(advice);
-			return Ok("Advice added successfully");
+
+            var hasBadge = await _gamificationRepository.UserHasCreateFirstAdviceBadge(userId);
+            if (!hasBadge)
+            {
+                BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(userId);
+                wallet.CreateFirstExpense = true;
+                await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                Notification notification = new Notification
+                {
+                    Title = $"You earned badge 'Create first advice'",
+                    IsRead = false,
+                    Time = DateTime.Now,
+                    UserId = (int)userId,
+                    User = user,
+                };
+
+                await _notificationRepository.CreateNotification(notification);
+            }
+            return Ok("Advice added successfully");
 		}
 
 		[HttpDelete("{id}")]
