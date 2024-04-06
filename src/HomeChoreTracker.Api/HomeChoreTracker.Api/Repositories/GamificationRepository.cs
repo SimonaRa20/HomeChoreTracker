@@ -181,6 +181,12 @@ namespace HomeChoreTracker.Api.Repositories
             return wallet?.DoneFirstOrganizeTask ?? false;
         }
 
+        public async Task<bool> UserHasEarnedPerDayFiftyPointsBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.EarnedPerDayFiftyPoints ?? false;
+        }
+
         public async Task<bool> UserHasEarnedFiftyPointsPerDay(int userId)
         {
             DateTime todayStart = DateTime.Today;
@@ -193,6 +199,13 @@ namespace HomeChoreTracker.Api.Repositories
             return totalPointsToday >= 50;
         }
 
+        public async Task<bool> UserHasEarnedPerDayHundredPointsBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.EarnedPerDayHundredPoints ?? false;
+        }
+
+
         public async Task<bool> UserHasEarnedHundredPointsPerDay(int userId)
         {
             DateTime todayStart = DateTime.Today;
@@ -203,6 +216,24 @@ namespace HomeChoreTracker.Api.Repositories
                 .SumAsync(ph => ph.EarnedPoints);
 
             return totalPointsToday >= 100;
+        }
+
+        public async Task<bool> UserHasDoneFiveTaskPerWeekBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFiveTaskPerWeek ?? false;
+        }
+
+        public async Task<bool> UserHasDoneTenTaskPerWeekBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneTenTaskPerWeek ?? false;
+        }
+
+        public async Task<bool> UserHasDoneTwentyFiveTaskPerWeekBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneTwentyFiveTaskPerWeek ?? false;
         }
     }
 }

@@ -29,5 +29,6 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<bool> VoteArtical(int taskId, int userId, int voteValue);
         Task<int> GetTotalVotes(int taskId);
         Task<List<TaskAssignment>> GetDoneTaskAssigment(int id);
+        Task<List<TaskAssignment>> GetDoneTaskAssigments(int userId);
     }
 }
