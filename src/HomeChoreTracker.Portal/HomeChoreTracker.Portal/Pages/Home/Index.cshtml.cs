@@ -14,6 +14,9 @@ namespace HomeChoreTracker.Portal.Pages.Home
         private readonly IConfiguration _config;
 
         public LevelRequest LevelResponse { get; set; }
+        public Dictionary<string, int> ThisWeekPointsHistory { get; set; }
+        public Dictionary<string, int> PreviousWeekPointsHistory { get; set; }
+
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -36,6 +39,25 @@ namespace HomeChoreTracker.Portal.Pages.Home
                 if (response.IsSuccessStatusCode)
                 {
                     LevelResponse = await response.Content.ReadFromJsonAsync<LevelRequest>();
+
+                    var apiUrlThisWeek = $"{_config["ApiUrl"]}/Gamification/ThisWeek/{id}";
+
+                    var responseThisWeek = await httpClient.GetAsync(apiUrlThisWeek);
+
+                    if (responseThisWeek.IsSuccessStatusCode) {
+
+                        ThisWeekPointsHistory = await responseThisWeek.Content.ReadFromJsonAsync<Dictionary<string, int>>();
+                    }
+
+                    var apiUrlPreviousWeek = $"{_config["ApiUrl"]}/Gamification/PreviousWeek/{id}";
+
+                    var responsePreviousWeek = await httpClient.GetAsync(apiUrlPreviousWeek);
+
+                    if (responsePreviousWeek.IsSuccessStatusCode)
+                    {
+                        PreviousWeekPointsHistory = await responsePreviousWeek.Content.ReadFromJsonAsync<Dictionary<string, int>>();
+                    }
+
                     return Page();
                 }
                 else

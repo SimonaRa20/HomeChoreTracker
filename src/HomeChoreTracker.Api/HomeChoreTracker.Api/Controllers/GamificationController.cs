@@ -1,6 +1,7 @@
 ﻿using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Forum;
 using HomeChoreTracker.Api.Contracts.Gamification;
+using HomeChoreTracker.Api.Contracts.User;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using HomeChoreTracker.Api.Repositories;
@@ -15,10 +16,12 @@ namespace HomeChoreTracker.Api.Controllers
     public class GamificationController : Controller
     {
         private readonly IGamificationRepository _gamificationRepository;
+        private readonly IHomeRepository _homeRepository;
 
-        public GamificationController(IGamificationRepository gamificationRepository)
+        public GamificationController(IGamificationRepository gamificationRepository, IHomeRepository homeRepository)
         {
             _gamificationRepository = gamificationRepository;
+            _homeRepository = homeRepository;
         }
 
         [HttpGet]
@@ -115,6 +118,48 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 return BadRequest($"An error occurred while updating the article: {ex.Message}");
             }
+        }
+
+        [HttpGet("ThisWeek/{homeId}")]
+        [Authorize]
+        public async Task<IActionResult> GetThisWeekPointsStatistic(int homeId)
+        {
+            List<PointsHistory> pointsHistories = await _gamificationRepository.GetHomeThisWeekPointsHistory(homeId);
+            List<UserGetResponse> homers = await _homeRepository.GetHomeMembers(homeId);
+
+            var categoryCounts = new Dictionary<string, int>();
+
+            foreach (var member in homers)
+            {
+                int totalPoints = pointsHistories
+                    .Where(ph => ph.HomeMemberId == member.HomeMemberId)
+                    .Sum(ph => ph.EarnedPoints);
+
+                categoryCounts.Add(member.UserName, totalPoints);
+            }
+
+            return Ok(categoryCounts);
+        }
+
+        [HttpGet("PreviousWeek/{homeId}")]
+        [Authorize]
+        public async Task<IActionResult> GetPreviousWeekPointsStatistic(int homeId)
+        {
+            List<PointsHistory> pointsHistories = await _gamificationRepository.GetHomePreviousWeekPointsHistory(homeId);
+            List<UserGetResponse> homers = await _homeRepository.GetHomeMembers(homeId);
+
+            var categoryCounts = new Dictionary<string, int>();
+
+            foreach (var member in homers)
+            {
+                int totalPoints = pointsHistories
+                    .Where(ph => ph.HomeMemberId == member.HomeMemberId)
+                    .Sum(ph => ph.EarnedPoints);
+
+                categoryCounts.Add(member.UserName, totalPoints);
+            }
+
+            return Ok(categoryCounts);
         }
     }
 }

@@ -13,5 +13,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<PointsHistory> GetPointsHistoryByTaskId(int id);
         Task AddPointsHistory(PointsHistory points);
         Task Delete(int id);
+        Task<List<PointsHistory>> GetHomeThisWeekPointsHistory(int homeId);
+        Task<List<PointsHistory>> GetHomePreviousWeekPointsHistory(int homeId);
     }
 }

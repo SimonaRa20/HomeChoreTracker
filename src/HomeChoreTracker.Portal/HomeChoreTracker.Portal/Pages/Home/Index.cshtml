@@ -73,15 +73,130 @@
                         }
                         
                     </div>
+
+                    <div class="row mt-4">
+                        <div class="col-lg-6">
+                            <div class="text-center">
+                                <h5>This week</h5>
+                                <div style="overflow-y:auto;">
+                                    <canvas id="weeklyChart" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="text-center">
+                                <h5>Previous week</h5>
+                                <div style="overflow-y:auto;">
+                                    <canvas id="previousWeekChart" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
                 </div>
-                <i class="fa fa-broom mr-2" aria-hidden="true"></i>
-                <i class="fa fa-tshirt mr-2" aria-hidden="true"></i>
-                <i class="fa fa-utensils mr-2" aria-hidden="true"></i>
-                <i class="fa fa-shower mr-2" aria-hidden="true"></i>
-                <i class="fa fa-bed mr-2" aria-hidden="true"></i>
-                <i class="fa fa-tree mr-2" aria-hidden="true"></i>
-                <i class="fa fa-sitemap mr-2" aria-hidden="true"></i>
+               
             </div>
+
+           
         </div>
     </div>
 </div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="vendor/chart.js/Chart.min.js"></script>
+<script src="js/demo/chart-bar-demo.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+    function createBarChart() {
+        var weeklyPoints = @Html.Raw(Json.Serialize(Model.ThisWeekPointsHistory));
+
+        if (weeklyPoints && Object.keys(weeklyPoints).length > 0) {
+            var users = Object.keys(weeklyPoints);
+            var points = Object.values(weeklyPoints);
+
+            var ctx = document.getElementById('weeklyChart');
+            if (ctx) {
+                var chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: users,
+                        datasets: [{
+                            label: 'Points Earned',
+                            data: points,
+                            backgroundColor: 'rgba(0, 123, 255, 1)', // Blue color with transparency
+                            borderColor: 'rgba(0, 123, 255, 1)', // Solid blue color
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0 // Display only whole numbers
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.error("Canvas element 'weeklyChart' not found.");
+            }
+        } else {
+            console.error("Weekly points data is null, undefined, or empty.");
+        }
+    }
+
+    function createPreviousWeekBarChart() {
+        var previousWeekPoints = @Html.Raw(Json.Serialize(Model.PreviousWeekPointsHistory));
+
+        if (previousWeekPoints && Object.keys(previousWeekPoints).length > 0) {
+            var users = Object.keys(previousWeekPoints);
+            var points = Object.values(previousWeekPoints);
+
+            var ctx = document.getElementById('previousWeekChart');
+            if (ctx) {
+                var chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: users,
+                        datasets: [{
+                            label: 'Points Earned',
+                            data: points,
+                            backgroundColor: 'rgba(255, 193, 7, 1)', // Orange color with transparency
+                            borderColor: 'rgba(255, 193, 7, 1)', // Solid orange color
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0 // Display only whole numbers
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.error("Canvas element 'previousWeekChart' not found.");
+            }
+        } else {
+            console.error("Previous week points data is null, undefined, or empty.");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        createBarChart(); // Create chart for this week
+        createPreviousWeekBarChart(); // Create chart for previous week
+    });
+
+
+</script>

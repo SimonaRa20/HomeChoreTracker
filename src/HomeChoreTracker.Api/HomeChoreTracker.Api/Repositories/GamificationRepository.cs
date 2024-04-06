@@ -68,5 +68,28 @@ namespace HomeChoreTracker.Api.Repositories
             }
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<List<PointsHistory>> GetHomeThisWeekPointsHistory(int homeId)
+        {
+            DateTime startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday);
+
+            DateTime endOfWeek = startOfWeek.AddDays(6);
+
+            return await _dbContext.PointsHistory
+                .Where(x => x.TaskId == homeId && x.EarnedDate >= startOfWeek && x.EarnedDate <= endOfWeek)
+                .ToListAsync();
+        }
+
+
+        public async Task<List<PointsHistory>> GetHomePreviousWeekPointsHistory(int homeId)
+        {
+            DateTime startOfPreviousWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + 1).AddDays(-7);
+
+            DateTime endOfPreviousWeek = startOfPreviousWeek.AddDays(6);
+
+            return await _dbContext.PointsHistory
+                .Where(x => x.TaskId == homeId && x.EarnedDate >= startOfPreviousWeek && x.EarnedDate <= endOfPreviousWeek)
+                .ToListAsync();
+        }
     }
 }
