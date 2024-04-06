@@ -13,6 +13,7 @@ using System.Web;
 using Microsoft.EntityFrameworkCore;
 using HomeChoreTracker.Api.Contracts.User;
 using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Contracts.Gamification;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -77,7 +78,7 @@ namespace HomeChoreTracker.Api.Controllers
                 return NotFound("This home not found.");
             }
 
-            List<PointsHistory> pointsHistory = await _gamificationRepository.GetGamificationLevelByHomeId(id);
+            List<PointsHistory> pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
 
             int sum = 0;
 
@@ -156,6 +157,66 @@ namespace HomeChoreTracker.Api.Controllers
             await _homeRepository.Update(home);
 
             return Ok("Upgrade home level");
+        }
+
+        [HttpGet("{id}/skip{skip}/take{take}")]
+        [Authorize]
+        public async Task<IActionResult> GetPointsHistoryBase(int id, int skip = 0, int take = 5)
+        {
+            try
+            {
+                var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
+                List<PointsHistory> points = pointsHistory.OrderByDescending(h => h.EarnedDate).Skip(skip).Take(take).ToList();
+                List<PointsResponse> response = new List<PointsResponse>();
+
+                foreach(var point in points)
+                {
+                    PointsResponse history = new PointsResponse
+                    {
+                        Text = point.Text,
+                        Time = point.EarnedDate,
+                        Points = point.EarnedPoints
+                    };
+
+                    response.Add(history);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while fetching points history: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetPointsHistoryBase(int id)
+        {
+            try
+            {
+                var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
+                List<PointsHistory> points = pointsHistory.OrderByDescending(h => h.EarnedDate).ToList();
+                List<PointsResponse> response = new List<PointsResponse>();
+
+                foreach (var point in pointsHistory)
+                {
+                    PointsResponse history = new PointsResponse
+                    {
+                        Text = point.Text,
+                        Time = point.EarnedDate,
+                        Points = point.EarnedPoints
+                    };
+
+                    response.Add(history);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while fetching points history: {ex.Message}");
+            }
         }
 
         [Route("GenerateInvitation")]

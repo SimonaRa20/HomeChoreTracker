@@ -21,7 +21,7 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.GamificationLevels.Where(x => x.Id.Equals(id)).FirstAsync();
         }
 
-        public async Task<List<PointsHistory>> GetGamificationLevelByHomeId(int homeId)
+        public async Task<List<PointsHistory>> GetPointsHistoryByHomeId(int homeId)
         {
             return await _dbContext.PointsHistory.Where(x => x.HomeId.Equals(homeId)).ToListAsync();
         }
