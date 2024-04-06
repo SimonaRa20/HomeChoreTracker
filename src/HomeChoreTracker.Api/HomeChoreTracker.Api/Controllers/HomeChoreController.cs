@@ -79,6 +79,17 @@ namespace HomeChoreTracker.Api.Controllers
                         };
 
                         await _gamificationRepository.AddPointsHistory(pointsHistory);
+
+                        Notification notification = new Notification
+                        {
+                            Title = $"Your created '{homeChoreBase.Name}' task was used. You earned 5 points.",
+                            IsRead = false,
+                            Time = DateTime.Now,
+                            UserId = (int)homeChoreBase.UserId,
+                            User = user,
+                        };
+
+                        await _notificationRepository.CreateNotification(notification);
                     }
                 }
 
