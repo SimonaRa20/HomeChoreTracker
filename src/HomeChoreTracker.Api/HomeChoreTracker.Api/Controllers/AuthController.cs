@@ -69,6 +69,31 @@ namespace HomeChoreTracker.Api.Controllers
                 userDto.Role = Role.User;
                 userDto.StartDayTime = new TimeSpan(8, 0, 0);
                 userDto.EndDayTime = new TimeSpan(22, 0, 0);
+
+                var badgeWallet = new BadgeWallet
+                {
+                    DoneFirstTask = false,
+                    DoneFirstCleaningTask = false,
+                    DoneFirstLaundryTask = false,
+                    DoneFirstKitchenTask = false,
+                    DoneFirstBathroomTask = false,
+                    DoneFirstBedroomTask = false,
+                    DoneFirstOutdoorsTask = false,
+                    DoneFirstOrganizeTask = false,
+                    EarnedPerDayFiftyPoints = false,
+                    EarnedPerDayHundredPoints = false,
+                    DoneFiveTaskPerWeek = false,
+                    DoneTenTaskPerWeek = false,
+                    DoneTwentyFiveTaskPerWeek = false,
+                    CreatedTaskWasUsedOtherHome = false,
+                    CreateFirstPurchase = false,
+                    CreateFirstAdvice = false,
+                    CreateFirstIncome = false,
+                    CreateFirstExpense = false,
+                    UserId = userDto.Id
+                };
+                userDto.BadgeWallet = badgeWallet;
+
                 await _authRepository.AddUser(userDto);
                 await _authRepository.Save();
 

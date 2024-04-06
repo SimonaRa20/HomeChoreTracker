@@ -29,8 +29,6 @@
         public bool CreateFirstIncome { get; set; }
         public bool CreateFirstExpense { get; set; }
 
-        public bool CreateFirstHomeChore { get; set; }
-
         public int UserId { get; set; }
         public User User { get; set; }
     }

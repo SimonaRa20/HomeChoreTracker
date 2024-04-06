@@ -91,5 +91,10 @@ namespace HomeChoreTracker.Api.Repositories
                 .Where(x => x.TaskId == homeId && x.EarnedDate >= startOfPreviousWeek && x.EarnedDate <= endOfPreviousWeek)
                 .ToListAsync();
         }
+
+        public async Task<BadgeWallet> GetUserBadgeWallet(int userId)
+        {
+            return await _dbContext.BadgeWallets.Where(x => x.UserId.Equals(userId)).FirstOrDefaultAsync();
+        }
     }
 }
