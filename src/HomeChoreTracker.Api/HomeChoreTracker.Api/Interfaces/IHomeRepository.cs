@@ -8,7 +8,7 @@ namespace HomeChoreTracker.Api.Interfaces
     {
         Task CreateHome(HomeRequest homeRequest, int userId);
         Task<bool> CheckOrExistTitle(HomeRequest homeRequest);
-        
+        Task Update(Home home);
         Task<List<Home>> GetAll(int userId);
         Task<HomeInvitation> Get(int homeId);
         Task<Home> GetHome(int homeId);

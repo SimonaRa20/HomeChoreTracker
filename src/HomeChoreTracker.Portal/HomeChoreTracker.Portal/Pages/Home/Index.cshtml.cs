@@ -44,5 +44,26 @@ namespace HomeChoreTracker.Portal.Pages.Home
                 }
             }
         }
+        public async Task<IActionResult> OnPostAsync(int homeId)
+        {
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/Home/Level/{homeId}";
+
+                var response = await httpClient.PutAsync(apiUrl, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToPage("/Home/Index", new { id = homeId });
+                }
+                else
+                {
+                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
+                }
+            }
+        }
     }
 }

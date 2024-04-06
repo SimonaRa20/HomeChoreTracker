@@ -56,7 +56,7 @@ namespace HomeChoreTracker.Portal.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return Redirect("/");
+                    return Redirect("/Notification");
                 }
                 else
                 {
