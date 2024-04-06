@@ -13,5 +13,6 @@ namespace HomeChoreTracker.Api.Interfaces
         Task DeleteInterval(int id);
         Task UpdateInterval(BusyInterval interval);
         Task<BusyInterval> GetBusyIntervalById(int id);
+        Task<List<User>> GetAllUsers();
     }
 }

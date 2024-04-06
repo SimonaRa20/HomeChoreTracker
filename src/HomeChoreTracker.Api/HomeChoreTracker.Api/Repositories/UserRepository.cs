@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Database;
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +76,11 @@ namespace HomeChoreTracker.Api.Repositories
         {
             _dbContext.BusyIntervals.Update(interval);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await _dbContext.Users.Where(x=>x.Role.Equals(Role.User)).ToListAsync();
         }
     }
 }

@@ -3,6 +3,7 @@ using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Mapping;
 using HomeChoreTracker.Api.Repositories;
+using HomeChoreTracker.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -93,7 +94,7 @@ namespace HomeChoreTracker.Api
             builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
             builder.Services.AddScoped<IGamificationRepository, GamificationRepository>();
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-
+            builder.Services.AddHostedService<GamificationService>();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())

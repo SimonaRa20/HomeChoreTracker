@@ -132,5 +132,77 @@ namespace HomeChoreTracker.Api.Repositories
             BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
             return wallet?.CreatedTaskWasUsedOtherHome ?? false;
         }
+
+        public async Task<bool> UserHasDoneFirstTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstTask ?? false;
+        }
+
+        public async Task<bool> UserHasDoneFirstCleaningTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstCleaningTask ?? false;
+        }
+
+        public async Task<bool> UserHasDoneFirstLaundryTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstLaundryTask ?? false;
+        }
+
+        public async Task<bool> UserHasDoneFirstKitchenTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstKitchenTask ?? false;
+        }
+
+        public async Task<bool> UserHasDoneFirstBathroomTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstBathroomTask ?? false;
+        }
+
+        public async Task<bool> UserHasDoneFirstBedroomTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstBedroomTask ?? false;
+        }
+
+        public async Task<bool> UserHasDoneFirstOutdoorsTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstOutdoorsTask ?? false;
+        }
+
+        public async Task<bool> UserHasDoneFirstOrganizeTaskBadge(int userId)
+        {
+            BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
+            return wallet?.DoneFirstOrganizeTask ?? false;
+        }
+
+        public async Task<bool> UserHasEarnedFiftyPointsPerDay(int userId)
+        {
+            DateTime todayStart = DateTime.Today;
+            DateTime todayEnd = todayStart.AddDays(1).AddSeconds(-1);
+
+            int totalPointsToday = await _dbContext.PointsHistory
+                .Where(ph => ph.HomeMemberId == userId && ph.EarnedDate >= todayStart && ph.EarnedDate <= todayEnd)
+                .SumAsync(ph => ph.EarnedPoints);
+
+            return totalPointsToday >= 50;
+        }
+
+        public async Task<bool> UserHasEarnedHundredPointsPerDay(int userId)
+        {
+            DateTime todayStart = DateTime.Today;
+            DateTime todayEnd = todayStart.AddDays(1).AddSeconds(-1);
+
+            int totalPointsToday = await _dbContext.PointsHistory
+                .Where(ph => ph.HomeMemberId == userId && ph.EarnedDate >= todayStart && ph.EarnedDate <= todayEnd)
+                .SumAsync(ph => ph.EarnedPoints);
+
+            return totalPointsToday >= 100;
+        }
     }
 }

@@ -22,5 +22,15 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<bool> UserHasCreateFirstAdviceBadge(int userId);
         Task<bool> UserHasCreateFirstPurchaseBadge(int userId);
         Task<bool> UserHasCreatedTaskWasUsedOtherHomeBadge(int userId);
+        Task<bool> UserHasDoneFirstTaskBadge(int userId);
+        Task<bool> UserHasDoneFirstCleaningTaskBadge(int userId);
+        Task<bool> UserHasDoneFirstLaundryTaskBadge(int userId);
+        Task<bool> UserHasDoneFirstKitchenTaskBadge(int userId);
+        Task<bool> UserHasDoneFirstBathroomTaskBadge(int userId);
+        Task<bool> UserHasDoneFirstBedroomTaskBadge(int userId);
+        Task<bool> UserHasDoneFirstOutdoorsTaskBadge(int userId);
+        Task<bool> UserHasDoneFirstOrganizeTaskBadge(int userId);
+        Task<bool> UserHasEarnedFiftyPointsPerDay(int userId);
+        Task<bool> UserHasEarnedHundredPointsPerDay(int userId);
     }
 }
