@@ -166,7 +166,7 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
-                List<PointsHistory> points = pointsHistory.OrderByDescending(h => h.EarnedDate).Skip(skip).Take(take).ToList();
+                List<PointsHistory> points = pointsHistory.OrderBy(h => h.EarnedDate).Skip(skip).Take(take).ToList();
                 List<PointsResponse> response = new List<PointsResponse>();
 
                 foreach(var point in points)
@@ -196,7 +196,7 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
-                List<PointsHistory> points = pointsHistory.OrderByDescending(h => h.EarnedDate).ToList();
+                List<PointsHistory> points = pointsHistory.OrderBy(h => h.EarnedDate).ToList();
                 List<PointsResponse> response = new List<PointsResponse>();
 
                 foreach (var point in pointsHistory)

@@ -17,5 +17,7 @@ namespace HomeChoreTracker.Api.Models
 		public List<DayOfWeek>? DaysOfWeek { get; set; }
 		public int? DayOfMonth { get; set; }
 		public MonthlyRepeatType? MonthlyRepeatType { get; set; }
+		public int? UserId { get; set; }
+		public int? HomeId { get; set; }
 	}
 }

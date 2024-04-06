@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Contracts.HomeChore;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using HomeChoreTracker.Api.Contracts.HomeChore;
 using HomeChoreTracker.Api.Contracts.HomeChoreBase;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
@@ -46,7 +47,7 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.TaskAssignments.AddAsync(taskAssignment);
         }
 
-        public async Task <HomeChoreTask>CreateHomeChore(HomeChoreRequest homeChoreRequest)
+        public async Task <HomeChoreTask>CreateHomeChore(HomeChoreRequest homeChoreRequest, int userId, int? homeId)
         {
             List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
             if(homeChoreRequest.DaysOfWeek != null)
@@ -86,6 +87,28 @@ namespace HomeChoreTracker.Api.Repositories
                         dayOfWeeks.Add(DayOfWeek.Sunday);
                     }
                 }
+            }
+
+            if (homeChoreRequest.IsPublic)
+            {
+                HomeChoreBase homeChoreBase = new HomeChoreBase
+                {
+                    Name = homeChoreRequest.Name,
+                    ChoreType = homeChoreRequest.ChoreType,
+                    Description = homeChoreRequest.Description,
+                    Points = homeChoreRequest.Points,
+                    Time = homeChoreRequest.Time,
+                    LevelType = homeChoreRequest.LevelType,
+                    Interval = homeChoreRequest.Interval,
+                    Unit = homeChoreRequest.Unit,
+                    DaysOfWeek = dayOfWeeks,
+                    DayOfMonth = homeChoreRequest.DayOfMonth,
+                    MonthlyRepeatType = homeChoreRequest.MonthlyRepeatType,
+                    UserId = userId,
+                    HomeId = (int)homeId
+                };
+
+                await _dbContext.HomeChoresBases.AddAsync(homeChoreBase);
             }
 
             HomeChoreTask homeChore = new HomeChoreTask

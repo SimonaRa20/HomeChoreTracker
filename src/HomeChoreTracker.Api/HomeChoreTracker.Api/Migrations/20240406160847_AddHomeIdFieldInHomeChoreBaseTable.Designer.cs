@@ -4,6 +4,7 @@ using HomeChoreTracker.Api.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeChoreTracker.Api.Migrations
 {
     [DbContext(typeof(HomeChoreTrackerDbContext))]
-    partial class HomeChoreTrackerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240406160847_AddHomeIdFieldInHomeChoreBaseTable")]
+    partial class AddHomeIdFieldInHomeChoreBaseTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,7 +300,8 @@ namespace HomeChoreTracker.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GamificationLevelId");
+                    b.HasIndex("GamificationLevelId")
+                        .IsUnique();
 
                     b.ToTable("Homes");
                 });
@@ -810,8 +814,8 @@ namespace HomeChoreTracker.Api.Migrations
             modelBuilder.Entity("HomeChoreTracker.Api.Models.Home", b =>
                 {
                     b.HasOne("HomeChoreTracker.Api.Models.GamificationLevel", "GamificationLevel")
-                        .WithMany()
-                        .HasForeignKey("GamificationLevelId")
+                        .WithOne()
+                        .HasForeignKey("HomeChoreTracker.Api.Models.Home", "GamificationLevelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

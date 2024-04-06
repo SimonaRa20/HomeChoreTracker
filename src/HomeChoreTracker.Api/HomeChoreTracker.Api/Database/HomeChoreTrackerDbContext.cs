@@ -31,6 +31,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<BusyInterval> BusyIntervals { get; set; }
         public DbSet<GamificationLevel> GamificationLevels { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<BadgeWallet> BadgeWallets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,11 +39,6 @@ namespace HomeChoreTracker.Api.Database
 
             modelBuilder.Entity<UserHomes>()
                 .HasKey(uh => new { uh.UserId, uh.HomeId });
-
-            modelBuilder.Entity<Home>()
-                .HasOne(h => h.GamificationLevel)
-                .WithOne()
-                .HasForeignKey<Home>(h => h.GamificationLevelId);
 
             modelBuilder.Entity<Home>()
                 .HasMany(h => h.Purchases)
@@ -98,6 +94,12 @@ namespace HomeChoreTracker.Api.Database
                 .HasMany(ta => ta.TaskVotes)
                 .WithOne(tv => tv.TaskAssignment)
                 .HasForeignKey(tv => tv.TaskAssignmentId);
+
+
+            modelBuilder.Entity<BadgeWallet>()
+                .HasOne(bw => bw.User)
+                .WithOne(u => u.BadgeWallet)
+                .HasForeignKey<BadgeWallet>(bw => bw.UserId);
         }
     }
 }

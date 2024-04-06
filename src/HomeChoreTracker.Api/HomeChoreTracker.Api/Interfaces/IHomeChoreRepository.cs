@@ -7,7 +7,7 @@ namespace HomeChoreTracker.Api.Interfaces
     public interface IHomeChoreRepository
     {
         Task AddHomeChoreBase(HomeChoreBase homeChoreBase, int homeId);
-        Task<HomeChoreTask> CreateHomeChore(HomeChoreRequest homeChoreRequest);
+        Task<HomeChoreTask> CreateHomeChore(HomeChoreRequest homeChoreRequest, int userId, int? homeId);
         Task Save();
         Task<List<HomeChoreTask>> GetAll(int id);
         Task<List<TaskAssignment>> GetCalendar(int id);

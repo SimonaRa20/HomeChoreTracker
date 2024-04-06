@@ -30,7 +30,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             CreateHomeChore = new HomeChoreRequest();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(int homeId)
         {
             ClearFieldErrors(key => key == "CreateHomeChore.ChoreType");
             ClearFieldErrors(key => key == "CreateHomeChore.Frequency");
@@ -46,7 +46,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 using (var httpClient = _httpClientFactory.CreateClient())
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var apiUrl = _config["ApiUrl"] + "/HomeChore";
+                    var apiUrl = _config["ApiUrl"] + $"/HomeChore/add/{homeId}";
 
                     CreateHomeChore.HomeId = Id;
 

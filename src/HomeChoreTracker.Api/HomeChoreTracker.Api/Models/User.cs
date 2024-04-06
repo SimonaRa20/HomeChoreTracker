@@ -16,5 +16,6 @@
         public List<Event>? CalendarEvents { get; set; }
         public List<BusyInterval> BusyIntervals { get; set; }
         public List<Notification> Notifications { get; set; }
+        public BadgeWallet BadgeWallet { get; set; }
     }
 }

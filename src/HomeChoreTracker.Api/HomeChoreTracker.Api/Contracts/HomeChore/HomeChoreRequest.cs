@@ -19,5 +19,6 @@ namespace HomeChoreTracker.Api.Contracts.HomeChore
         public MonthlyRepeatType? MonthlyRepeatType { get; set; }
         public int HomeId { get; set; }
         public bool WasEarnedPoints { get; set; }
+        public bool IsPublic { get; set; }
     }
 }

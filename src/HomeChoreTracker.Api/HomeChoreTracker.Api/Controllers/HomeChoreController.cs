@@ -44,9 +44,43 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
+                int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
                 var homeChoreBase = await _homeChoreBaseRepository.GetChoreBase(taskId);
 
                 await _homeChoreRepository.AddHomeChoreBase(homeChoreBase, homeId);
+
+                var users = await _homeRepository.GetHomeMembers(homeId);
+               
+
+                if(homeChoreBase.UserId != null)
+                {
+                    bool newFamily = false;
+
+                    foreach (var familyMember in users)
+                    {
+                        if (familyMember.HomeMemberId.Equals(id) && !homeChoreBase.UserId.Equals(id))
+                        {
+                            newFamily = true;
+                        }
+                    }
+
+                    if(newFamily)
+                    {
+                        var user = await _userRepository.GetUserById((int)homeChoreBase.UserId);
+
+                        PointsHistory pointsHistory = new PointsHistory
+                        {
+                            EarnedPoints = 5,
+                            HomeMemberId = (int)homeChoreBase.UserId,
+                            TaskId = (int)taskId,
+                            HomeId = (int)homeChoreBase.HomeId,
+                            Text = $"{user.UserName} created '{homeChoreBase.Name}' task was used.",
+                            EarnedDate = DateTime.Now,
+                        };
+
+                        await _gamificationRepository.AddPointsHistory(pointsHistory);
+                    }
+                }
 
                 return Ok($"Home chore was added successfully");
             }
@@ -56,10 +90,11 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateHomeChoreBase(HomeChoreRequest homeChoreBaseRequest)
+        [HttpPost("add/{homeId}")]
+        public async Task<IActionResult> CreateHomeChoreBase(int homeId, HomeChoreRequest homeChoreBaseRequest)
         {
-            HomeChoreTask task = await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest);
+            int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            HomeChoreTask task = await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest, id, homeId);
 
             await _homeChoreRepository.Save();
             if (task == null)
@@ -430,6 +465,8 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
+                int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
                 var homeChore = await _homeChoreRepository.Get(id);
 
                 if (homeChore == null)
@@ -535,7 +572,7 @@ namespace HomeChoreTracker.Api.Controllers
                     homeChoreRequest.EndDate = homeChoreBaseRequest.EndDate;
                     homeChoreRequest.HomeId = homeChore.HomeId;
 
-                    HomeChoreTask newTask = await _homeChoreRepository.CreateHomeChore(homeChoreRequest);
+                    HomeChoreTask newTask = await _homeChoreRepository.CreateHomeChore(homeChoreRequest, userId, null);
                     await _homeChoreRepository.Save();
 
 
@@ -623,8 +660,6 @@ namespace HomeChoreTracker.Api.Controllers
                     return Ok($"Home chore base with ID {id} updated successfully");
                 }
 
-
-                return BadRequest($"An error occurred while updating the home chore");
             }
             catch (Exception ex)
             {

@@ -27,24 +27,40 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task CreateHome(HomeRequest homeRequest, int userId)
         {
-            Home home = new Home
+            // Fetch the GamificationLevel with ID 1
+            GamificationLevel defaultGamificationLevel = await _gamificationRepository.GetGamificationLevel(1);
+
+            // Check if the GamificationLevel exists
+            if (defaultGamificationLevel != null)
             {
-                Title = homeRequest.Title,
-                GamificationLevel = await _gamificationRepository.GetGamificationLevel(1),
-            };
+                // Create the new Home with the default GamificationLevel
+                Home home = new Home
+                {
+                    Title = homeRequest.Title,
+                    GamificationLevelId = defaultGamificationLevel.Id,
+                    GamificationLevel = defaultGamificationLevel
+                };
 
-            await _dbContext.Homes.AddAsync(home);
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.Homes.AddAsync(home);
+                await _dbContext.SaveChangesAsync();
 
-            var userHome = new UserHomes
+                var userHome = new UserHomes
+                {
+                    UserId = userId,
+                    HomeId = home.Id,
+                };
+
+                _dbContext.UserHomes.Add(userHome);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
             {
-                UserId = userId,
-                HomeId = home.Id,
-            };
-
-            _dbContext.UserHomes.Add(userHome);
-            await _dbContext.SaveChangesAsync();
+                // Handle the scenario where the GamificationLevel with ID 1 doesn't exist
+                // For example, log an error or throw an exception
+                throw new Exception("Default GamificationLevel not found");
+            }
         }
+
 
         public async Task<Home> GetHome(int homeId)
         {
