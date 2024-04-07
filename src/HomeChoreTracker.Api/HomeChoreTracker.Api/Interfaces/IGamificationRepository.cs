@@ -37,5 +37,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<bool> UserHasDoneFiveTaskPerWeekBadge(int userId);
         Task<bool> UserHasDoneTenTaskPerWeekBadge(int userId);
         Task<bool> UserHasDoneTwentyFiveTaskPerWeekBadge(int userId);
+        Task<int> GetUserBadgesCountByUserId(int userId);
+        Task<int> GetUserPointsByUserId(int userId);
     }
 }

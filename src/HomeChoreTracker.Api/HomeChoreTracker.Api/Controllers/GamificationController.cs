@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Forum;
 using HomeChoreTracker.Api.Contracts.Gamification;
 using HomeChoreTracker.Api.Contracts.User;
@@ -17,11 +18,13 @@ namespace HomeChoreTracker.Api.Controllers
     {
         private readonly IGamificationRepository _gamificationRepository;
         private readonly IHomeRepository _homeRepository;
+        private readonly IUserRepository _userRepository;
 
-        public GamificationController(IGamificationRepository gamificationRepository, IHomeRepository homeRepository)
+        public GamificationController(IGamificationRepository gamificationRepository, IHomeRepository homeRepository, IUserRepository userRepository)
         {
             _gamificationRepository = gamificationRepository;
             _homeRepository = homeRepository;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
@@ -82,7 +85,7 @@ namespace HomeChoreTracker.Api.Controllers
                     await _gamificationRepository.AddLevel(level);
                 }
             }
-            
+
             return Ok("Level added successfully");
         }
 
@@ -167,7 +170,7 @@ namespace HomeChoreTracker.Api.Controllers
         public async Task<IActionResult> GetBadgeWallet()
         {
             int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-            
+
             BadgeWallet badgeWallet = await _gamificationRepository.GetUserBadgeWallet(id);
 
             BadgeWalletResponse response = new BadgeWalletResponse
@@ -196,6 +199,62 @@ namespace HomeChoreTracker.Api.Controllers
             };
 
             return Ok(response);
+        }
+
+        [HttpGet("RatingsByPoints")]
+        [Authorize]
+        public async Task<IActionResult> GetRatingsByPoints()
+        {
+            List<RatingsResponse> ratings = new List<RatingsResponse>();
+
+            List<User> users = await _userRepository.GetAllUsers();
+
+            foreach (User user in users)
+            {
+                int badges = await _gamificationRepository.GetUserBadgesCountByUserId(user.Id);
+                int points = await _gamificationRepository.GetUserPointsByUserId(user.Id);
+
+                RatingsResponse response = new RatingsResponse
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                    EarnedPoints = points,
+                    EarnedBadgesCount = badges,
+                };
+
+                ratings.Add(response);
+            }
+
+            var result = ratings.OrderByDescending(x=>x.EarnedPoints).ToList();
+            return Ok(result);
+        }
+
+        [HttpGet("RatingsByBadges")]
+        [Authorize]
+        public async Task<IActionResult> GetRatingsByBadges()
+        {
+            List<RatingsResponse> ratings = new List<RatingsResponse>();
+
+            List<User> users = await _userRepository.GetAllUsers();
+
+            foreach (User user in users)
+            {
+                int badges = await _gamificationRepository.GetUserBadgesCountByUserId(user.Id);
+                int points = await _gamificationRepository.GetUserPointsByUserId(user.Id);
+
+                RatingsResponse response = new RatingsResponse
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                    EarnedPoints = points,
+                    EarnedBadgesCount = badges,
+                };
+
+                ratings.Add(response);
+            }
+
+            var result = ratings.OrderByDescending(x => x.EarnedBadgesCount).ToList();
+            return Ok(result);
         }
     }
 }

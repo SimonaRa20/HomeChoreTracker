@@ -2,6 +2,7 @@
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace HomeChoreTracker.Api.Repositories
 {
@@ -234,6 +235,34 @@ namespace HomeChoreTracker.Api.Repositories
         {
             BadgeWallet wallet = await _dbContext.BadgeWallets.FirstOrDefaultAsync(x => x.UserId == userId);
             return wallet?.DoneTwentyFiveTaskPerWeek ?? false;
+        }
+
+        public async Task<int> GetUserBadgesCountByUserId(int userId)
+        {
+            BadgeWallet wallet = _dbContext.BadgeWallets.FirstOrDefault(x => x.UserId.Equals(userId));
+            int trueCount = 0;
+            PropertyInfo[] properties = typeof(BadgeWallet).GetProperties();
+            foreach (var property in properties)
+            {
+                if (property.PropertyType == typeof(bool) && (bool)property.GetValue(wallet))
+                {
+                    trueCount++;
+                }
+            }
+
+            return trueCount;
+        }
+
+        public async Task<int> GetUserPointsByUserId(int userId)
+        {
+            List<PointsHistory> points = await _dbContext.PointsHistory.Where(x => x.HomeMemberId.Equals(userId)).ToListAsync();
+            int sum = 0;
+            foreach (var point in points)
+            {
+                sum += point.EarnedPoints;
+            }
+
+            return sum;
         }
     }
 }
