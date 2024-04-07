@@ -36,7 +36,7 @@ namespace HomeChoreTracker.Api.Services
                             {
                                 bool hasEarnedFiftyPoints = await _gamificationRepository.UserHasEarnedFiftyPointsPerDay(user.Id);
 
-                                if (!hasEarnedFiftyPoints)
+                                if (hasEarnedFiftyPoints)
                                 {
                                     BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
                                     wallet.EarnedPerDayFiftyPoints = true;
@@ -56,11 +56,11 @@ namespace HomeChoreTracker.Api.Services
                             }
 
                             bool hasEarnedHundredPointsBadge = await _gamificationRepository.UserHasEarnedPerDayHundredPointsBadge(user.Id);
-                            if(!hasEarnedHundredPointsBadge)
+                            if(hasEarnedHundredPointsBadge)
                             {
                                 bool hasEarnedHundredPoints = await _gamificationRepository.UserHasEarnedHundredPointsPerDay(user.Id);
 
-                                if (!hasEarnedHundredPoints)
+                                if (hasEarnedHundredPoints)
                                 {
                                     BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
                                     wallet.EarnedPerDayHundredPoints = true;
