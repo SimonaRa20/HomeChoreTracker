@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.HomeChore;
@@ -412,21 +413,6 @@ namespace HomeChoreTracker.Api.Controllers
                             await _notificationRepository.CreateNotification(noti);
                         }
                     }
-                }
-                else
-                {
-                    Notification notification = new Notification
-                    {
-                        Title = $"Removed '{task.Name}' earned {task.Points} points",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)homeChore.HomeMemberId,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(notification);
-                    await _gamificationRepository.Delete(pointHistory.Id);
-                    homeChore.Points = 0;
                 }
                 
                 await _homeChoreRepository.UpdateTaskAssignment(homeChore);
@@ -865,7 +851,7 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
                 var voteTask = await _homeChoreRepository.VoteArtical(taskId, userId, voteValue);
-
+                var user = await _userRepository.GetUserById(userId);
                 TaskAssignment assignment = await _homeChoreRepository.GetTaskAssigment(taskId);
                 HomeChoreTask task = await _homeChoreRepository.Get(assignment.TaskId);
 
@@ -879,6 +865,17 @@ namespace HomeChoreTracker.Api.Controllers
                     assignment.Points = -10;
                     await _homeChoreRepository.UpdateTaskAssignment(assignment);
                     await _homeChoreRepository.Save();
+
+                    Notification notification = new Notification
+                    {
+                        Title = $"Your task '{task.Name}' was voted as completed incorrectly {assignment.StartDate}. Your points are being deducted, and you receive a penalty of 10 points",
+                        IsRead = false,
+                        Time = DateTime.Now,
+                        UserId = (int)userId,
+                        User = user,
+                    };
+
+                    await _notificationRepository.CreateNotification(notification);
                 }
                 else
                 {
