@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-lg-12">
             <a class="btn btn-secondary btn-sm mb-2" href="/"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>My Calendar</a>
-             <a class="btn btn-light btn-sm mb-2" asp-page="/BadgeWallet"><i class="fa fa-wallet mr-2" aria-hidden="true"></i>My Bagde Wallet</a>
+            <a class="btn btn-light btn-sm mb-2" asp-page="/BadgeWallet"><i class="fa fa-wallet mr-2" aria-hidden="true"></i>My Bagde Wallet</a>
             <div class="card mb-4 py-3 border-left-primary">
 
                 <div class="d-flex justify-content-between m-2">
@@ -55,15 +55,15 @@
                 </div>
 
                 <div class="modal" tabindex="-1" role="dialog" id="exampleModal">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Selected home chore</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                              <form method="post" asp-page-handler="IsDone">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Selected home chore</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-page-handler="IsDone">
                 <div class="modal-body">
                     <p><strong>Name:</strong> <span id="modalTitle"></span></p>
                     <p><strong>Description:</strong> <span id="modalDescription"></span></p>
@@ -74,20 +74,25 @@
                     <p><strong>Date:</strong> <span id="modalStartDate"></span> / <span id="modalEndDate"></span></p>
                    <div class="form-check">
     <input type="hidden" id="modalId" name="id" value="" />
-    <input type="checkbox" class="form-check-input" id="done" name="done" >
-    <label class="form-check-label" for="isDoneCheckbox">Check if task is done</label>
+    <div id="doneCheckbox">
+        <input type="checkbox" class="form-check-input" id="done" name="done">
+        <label class="form-check-label" for="isDoneCheckbox">Check if task is done</label>
+    </div>
+</div>
 </div>
 
-                </div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <div id="saveButton">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
             </form>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </div>
+</div>
+
 
                 <div id="calendar" class="m-2"></div>
             </div>
@@ -109,23 +114,23 @@ else
                 right: 'month,agendaWeek,agendaDay'
             },
             events: [
-    @if(Model.Events != null)
-    {
-        @foreach (var chore in Model.Events)
+                @if(Model.Events != null)
                 {
-                    <text>
-                        {
-                            id: '@chore.Id',
-                            title: '@chore.Summary',
-                            start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                            end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                            color: "#d3d3d3",
-                            textColor: 'black',
-                            editable: false
-                        },
-                    </text>
+                    @foreach (var chore in Model.Events)
+                    {
+                        <text>
+                            {
+                                id: '@chore.Id',
+                                title: '@chore.Summary',
+                                start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                color: "#d3d3d3",
+                                textColor: 'black',
+                                editable: false
+                            },
+                        </text>
+                    }
                 }
-    }
     
                 @foreach (var chore in Model.HomeChoreResponse)
                 {
@@ -137,26 +142,25 @@ else
                             end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                             color: '@GetTextColor(@chore.Task.ChoreType.ToString())',
                             textColor: 'white',
-                  
                         },
                     </text>
                 }
             ],
-           eventRender: function (event, element) {
-               var startTime = moment(event.start._i).format('HH:mm');
+            eventRender: function (event, element) {
+                var startTime = moment(event.start._i).format('HH:mm');
 
                 element.css('background-color', event.color);
                 element.css('border-color', event.color);
                 element.css('opacity', '0.8');
 
                 var eventText = '<div class="fc-content">' +
-                                        '<span class="fc-title" style="height: 32px;">' + startTime + ' ' + event.title + '</span>' +
-                                    '</div>';
-               element.css('min-height', '16px');
+                                    '<span class="fc-title" style="height: 32px;">' + startTime + ' ' + event.title + '</span>' +
+                                '</div>';
+                element.css('min-height', '16px');
 
-               element.find('.fc-time').remove();
-                    element.find('.fc-title').remove();
-                    element.append(eventText);
+                element.find('.fc-time').remove();
+                element.find('.fc-title').remove();
+                element.append(eventText);
             },
             eventClick: function (calEvent, jsEvent, view) {
                 if (calEvent.color === "#d3d3d3") {
@@ -179,8 +183,18 @@ else
                         $('#modalEndDate').text(endDate);
                         $('#modalTime').text(response.time);
 
-
                         $('#done').prop('checked', response.isDone);
+                        console.log(response.isDone)
+
+                        if (response.isDone) {
+            // Hide the "Save" button
+            $('#saveButton').hide();
+             $('#doneCheckbox').hide();
+        } else {
+            // Show the "Save" button
+            $('#saveButton').show();
+             $('#doneCheckbox').show();
+        }
 
                         $('#modalId').val(response.id);
                         console.log(response)
@@ -306,5 +320,3 @@ else
         vertical-align: middle;
     }
 </style>
-
-

@@ -39,7 +39,7 @@ namespace HomeChoreTracker.Portal.Pages
         {
             var token = User.FindFirstValue("Token");
 
-            if(token == null)
+            if (token == null)
             {
                 return RedirectToPage("Auth/Login");
             }
@@ -83,11 +83,11 @@ namespace HomeChoreTracker.Portal.Pages
                             time = chore.Task.Time.ToString(),
                         });
 
-                        
+
                     }
                     return Page();
                 }
-                    else
+                else
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
@@ -204,7 +204,7 @@ namespace HomeChoreTracker.Portal.Pages
                     {
                         isDone = false;
                     }
-                   
+
 
                     var apiUrl = $"{_config["ApiUrl"]}/HomeChore/ChoreIsDone/{id}?isDone={isDone}";
 
