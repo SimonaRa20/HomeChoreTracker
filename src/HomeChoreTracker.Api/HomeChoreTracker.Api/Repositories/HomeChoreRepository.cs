@@ -275,6 +275,7 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task UpdateTaskAssignment(TaskAssignment assignment)
         {
             _dbContext.Entry(assignment).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<List<TaskAssignment>> GetHomeChoresUserCalendar(int id)

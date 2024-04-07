@@ -79,7 +79,7 @@ namespace HomeChoreTracker.Api
                            .AllowCredentials();
                 });
             });
-            builder.Services.AddDbContext<HomeChoreTrackerDbContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<HomeChoreTrackerDbContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
             
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();

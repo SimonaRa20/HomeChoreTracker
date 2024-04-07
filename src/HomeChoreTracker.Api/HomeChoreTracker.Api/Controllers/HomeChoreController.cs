@@ -225,7 +225,7 @@ namespace HomeChoreTracker.Api.Controllers
                 var user = await _userRepository.GetUserById((int)homeChore.HomeMemberId);
 
                 var pointHistory = await _gamificationRepository.GetPointsHistoryByTaskId(id);
-
+                BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
                 homeChore.IsDone = isDone;
                 if (isDone && pointHistory == null)
                 {
@@ -256,7 +256,7 @@ namespace HomeChoreTracker.Api.Controllers
                     var hasBadge = await _gamificationRepository.UserHasDoneFirstTaskBadge(user.Id);
                     if (!hasBadge)
                     {
-                        BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
+                        
                         wallet.DoneFirstTask = true;
                         await _gamificationRepository.UpdateBadgeWallet(wallet);
 
@@ -272,7 +272,146 @@ namespace HomeChoreTracker.Api.Controllers
                         await _notificationRepository.CreateNotification(noti);
                     }
 
-                    CheckBadgeSendNotification(task.ChoreType, user);
+                    if (task.ChoreType.Equals(HomeChoreType.Cleaning))
+                    {
+                        var hasDoneFirstCleaningTaskBadge = await _gamificationRepository.UserHasDoneFirstCleaningTaskBadge(user.Id);
+                        if (!hasDoneFirstCleaningTaskBadge)
+                        {
+                            wallet.DoneFirstCleaningTask = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first cleaning task'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)user.Id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
+                    }
+                    else if (task.ChoreType.Equals(HomeChoreType.Laundry))
+                    {
+                        var hasDoneFirstLaundryTaskBadge = await _gamificationRepository.UserHasDoneFirstLaundryTaskBadge(user.Id);
+                        if (!hasDoneFirstLaundryTaskBadge)
+                        {
+                            wallet.DoneFirstLaundryTask = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first laundry task'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)user.Id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
+                    }
+                    else if (task.ChoreType.Equals(HomeChoreType.Kitchen))
+                    {
+                        var hasDoneFirstKitchenTaskBadge = await _gamificationRepository.UserHasDoneFirstKitchenTaskBadge(user.Id);
+                        if (!hasDoneFirstKitchenTaskBadge)
+                        {
+                            wallet.DoneFirstKitchenTask = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first kitchen task'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)user.Id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
+                    }
+                    else if (task.ChoreType.Equals(HomeChoreType.Bathroom))
+                    {
+                        var hasDoneFirstBathroomTaskBadge = await _gamificationRepository.UserHasDoneFirstBathroomTaskBadge(user.Id);
+                        if (!hasDoneFirstBathroomTaskBadge)
+                        {
+                            wallet.DoneFirstBathroomTask = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first bathroom task'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)user.Id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
+                    }
+                    else if (task.ChoreType.Equals(HomeChoreType.Bedroom))
+                    {
+                        var hasDoneFirstBedroomTaskBadge = await _gamificationRepository.UserHasDoneFirstBedroomTaskBadge(user.Id);
+                        if (!hasDoneFirstBedroomTaskBadge)
+                        {
+                            wallet.DoneFirstBedroomTask = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first bedroom task'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)user.Id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
+                    }
+                    else if (task.ChoreType.Equals(HomeChoreType.Outdoors))
+                    {
+                        var hasDoneFirstOutdoorsTaskBadge = await _gamificationRepository.UserHasDoneFirstOutdoorsTaskBadge(user.Id);
+                        if (!hasDoneFirstOutdoorsTaskBadge)
+                        {
+                            wallet.DoneFirstOutdoorsTask = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first outdoors task'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)user.Id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
+                    }
+                    else
+                    {
+                        var hasDoneFirstOrganizeTaskBadge = await _gamificationRepository.UserHasDoneFirstOrganizeTaskBadge(user.Id);
+                        if (!hasDoneFirstOrganizeTaskBadge)
+                        {
+                            wallet.DoneFirstOrganizeTask = true;
+                            await _gamificationRepository.UpdateBadgeWallet(wallet);
+
+                            Notification noti = new Notification
+                            {
+                                Title = $"You earned badge 'Create first organize task'",
+                                IsRead = false,
+                                Time = DateTime.Now,
+                                UserId = (int)user.Id,
+                                User = user,
+                            };
+
+                            await _notificationRepository.CreateNotification(noti);
+                        }
+                    }
                 }
                 else
                 {
@@ -291,7 +430,6 @@ namespace HomeChoreTracker.Api.Controllers
                 }
                 
                 await _homeChoreRepository.UpdateTaskAssignment(homeChore);
-                await _homeChoreRepository.Save();
 
                 if (homeChore == null)
                 {
@@ -303,157 +441,6 @@ namespace HomeChoreTracker.Api.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"An error occurred while fetching home chore bases: {ex.Message}");
-            }
-        }
-
-        private async void CheckBadgeSendNotification(HomeChoreType homeChoreType, User user)
-        {
-            if(homeChoreType.Equals(HomeChoreType.Cleaning))
-            {
-                var hasBadge = await _gamificationRepository.UserHasDoneFirstCleaningTaskBadge(user.Id);
-                if (!hasBadge)
-                {
-                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
-                    wallet.DoneFirstCleaningTask = true;
-                    await _gamificationRepository.UpdateBadgeWallet(wallet);
-
-                    Notification noti = new Notification
-                    {
-                        Title = $"You earned badge 'Create first cleaning task'",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)user.Id,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(noti);
-                }
-            }
-            else if (homeChoreType.Equals(HomeChoreType.Laundry))
-            {
-                var hasBadge = await _gamificationRepository.UserHasDoneFirstLaundryTaskBadge(user.Id);
-                if (!hasBadge)
-                {
-                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
-                    wallet.DoneFirstLaundryTask = true;
-                    await _gamificationRepository.UpdateBadgeWallet(wallet);
-
-                    Notification noti = new Notification
-                    {
-                        Title = $"You earned badge 'Create first laundry task'",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)user.Id,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(noti);
-                }
-            }
-            else if (homeChoreType.Equals(HomeChoreType.Kitchen))
-            {
-                var hasBadge = await _gamificationRepository.UserHasDoneFirstKitchenTaskBadge(user.Id);
-                if (!hasBadge)
-                {
-                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
-                    wallet.DoneFirstKitchenTask = true;
-                    await _gamificationRepository.UpdateBadgeWallet(wallet);
-
-                    Notification noti = new Notification
-                    {
-                        Title = $"You earned badge 'Create first kitchen task'",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)user.Id,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(noti);
-                }
-            }
-            else if (homeChoreType.Equals(HomeChoreType.Bathroom))
-            {
-                var hasBadge = await _gamificationRepository.UserHasDoneFirstBathroomTaskBadge(user.Id);
-                if (!hasBadge)
-                {
-                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
-                    wallet.DoneFirstBathroomTask = true;
-                    await _gamificationRepository.UpdateBadgeWallet(wallet);
-
-                    Notification noti = new Notification
-                    {
-                        Title = $"You earned badge 'Create first bathroom task'",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)user.Id,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(noti);
-                }
-            }
-            else if (homeChoreType.Equals(HomeChoreType.Bedroom))
-            {
-                var hasBadge = await _gamificationRepository.UserHasDoneFirstBedroomTaskBadge(user.Id);
-                if (!hasBadge)
-                {
-                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
-                    wallet.DoneFirstBedroomTask = true;
-                    await _gamificationRepository.UpdateBadgeWallet(wallet);
-
-                    Notification noti = new Notification
-                    {
-                        Title = $"You earned badge 'Create first bedroom task'",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)user.Id,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(noti);
-                }
-            }
-            else if (homeChoreType.Equals(HomeChoreType.Outdoors))
-            {
-                var hasBadge = await _gamificationRepository.UserHasDoneFirstOutdoorsTaskBadge(user.Id);
-                if (!hasBadge)
-                {
-                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
-                    wallet.DoneFirstOutdoorsTask = true;
-                    await _gamificationRepository.UpdateBadgeWallet(wallet);
-
-                    Notification noti = new Notification
-                    {
-                        Title = $"You earned badge 'Create first outdoors task'",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)user.Id,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(noti);
-                }
-            }
-            else
-            {
-                var hasBadge = await _gamificationRepository.UserHasDoneFirstOrganizeTaskBadge(user.Id);
-                if (!hasBadge)
-                {
-                    BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
-                    wallet.DoneFirstOrganizeTask = true;
-                    await _gamificationRepository.UpdateBadgeWallet(wallet);
-
-                    Notification noti = new Notification
-                    {
-                        Title = $"You earned badge 'Create first organize task'",
-                        IsRead = false,
-                        Time = DateTime.Now,
-                        UserId = (int)user.Id,
-                        User = user,
-                    };
-
-                    await _notificationRepository.CreateNotification(noti);
-                }
             }
         }
 

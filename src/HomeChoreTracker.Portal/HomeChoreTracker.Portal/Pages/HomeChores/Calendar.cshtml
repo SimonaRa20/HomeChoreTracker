@@ -166,25 +166,20 @@ else
             eventClick: function (calEvent, jsEvent, view) {
 
                 var userId = @Html.Raw(Json.Serialize(Model.UserId));
-                console.log(userId)
-                console.log(calEvent.assigned)
                 if (calEvent.isDone === 'True') {
                     
                     if (userId != calEvent.assigned)
                     {
-                        console.log('1')
                         $('#assign-to-selection').hide();
                         $('#vote-to-selection').show();
                     }
                     else
                     {
-                        console.log('11')
                         $('#assign-to-selection').hide();
                         $('#vote-to-selection').hide();
                     }
                     
                 } else {
-                    console.log('111')
                     $('#assign-to-selection').show();
                     $('#vote-to-selection').hide();
                 }
@@ -200,7 +195,7 @@ else
                 $('#task-totalVotes').text(calEvent.votes);
 
                 $('#vote-to-selection form').find('input[name="taskId"]').val(calEvent.id);
-                console.log(calEvent.isDone)
+
                 var assignedMemberId = calEvent.assigned;
                 var assignedMemberName = '';
 
@@ -223,6 +218,8 @@ else
                 $('#task-assigned').text(assignedMemberName);
                 $('#assigned-person').val(assignedMemberId);
                 $('#task-id').val(calEvent.id);
+
+                console.log(calEvent.id)
             }
         });
     });
@@ -263,7 +260,7 @@ else
                 </form>
                 </div>
                 <div id="assign-to-selection">
-                    <form id="assign-person-form" method="post" asp-page-handler="Assign">
+                    <form id="assign-person-form" method="post" >
                         <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
                         <input type="hidden" id="task-id" name="taskId" value="" />
                         <div class="form-group">
