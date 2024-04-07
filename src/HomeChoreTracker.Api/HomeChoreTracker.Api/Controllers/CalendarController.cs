@@ -10,6 +10,7 @@ using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime;
 using System.Security.Claims;
 using System.Text;
 
@@ -142,59 +143,6 @@ public class CalendarController : Controller
         return Ok(homeChoreEventResponse);
     }
 
-    [HttpPut("{id}")]
-    [Authorize]
-    public async Task<IActionResult> AssignTaskToMember(int id, AssignedHomeMember assignedHomeMember)
-    {
-        try
-        {
-            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-            User user = await _userRepository.GetUserById(userId);
-
-            if(assignedHomeMember.HomeMemberId == null)
-            {
-                TaskAssignment taskAs = await _homeChoreRepository.GetTaskAssigment(assignedHomeMember.TaskId);
-                taskAs.HomeMemberId = null;
-                await _homeChoreRepository.UpdateTaskAssignment(taskAs);
-                await _homeChoreRepository.Save();
-                return Ok();
-            }
-
-
-            TaskAssignment taskAssignment = await _homeChoreRepository.GetTaskAssigment(assignedHomeMember.TaskId);
-            taskAssignment.HomeMemberId = assignedHomeMember.HomeMemberId;
-
-            HomeChoreTask task = await _homeChoreRepository.Get(taskAssignment.TaskId);
-
-            List<TaskAssignment> userTasksAssigned = new List<TaskAssignment>();
-
-            if (assignedHomeMember.HomeMemberId != null)
-            {
-                userTasksAssigned = await _homeChoreRepository.GetAssignedTasks((int)assignedHomeMember.HomeMemberId);
-            }
-
-            List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, taskAssignment.StartDate, user.CalendarEvents, task.Time, userTasksAssigned);
-
-            if (suitableIntervals.Any())
-            {
-                var (start, end) = suitableIntervals.First();
-                taskAssignment.StartDate = start;
-                taskAssignment.EndDate = start.AddMinutes(GetMinutesFromTimeLong(task.Time));
-            }
-            else
-            {
-                return BadRequest("No suitable time intervals found for the task.");
-            }
-
-            await _homeChoreRepository.UpdateTaskAssignment(taskAssignment);
-            await _homeChoreRepository.Save();
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred: {ex.Message}");
-        }
-    }
 
     [HttpPost("AssignTasksToMembers/{homeId}")]
     [Authorize]
@@ -229,9 +177,10 @@ public class CalendarController : Controller
                 User user = await _userRepository.GetUserById(minPointsMember.Key);
 
                 List<TaskAssignment> userTasksAssigned = await _homeChoreRepository.GetAssignedTasks(minPointsMember.Key);
+                List<BusyInterval> busyIntervals = await _userRepository.GetUserBusyIntervals(minPointsMember.Key);
 
                 HomeChoreTask hometask = await _homeChoreRepository.Get(task.TaskId);
-                List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, task.StartDate, user.CalendarEvents, hometask.Time, userTasksAssigned);
+                List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, task.StartDate, user.CalendarEvents, hometask.Time, userTasksAssigned, busyIntervals);
 
                 if (suitableIntervals.Any())
                 {
@@ -245,8 +194,7 @@ public class CalendarController : Controller
                 }
 
                 await _homeChoreRepository.UpdateTaskAssignment(task);
-                await _homeChoreRepository.Save();
-                
+
                 assignedPoints[minPointsMember.Key] += hometask.Points;
             }
 
@@ -257,121 +205,166 @@ public class CalendarController : Controller
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> AssignTaskToMember(int id, AssignedHomeMember assignedHomeMember)
+    {
+        try
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            User user = await _userRepository.GetUserById(userId);
 
+            TaskAssignment taskAssignment = await _homeChoreRepository.GetTaskAssigment(assignedHomeMember.TaskId);
+            if (assignedHomeMember.HomeMemberId == null)
+            {
+                taskAssignment.HomeMemberId = null;
+                await _homeChoreRepository.UpdateTaskAssignment(taskAssignment);
+                await _homeChoreRepository.Save();
+                return Ok();
+            }
 
-    private List<(DateTime start, DateTime end)> FindSuitableTimeIntervals(User user, DateTime StartTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks)
+            taskAssignment.HomeMemberId = assignedHomeMember.HomeMemberId;
+
+            HomeChoreTask task = await _homeChoreRepository.Get(taskAssignment.TaskId);
+
+            User assignedUser = await _userRepository.GetUserById(assignedHomeMember.HomeMemberId.Value);
+            List<TaskAssignment> userTasksAssigned = await _homeChoreRepository.GetAssignedTasks(assignedUser.Id);
+            List<BusyInterval> busyIntervals = await _userRepository.GetUserBusyIntervals(assignedUser.Id);
+
+            List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, taskAssignment.StartDate, user.CalendarEvents, task.Time, userTasksAssigned, busyIntervals);
+
+            if (suitableIntervals.Any())
+            {
+                var (start, end) = suitableIntervals.First();
+                taskAssignment.StartDate = start;
+                taskAssignment.EndDate = start.AddMinutes(GetMinutesFromTimeLong(task.Time));
+            }
+            else
+            {
+                return BadRequest("No suitable time intervals found for the task.");
+            }
+
+            await _homeChoreRepository.UpdateTaskAssignment(taskAssignment);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+
+    private List<(DateTime start, DateTime end)> FindSuitableTimeIntervals(User user, DateTime startTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals)
     {
         List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
 
-        TimeSpan nightEnd = TimeSpan.FromHours(user.EndDayTime.Hours);
+        DateTime currentDate = startTime.Date;
+        TimeSpan startDayTime = user.StartDayTime;
+        TimeSpan endDayTime = user.EndDayTime;
 
-        if (events == null || events.Count == 0)
+        while (true)
         {
-            DateTime dayStart = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.StartDayTime.Hours, user.StartDayTime.Minutes, 0);
-            DateTime dayEnd = new DateTime(StartTime.Year, StartTime.Month, StartTime.Day, user.EndDayTime.Hours, user.EndDayTime.Hours, 0);
-            suitableIntervals.Add((dayStart, dayEnd));
-        }
-        else
-        {
-            events = events.Where(e => e.StartDate > StartTime).OrderBy(e => e.StartDate).ToList();
+            suitableIntervals = GetSuitableIntervalsForDay(user, currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals);
 
-            List<(DateTime start, DateTime end)> freeIntervals = GetFreeIntervals(events, StartTime, nightEnd);
-
-            foreach (var interval in freeIntervals)
+            if (suitableIntervals.Any())
             {
-                if (IsIntervalSuitable(interval.start, interval.end, user))
+                break;
+            }
+
+            currentDate = currentDate.AddDays(1);
+        }
+
+        return suitableIntervals;
+    }
+
+    private List<(DateTime start, DateTime end)> GetSuitableIntervalsForDay(User user, DateTime date, TimeSpan startDayTime, TimeSpan endDayTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals)
+    {
+        List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
+
+        DateTime dayStart = date.Date.Add(startDayTime);
+        DateTime dayEnd = date.Date.Add(endDayTime);
+
+        suitableIntervals.Add((dayStart, dayEnd));
+
+        if (events != null)
+        {
+            foreach (var e in events)
+            {
+                List<(DateTime start, DateTime end)> updatedIntervals = new List<(DateTime start, DateTime end)>();
+
+                foreach (var interval in suitableIntervals)
                 {
-                    suitableIntervals.Add(interval);
+                    if (interval.end > e.StartDate && interval.start < e.EndDate)
+                    {
+                        if (interval.start < e.StartDate)
+                            updatedIntervals.Add((interval.start, e.StartDate));
+                        if (interval.end > e.EndDate)
+                            updatedIntervals.Add((e.EndDate, interval.end));
+                    }
+                    else
+                    {
+                        updatedIntervals.Add(interval);
+                    }
+                }
+
+                suitableIntervals = updatedIntervals;
+            }
+        }
+        busyIntervals = busyIntervals.OrderBy(x => x.StartTime).ToList();
+
+        foreach (BusyInterval busyInterval in busyIntervals)
+        {
+            foreach (var interval in suitableIntervals.ToList())
+            {
+                if (interval.end.TimeOfDay > busyInterval.StartTime && interval.start.TimeOfDay < busyInterval.EndTime)
+                {
+                    suitableIntervals.Remove(interval);
+                    if (interval.start.TimeOfDay < busyInterval.StartTime)
+                        suitableIntervals.Add((interval.start, interval.start.Add(busyInterval.StartTime - interval.start.TimeOfDay)));
+                    if (interval.end.TimeOfDay > busyInterval.EndTime)
+                        suitableIntervals.Add((interval.start.Add(busyInterval.EndTime - interval.start.TimeOfDay), interval.end));
                 }
             }
         }
 
         suitableIntervals = suitableIntervals
             .Where(i => (i.end - i.start).TotalMinutes >= GetMinutesFromTimeLong(choreTime))
-            .Where(i => i.start.TimeOfDay >= TimeSpan.FromHours(user.StartDayTime.Hours))
             .ToList();
 
         foreach (var assignedTask in assignedTasks)
         {
-            suitableIntervals = suitableIntervals.SelectMany(interval =>
+            foreach (var interval in suitableIntervals.ToList())
             {
-                if (assignedTask.StartDate < interval.end && assignedTask.EndDate > interval.start)
+                if (interval.end.TimeOfDay > assignedTask.StartDate.TimeOfDay && interval.start.TimeOfDay < assignedTask.EndDate.TimeOfDay)
                 {
-                    if (assignedTask.StartDate <= interval.start && assignedTask.EndDate >= interval.end)
-                    {
-                        return Enumerable.Empty<(DateTime start, DateTime end)>();
-                    }
-                    else if (assignedTask.StartDate <= interval.start)
-                    {
-                        return new[]
-                        {
-                        (assignedTask.EndDate, interval.end)
-                    };
-                    }
-                    else if (assignedTask.EndDate >= interval.end)
-                    {
-                        return new[]
-                        {
-                        (interval.start, assignedTask.StartDate)
-                    };
-                    }
-                    else
-                    {
-                        return new[]
-                        {
-                        (interval.start, assignedTask.StartDate),
-                        (assignedTask.EndDate, interval.end)
-                    };
-                    }
+                    suitableIntervals.Remove(interval);
+                    if (interval.start.TimeOfDay < assignedTask.StartDate.TimeOfDay)
+                        suitableIntervals.Add((interval.start, interval.start.Add(assignedTask.StartDate.TimeOfDay - interval.start.TimeOfDay)));
+                    if (interval.end.TimeOfDay > assignedTask.StartDate.TimeOfDay)
+                        suitableIntervals.Add((interval.start.Add(assignedTask.EndDate.TimeOfDay - interval.start.TimeOfDay), interval.end));
                 }
-                return new[] { interval };
-            }).ToList();
+            }
+            suitableIntervals.RemoveAll(interval =>
+            assignedTask.StartDate < interval.end &&
+            assignedTask.EndDate > interval.start);
         }
-
         return suitableIntervals;
     }
 
 
-    private List<(DateTime start, DateTime end)> GetFreeIntervals(List<Event> events, DateTime startTime, TimeSpan nightEnd)
+    private IEnumerable<(DateTime start, DateTime end)> GetFreeIntervals(DateTime referenceDate, DateTime eventStart, DateTime eventEnd, int startHour, int endHour)
     {
-        List<(DateTime start, DateTime end)> freeIntervals = new List<(DateTime start, DateTime end)>();
-
-        DateTime currentTime = startTime;
-        while (currentTime < startTime.AddDays(1).Date)
+        if (eventStart.Date == referenceDate.Date)
         {
-            DateTime nextTime = currentTime.AddHours(1);
+            if (eventStart.Hour > startHour)
+                yield return (referenceDate.Date.AddHours(startHour), eventStart);
 
-            if (currentTime.TimeOfDay < nightEnd)
-            {
-                freeIntervals.Add((currentTime, nextTime));
-            }
-
-            currentTime = nextTime;
+            if (eventEnd.Hour < endHour)
+                yield return (eventEnd, referenceDate.Date.AddHours(endHour));
         }
-
-        foreach (var e in events)
+        else
         {
-            freeIntervals.RemoveAll(i => (i.start >= e.StartDate && i.start < e.EndDate) || (i.end > e.StartDate && i.end <= e.EndDate));
+            yield return (referenceDate.Date.AddHours(startHour), referenceDate.Date.AddHours(endHour));
         }
-
-        return freeIntervals;
-    }
-
-    private bool IsIntervalSuitable(DateTime start, DateTime end, User user)
-    {
-        if (start.TimeOfDay < TimeSpan.FromHours(12))
-        {
-            return true;
-        }
-        if (start.TimeOfDay >= TimeSpan.FromHours(12) && start.TimeOfDay < TimeSpan.FromHours(18))
-        {
-            return true;
-        }
-        if (end.TimeOfDay >= TimeSpan.FromHours(18))
-        {
-            return true;
-        }
-        return false;
     }
 
     private int GetMinutesFromTimeLong(TimeLong timeLong)
