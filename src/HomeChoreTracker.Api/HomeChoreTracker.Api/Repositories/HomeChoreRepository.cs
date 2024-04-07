@@ -172,11 +172,24 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task<int> GetTotalPointsAssigned(int memberId)
         {
+            var assignments = await _dbContext.TaskAssignments
+                .Where(assignment => assignment.HomeMemberId == memberId)
+                .ToListAsync();
+
             var completedAssignments = await _dbContext.TaskAssignments
-        .Where(assignment => assignment.HomeMemberId == memberId)
-        .ToListAsync();
+                .Where(assignment => assignment.HomeMemberId == memberId && assignment.IsDone)
+                .ToListAsync();
 
             int totalPoints = 0;
+
+            foreach (var assignment in assignments)
+            {
+                var task = await _dbContext.HomeChoreTasks.FindAsync(assignment.TaskId);
+                if (task != null)
+                {
+                    totalPoints += task.Points;
+                }
+            }
 
             foreach (var assignment in completedAssignments)
             {

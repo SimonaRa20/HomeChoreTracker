@@ -205,6 +205,7 @@ public class CalendarController : Controller
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
+
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> AssignTaskToMember(int id, AssignedHomeMember assignedHomeMember)
