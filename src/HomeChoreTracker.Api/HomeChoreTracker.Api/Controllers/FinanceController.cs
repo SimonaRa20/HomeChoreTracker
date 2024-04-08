@@ -1025,6 +1025,7 @@ namespace HomeChoreTracker.Api.Controllers
                     .SetFontSize(14);
                 document.Add(summary);
 
+
                 document.Close();
 
                 var pdfBytes = stream.ToArray();

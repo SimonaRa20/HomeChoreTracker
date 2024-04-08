@@ -159,5 +159,12 @@ namespace HomeChoreTracker.Api.Repositories
 		{
 			return await _dbContext.FinancialCategories.Where(x => x.Id.Equals(id)).FirstOrDefaultAsync();
 		}
+
+		public async Task<decimal> GetTotalIncomeForCategory(DateTime startDate, DateTime endDate, int userId, int categoryId)
+		{
+			return await _dbContext.FinancialRecords
+				.Where(i => i.Type.Equals(FinancialType.Income) && i.UserId.Equals(userId) && i.FinancialCategoryId == categoryId && i.Time >= startDate && i.Time <= endDate)
+				.SumAsync(i => i.Amount);
+		}
 	}
 }
