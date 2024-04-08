@@ -28,7 +28,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
         [BindProperty(SupportsGet = true)]
         public int CurrentPage { get; set; } = 1;
         public int Count { get; set; }
-        public int PageSize { get; set; } = 5;
+        public int PageSize { get; set; } = 10;
         public int TotalPages { get; set; }
 
         public bool ShowPrevious => CurrentPage > 1;
@@ -54,9 +54,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			using (var httpClient = _httpClientFactory.CreateClient())
 			{
 				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
 				var apiUrlHome = $"{_config["ApiUrl"]}/Home";
-
 				var responseHomes = await httpClient.GetAsync(apiUrlHome);
 
 				if (responseHomes.IsSuccessStatusCode)
@@ -70,9 +68,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 
 				int pageSize = PageSize;
                 int skip = (CurrentPage - 1) * pageSize;
-
                 var apiUrl = $"{_config["ApiUrl"]}/Finance/transferHistory/skip{skip}/take{pageSize}";
-
 				var response = await httpClient.GetAsync(apiUrl);
 
 				if (response.IsSuccessStatusCode)
@@ -80,6 +76,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					TransferHistory = await response.Content.ReadFromJsonAsync<List<TransferHistoryItem>>();
                     var apiUrlAll = _config["ApiUrl"] + "/Finance/transferHistory";
                     var totalCountResponse = await httpClient.GetAsync(apiUrlAll);
+
                     if (totalCountResponse.IsSuccessStatusCode)
                     {
                         List<TransferHistoryItem> list = await totalCountResponse.Content.ReadFromJsonAsync<List<TransferHistoryItem>>();
@@ -88,7 +85,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                     }
 
 					var apiUrlICategories = $"{_config["ApiUrl"]}/Finance/CategoriesIncome";
-
 					var responseICategories = await httpClient.GetAsync(apiUrlICategories);
 
 					if (responseICategories.IsSuccessStatusCode)
@@ -97,7 +93,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					}
 
 					var apiUrlECategories = $"{_config["ApiUrl"]}/Finance/CategoriesExpense";
-
 					var responseECategories = await httpClient.GetAsync(apiUrlECategories);
 
 					if (responseECategories.IsSuccessStatusCode)
@@ -121,7 +116,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			ClearFieldErrors(key => key == "DeleteItemType");
 			if (!ModelState.IsValid)
 			{
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 
@@ -146,12 +141,11 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					}
 
 					var apiUrl = $"{_config["ApiUrl"]}/Finance/income/{id}";
-
-					// Update EditHomeChore with form values
 					EditIncome.Title = Request.Form["EditIncomeTitle"];
 					EditIncome.Amount = decimal.Parse(Request.Form["EditIncomeAmount"]);
 					EditIncome.Description = Request.Form["EditIncomeDescription"];
 					EditIncome.Time = DateTime.Parse(Request.Form["EditIncomeTime"]);
+
 					if (!string.IsNullOrEmpty(Request.Form["EditIncomeType"]))
 					{
 						if (int.TryParse(Request.Form["EditIncomeType"], out int editIncomeCategoryId))
@@ -191,7 +185,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			catch (Exception ex)
 			{
 				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 		}
@@ -202,7 +196,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			ClearFieldErrors(key => key == "DeleteItemType");
 			if (!ModelState.IsValid)
 			{
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 
@@ -212,9 +206,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				using (var httpClient = _httpClientFactory.CreateClient())
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
 					var apiUrlHome = $"{_config["ApiUrl"]}/Home";
-
 					var responseHomes = await httpClient.GetAsync(apiUrlHome);
 
 					if (responseHomes.IsSuccessStatusCode)
@@ -227,12 +219,11 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					}
 
 					var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
-
-					// Update EditHomeChore with form values
 					EditExpense.Title = Request.Form["EditExpenseTitle"];
 					EditExpense.Amount = decimal.Parse(Request.Form["EditExpenseAmount"]);
 					EditExpense.Description = Request.Form["EditExpenseDescription"];
 					EditExpense.Time = DateTime.Parse(Request.Form["EditExpenseTime"]);
+
 					if (!string.IsNullOrEmpty(Request.Form["EditExpenseType"]))
 					{
 						if (int.TryParse(Request.Form["EditExpenseType"], out int editExpenseTypeId))
@@ -272,7 +263,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			catch (Exception ex)
 			{
 				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 		}
@@ -286,8 +277,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 DeleteItemType = Request.Form["DeleteItemType"];
                 var apiUrl = $"{_config["ApiUrl"]}/Finance/{id}?type={DeleteItemType}";
-
-
                 var response = await httpClient.DeleteAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -297,7 +286,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
                 }
                 else
                 {
-                    // Handle deletion failure
                     await OnGetAsync();
                     ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
                     return Page();
@@ -311,9 +299,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			using (var httpClient = _httpClientFactory.CreateClient())
 			{
 				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
 				var apiUrlHome = $"{_config["ApiUrl"]}/Home";
-
 				var responseHomes = await httpClient.GetAsync(apiUrlHome);
 
 				if (responseHomes.IsSuccessStatusCode)
@@ -325,11 +311,10 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomes.ReasonPhrase}");
 				}
 
-
 				var apiUrl = $"{_config["ApiUrl"]}/Finance/income/{id}";
 				var response = await httpClient.GetAsync(apiUrl);
-
 				var incomeDetails = new IncomeResponse();
+
 				if (response.IsSuccessStatusCode)
 				{
 					incomeDetails = await response.Content.ReadFromJsonAsync<IncomeResponse>();
@@ -346,7 +331,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 							type = incomeDetails.Type.ToString(),
 							financialCategory = incomeDetails.FinancialCategory,
 							financialCategoryId = incomeDetails.FinancialCategoryId,
-							home = home?.Title ?? "-", // Include home title in the response
+							home = home?.Title ?? "-",
 							homeId = home?.Id,
 						});
 					}
@@ -369,9 +354,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
 				var apiUrlHome = $"{_config["ApiUrl"]}/Home";
-
 				var responseHomes = await httpClient.GetAsync(apiUrlHome);
 
 				if (responseHomes.IsSuccessStatusCode)
@@ -385,8 +368,8 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 
 				var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
                 var response = await httpClient.GetAsync(apiUrl);
-
                 var expenseDetails = new ExpenseResponse();
+
                 if (response.IsSuccessStatusCode)
                 {
                     expenseDetails = await response.Content.ReadFromJsonAsync<ExpenseResponse>();
@@ -422,7 +405,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 		{
 			if (!ModelState.IsValid)
 			{
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 
@@ -432,16 +415,14 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				using (var httpClient = _httpClientFactory.CreateClient())
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
 					var apiUrl = $"{_config["ApiUrl"]}/Finance/income/{id}";
-
 					var response = await httpClient.GetAsync(apiUrl);
 
 					if (response.IsSuccessStatusCode)
 					{
 						EditIncome = await response.Content.ReadFromJsonAsync<IncomeRequest>();
-						// Fetch homes
 						var homesResponse = await httpClient.GetAsync($"{_config["ApiUrl"]}/Home");
+
 						if (homesResponse.IsSuccessStatusCode)
 						{
 							Homes = await homesResponse.Content.ReadFromJsonAsync<List<HomeResponse>>();
@@ -464,7 +445,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			catch (Exception ex)
 			{
 				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 		}
@@ -473,7 +454,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 		{
 			if (!ModelState.IsValid)
 			{
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 
@@ -483,16 +464,14 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				using (var httpClient = _httpClientFactory.CreateClient())
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
 					var apiUrl = $"{_config["ApiUrl"]}/Finance/expense/{id}";
-
 					var response = await httpClient.GetAsync(apiUrl);
 
 					if (response.IsSuccessStatusCode)
 					{
 						EditExpense = await response.Content.ReadFromJsonAsync<ExpenseRequest>();
-						// Fetch homes
 						var homesResponse = await httpClient.GetAsync($"{_config["ApiUrl"]}/Home");
+
 						if (homesResponse.IsSuccessStatusCode)
 						{
 							Homes = await homesResponse.Content.ReadFromJsonAsync<List<HomeResponse>>();
@@ -515,10 +494,11 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			catch (Exception ex)
 			{
 				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-				await OnGetAsync(); // Refresh the data
+				await OnGetAsync();
 				return Page();
 			}
 		}
+
 		private void ClearFieldErrors(Func<string, bool> predicate)
 		{
 			foreach (var field in ModelState)

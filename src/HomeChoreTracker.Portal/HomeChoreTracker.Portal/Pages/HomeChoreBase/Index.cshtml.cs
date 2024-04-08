@@ -19,9 +19,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
         [BindProperty(SupportsGet = true)]
         public int CurrentPage { get; set; } = 1;
         public int Count { get; set; }
-        public int PageSize { get; set; } = 5;
+        public int PageSize { get; set; } = 10;
         public int TotalPages { get; set; }
-
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
 
@@ -41,12 +40,9 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 int pageSize = PageSize;
                 int skip = (CurrentPage - 1) * pageSize;
-
                 var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/skip{skip}/take{pageSize}";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -76,7 +72,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
                 var response = await httpClient.GetAsync(apiUrl);
 
@@ -87,9 +82,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
                     if (choreDetails != null)
                     {
-                        // Directly assign choreDetails.DaysOfWeek to daysOfWeekList
                         var daysOfWeekList = choreDetails.DaysOfWeek;
-
                         string choreTypeText = ((HomeChoreType)choreDetails.ChoreType).ToString();
                         string choreTimeText = ((TimeLong)choreDetails.Time).ToString();
                         string choreLevelTypeText = ((LevelType)choreDetails.LevelType).ToString();
@@ -134,7 +127,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
             ClearFieldErrors(key => key == "Name");
             if (!ModelState.IsValid)
             {
-                await OnGetAsync(); // Refresh the data
+                await OnGetAsync();
                 return Page();
             }
 
@@ -145,10 +138,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     var apiUrl = $"{_config["ApiUrl"]}/HomeChoreBase/{id}";
-
                     var val = Request.Form["editDaysOfWeek"];
-
-                    // Update EditHomeChore with form values
                     EditHomeChore.Name = Request.Form["editName"];
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
                     EditHomeChore.Description = Request.Form["editDescription"];
@@ -160,7 +150,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     EditHomeChore.DaysOfWeek = Request.Form["editDaysOfWeek"].SelectMany(s => s.Split(',')).Select(int.Parse).ToList();
                     EditHomeChore.DayOfMonth = int.Parse(Request.Form["editDayOfMonth"]);
                     EditHomeChore.MonthlyRepeatType = (int)Enum.Parse<MonthlyRepeatType>(Request.Form["editMonthlyRepeatType"]);
-
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditHomeChore);
 
                     if (response.IsSuccessStatusCode)
@@ -177,7 +166,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-                await OnGetAsync(); // Refresh the data
+                await OnGetAsync();
                 return Page();
             }
         }
@@ -198,7 +187,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                 }
                 else
                 {
-                    // Handle deletion failure
                     ModelState.AddModelError(string.Empty, $"Failed to delete chore: {response.StatusCode}");
                     return Page();
                 }

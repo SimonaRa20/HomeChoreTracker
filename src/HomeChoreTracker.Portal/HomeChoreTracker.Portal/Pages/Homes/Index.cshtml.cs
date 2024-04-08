@@ -30,9 +30,7 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 			using (var httpClient = _httpClientFactory.CreateClient())
 			{
 				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
 				var apiUrl = $"{_config["ApiUrl"]}/Home";
-
 				var response = await httpClient.GetAsync(apiUrl);
 
 				if (response.IsSuccessStatusCode)

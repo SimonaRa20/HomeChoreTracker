@@ -2,15 +2,8 @@ using HomeChoreTracker.Portal.Models.Finance;
 using HomeChoreTracker.Portal.Models.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace HomeChoreTracker.Portal.Pages.Finance
 {
@@ -44,16 +37,13 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			using (var httpClient = _httpClientFactory.CreateClient())
 			{
 				httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
 				var apiUrl = $"{_config["ApiUrl"]}/Home";
-
 				var response = await httpClient.GetAsync(apiUrl);
 
 				if (response.IsSuccessStatusCode)
 				{
 					Homes = await response.Content.ReadFromJsonAsync<List<HomeResponse>>();
 					var apiUrlCategories = $"{_config["ApiUrl"]}/Finance/CategoriesExpense";
-
 					var responseCategories = await httpClient.GetAsync(apiUrlCategories);
 
 					if (responseCategories.IsSuccessStatusCode)
@@ -73,7 +63,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 			ClearFieldErrors(key => key == "CreateNewExpense.ExpenseImage");
 			if (!ModelState.IsValid)
 			{
-				// Validation failed
 				return Page();
 			}
 
@@ -83,7 +72,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				using (var httpClient = _httpClientFactory.CreateClient())
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
 					var apiUrl = $"{_config["ApiUrl"]}/Finance/expenseimage";
 
 					using (var content = new MultipartFormDataContent())
@@ -93,7 +81,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 							content.Add(new StringContent(CreateNewExpense.HomeId.Value.ToString()), "HomeId");
 						}
 
-						// Add FinancialCategoryId and NewFinancialCategory to the form data
 						content.Add(new StringContent(CreateNewExpense.FinancialCategoryId.ToString()), "FinancialCategoryId");
 						if (CreateNewExpense.FinancialCategoryId == 0 && !string.IsNullOrEmpty(CreateNewExpense.NewFinancialCategory))
 						{
@@ -104,7 +91,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 
 						if (imageFile == null || imageFile.Length == 0)
 						{
-							// No image file uploaded
 							ModelState.AddModelError(string.Empty, string.Empty);
 							return await OnGetAsync();
 						}

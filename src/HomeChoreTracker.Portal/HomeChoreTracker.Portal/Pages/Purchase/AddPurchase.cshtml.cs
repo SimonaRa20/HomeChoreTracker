@@ -32,7 +32,6 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
             PurchaseRequest = new PurchaseRequest();
         }
 
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -48,7 +47,6 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
                     PurchaseRequest.HomeId = Id;
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     var apiUrl = _config["ApiUrl"] + "/Purchase";
-
                     var response = await httpClient.PostAsJsonAsync(apiUrl, PurchaseRequest);
 
                     if (response.IsSuccessStatusCode)

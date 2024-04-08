@@ -1,183 +1,195 @@
 ﻿@page "{id:int}"
 @model HomeChoreTracker.Portal.Pages.Purchase.AddPurchaseModel
 @{
-    Layout = "~/Pages/Shared/_Layout.cshtml";
+	Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 @section HeadContent
 {
-    <title>@ViewData["Title"] - Home Chore Tracker</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet" asp-append-version="true">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
 
-@if (User.Identity.IsAuthenticated)
+@if (!User.Identity.IsAuthenticated)
 {
-<div class="row">
-    <div class="col-lg-12">
-        <a class="btn btn-light btn-sm" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Purchases</a>
-        <a class="btn btn-secondary btn-sm" asp-page="./AddPurchase" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-light btn-sm" href="/Purchase/@Model.Id"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Purchases</a>
+			<a class="btn btn-secondary btn-sm" asp-page="./AddPurchase" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
 
-        <div class="card mb-4 py-3 mt-2 border-left-primary">
-            <div class="card-body">
-                <form method="post" onsubmit="return validatePurchase()">
-                    <div class="form-group">
-                        <label for="PurchaseDate">Purchase Date</label>
-                        <input type="date" class="form-control" id="PurchaseDate" name="PurchaseDate" asp-for="PurchaseRequest.PurchaseDate">
-                        <span asp-validation-for="PurchaseRequest.PurchaseDate" class="text-danger"></span>
-                    </div>
-                    <div class="form-group" id="shoppingItems">
-                        <label>Shopping Items</label>
-                        <div class="shopping-item">
-                            <div class="form-group">
-                                <label for="Title0">Title</label>
-                                <input type="text" class="form-control" id="Title0" name="Items[0].Title" placeholder="Title" asp-for="PurchaseRequest.Items[0].Title">
-                                <span id="TitleError0" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="Quantity0">Quantity</label>
-                                <input type="number" class="form-control" id="Quantity0" name="Items[0].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[0].Quantity" step="0.01" min="0.01">
-                                <span id="QuantityError0" class="text-danger"></span>
-                            </div>
-
-                            <label for="QuantityType">Quantity Type</label>
-                            <select class="form-control mb-2" name="Items[0].QuantityType" asp-for="PurchaseRequest.Items[0].QuantityType">
-                                @foreach (HomeChoreTracker.Portal.Constants.QuantityType type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.QuantityType)))
-                                {
-                                    <option value="@type">@type</option>
-                                }
-                            </select>
-                            <label for="QuantityType">Quantity Type</label>
-                            <select class="form-control mb-2" name="Items[0].ProductType" asp-for="PurchaseRequest.Items[0].ProductType">
-                                @foreach (HomeChoreTracker.Portal.Constants.ProductType type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.ProductType)))
-                                {
-                                    <option value="@type">@type</option>
-                                }
-                            </select>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="removeShoppingItem(this)">Remove</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary mb-2" onclick="addShoppingItem()">Add Shopping Item</button>
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-primary">Save Purchase</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    </div>
+			<div class="card mb-4 py-3 mt-2 border-left-primary">
+				<div class="card-body">
+					<form method="post" onsubmit="return validatePurchase()">
+						<div class="form-group">
+							<label for="PurchaseDate">Purchase Date</label>
+							<input type="date" class="form-control" id="PurchaseDate" name="PurchaseDate" asp-for="PurchaseRequest.PurchaseDate">
+							<span asp-validation-for="PurchaseRequest.PurchaseDate" class="text-danger"></span>
+						</div>
+						<div class="form-group" id="shoppingItems">
+							<label>Shopping Items</label>
+							<div class="shopping-item">
+								<div class="form-group">
+									<label for="Title0">Title</label>
+									<input type="text" class="form-control" id="Title0" name="Items[0].Title" placeholder="Title" asp-for="PurchaseRequest.Items[0].Title">
+									<span id="TitleError0" class="text-danger"></span>
+								</div>
+								<div class="form-group">
+									<label for="Quantity0">Quantity</label>
+									<input type="number" class="form-control" id="Quantity0" name="Items[0].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[0].Quantity" step="0.01" min="0.01">
+									<span id="QuantityError0" class="text-danger"></span>
+								</div>
+								<label for="QuantityType">Quantity Type</label>
+								<select class="form-control mb-2" name="Items[0].QuantityType" asp-for="PurchaseRequest.Items[0].QuantityType">
+									@foreach (HomeChoreTracker.Portal.Constants.QuantityType type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.QuantityType)))
+									{
+										<option value="@type">@type</option>
+									}
+								</select>
+								<label for="QuantityType">Quantity Type</label>
+								<select class="form-control mb-2" name="Items[0].ProductType" asp-for="PurchaseRequest.Items[0].ProductType">
+									@foreach (HomeChoreTracker.Portal.Constants.ProductType type in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.ProductType)))
+									{
+										<option value="@type">@type</option>
+									}
+								</select>
+								<button type="button" class="btn btn-danger btn-sm" onclick="removeShoppingItem(this)">Remove</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col">
+								<button type="button" class="btn btn-primary mb-2" onclick="addShoppingItem()">Add Shopping Item</button>
+							</div>
+							<div class="col-auto">
+								<button type="submit" class="btn btn-primary">Save Purchase</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 else
 {
-    Response.Redirect("/Auth/Login");
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 
-
 <<script>
-     function addShoppingItem() {
-         var itemCount = document.querySelectorAll('.shopping-item').length;
-         var newItemHtml = '<div class="shopping-item">' +
-             '<div class="form-group">' +
-             '<label for="Title' + itemCount + '">Title</label>' +
-             '<input type="text" class="form-control mb-2" id="Title' + itemCount + '" name="Items[' + itemCount + '].Title" placeholder="Title" asp-for="PurchaseRequest.Items[' + itemCount + '].Title">' +
-             '<span id="TitleError' + itemCount + '" class="text-danger"></span>' +
-             '</div>' +
-             '<div class="form-group">' +
-             '<label for="Quantity' + itemCount + '">Quantity</label>' +
-             '<input type="number" class="form-control mb-2" id="Quantity' + itemCount + '" name="Items[' + itemCount + '].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[' + itemCount + '].Quantity" step="0.01" min="0.01">' +
-             '<span id="QuantityError' + itemCount + '" class="text-danger"></span>' +
-             '</div>' +
-             '<label for="QuantityType' + itemCount + '">Quantity Type</label>' +
-             '<select class="form-control mb-2" id="QuantityType' + itemCount + '" name="Items[' + itemCount + '].QuantityType" asp-for="PurchaseRequest.Items[' + itemCount + '].QuantityType">';
+	 function addShoppingItem() {
+		 var itemCount = document.querySelectorAll('.shopping-item').length;
+		 var newItemHtml = '<div class="shopping-item">' +
+			 '<div class="form-group">' +
+			 '<label for="Title' + itemCount + '">Title</label>' +
+			 '<input type="text" class="form-control mb-2" id="Title' + itemCount + '" name="Items[' + itemCount + '].Title" placeholder="Title" asp-for="PurchaseRequest.Items[' + itemCount + '].Title">' +
+			 '<span id="TitleError' + itemCount + '" class="text-danger"></span>' +
+			 '</div>' +
+			 '<div class="form-group">' +
+			 '<label for="Quantity' + itemCount + '">Quantity</label>' +
+			 '<input type="number" class="form-control mb-2" id="Quantity' + itemCount + '" name="Items[' + itemCount + '].Quantity" placeholder="Quantity" asp-for="PurchaseRequest.Items[' + itemCount + '].Quantity" step="0.01" min="0.01">' +
+			 '<span id="QuantityError' + itemCount + '" class="text-danger"></span>' +
+			 '</div>' +
+			 '<label for="QuantityType' + itemCount + '">Quantity Type</label>' +
+			 '<select class="form-control mb-2" id="QuantityType' + itemCount + '" name="Items[' + itemCount + '].QuantityType" asp-for="PurchaseRequest.Items[' + itemCount + '].QuantityType">';
 
-         var quantityTypeOptions = '';
-         var quantityTypes = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(HomeChoreTracker.Portal.Constants.QuantityType))));
-         quantityTypes.forEach(function (type) {
-             quantityTypeOptions += '<option value="' + type + '">' + type + '</option>';
-         });
-         newItemHtml += quantityTypeOptions;
+		 var quantityTypeOptions = '';
+		 var quantityTypes = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(HomeChoreTracker.Portal.Constants.QuantityType))));
+		 quantityTypes.forEach(function (type) {
+			 quantityTypeOptions += '<option value="' + type + '">' + type + '</option>';
+		 });
+		 newItemHtml += quantityTypeOptions;
 
-         newItemHtml += '</select>' +
-             '<label for="ProductType' + itemCount + '">Product Type</label>' +
-             '<select class="form-control mb-2" id="ProductType' + itemCount + '" name="Items[' + itemCount + '].ProductType" asp-for="PurchaseRequest.Items[' + itemCount + '].ProductType">';
+		 newItemHtml += '</select>' +
+			 '<label for="ProductType' + itemCount + '">Product Type</label>' +
+			 '<select class="form-control mb-2" id="ProductType' + itemCount + '" name="Items[' + itemCount + '].ProductType" asp-for="PurchaseRequest.Items[' + itemCount + '].ProductType">';
 
-         var productTypeOptions = '';
-         var productTypes = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(HomeChoreTracker.Portal.Constants.ProductType))));
-         productTypes.forEach(function (type) {
-             productTypeOptions += '<option value="' + type + '">' + type + '</option>';
-         });
-         newItemHtml += productTypeOptions;
+		 var productTypeOptions = '';
+		 var productTypes = @Html.Raw(Json.Serialize(Enum.GetNames(typeof(HomeChoreTracker.Portal.Constants.ProductType))));
+		 productTypes.forEach(function (type) {
+			 productTypeOptions += '<option value="' + type + '">' + type + '</option>';
+		 });
+		 newItemHtml += productTypeOptions;
 
-         newItemHtml += '</select>' +
-             '<button type="button" class="btn btn-danger btn-sm" onclick="removeShoppingItem(this)">Remove</button>' +
-             '</div>';
+		 newItemHtml += '</select>' +
+			 '<button type="button" class="btn btn-danger btn-sm" onclick="removeShoppingItem(this)">Remove</button>' +
+			 '</div>';
 
-         document.getElementById('shoppingItems').insertAdjacentHTML('beforeend', newItemHtml);
-     }
+		 document.getElementById('shoppingItems').insertAdjacentHTML('beforeend', newItemHtml);
+	 }
 
-     function validateShoppingItem(itemCount) {
-         var title = document.getElementById('Title' + itemCount);
-         var quantity = document.getElementById('Quantity' + itemCount);
-         var titleError = document.getElementById('TitleError' + itemCount);
-         var quantityError = document.getElementById('QuantityError' + itemCount);
+	 function validateShoppingItem(itemCount) {
+		 var title = document.getElementById('Title' + itemCount);
+		 var quantity = document.getElementById('Quantity' + itemCount);
+		 var titleError = document.getElementById('TitleError' + itemCount);
+		 var quantityError = document.getElementById('QuantityError' + itemCount);
 
-         if (title && quantity && titleError && quantityError) {
-             if (title.value.trim() === '') {
-                 titleError.textContent = 'Title is required';
-             } else {
-                 titleError.textContent = '';
-             }
+		 if (title && quantity && titleError && quantityError) {
+			 if (title.value.trim() === '') {
+				 titleError.textContent = 'Title is required';
+			 } else {
+				 titleError.textContent = '';
+			 }
 
-             if (quantity.value.trim() === '' || parseFloat(quantity.value) < 0.01) {
-                 quantityError.textContent = 'Quantity must be greater than or equal to 0.01';
-             } else {
-                 quantityError.textContent = '';
-             }
-         } else {
-             console.log('One or more elements not found for item:', itemCount);
-         }
-     }
+			 if (quantity.value.trim() === '' || parseFloat(quantity.value) < 0.01) {
+				 quantityError.textContent = 'Quantity must be greater than or equal to 0.01';
+			 } else {
+				 quantityError.textContent = '';
+			 }
+		 } else {
+			 console.log('One or more elements not found for item:', itemCount);
+		 }
+	 }
 
-     function validatePurchase() {
-         var isValid = true;
-         var itemCount = document.querySelectorAll('.shopping-item').length;
+	 function validatePurchase() {
+		 var isValid = true;
+		 var itemCount = document.querySelectorAll('.shopping-item').length;
 
-         for (var i = 0; i < itemCount; i++) {
-             var title = document.getElementById('Title' + i);
-             var quantity = document.getElementById('Quantity' + i);
-             var titleError = document.getElementById('TitleError' + i);
-             var quantityError = document.getElementById('QuantityError' + i);
+		 for (var i = 0; i < itemCount; i++) {
+			 var title = document.getElementById('Title' + i);
+			 var quantity = document.getElementById('Quantity' + i);
+			 var titleError = document.getElementById('TitleError' + i);
+			 var quantityError = document.getElementById('QuantityError' + i);
 
-             if (title && quantity && titleError && quantityError) {
-                 if (title.value.trim() === '') {
-                     titleError.textContent = 'Title is required';
-                     isValid = false;
-                 } else {
-                     titleError.textContent = '';
-                 }
+			 if (title && quantity && titleError && quantityError) {
+				 if (title.value.trim() === '') {
+					 titleError.textContent = 'Title is required';
+					 isValid = false;
+				 } else {
+					 titleError.textContent = '';
+				 }
 
-                 if (quantity.value.trim() === '' || parseFloat(quantity.value) < 0.01) {
-                     quantityError.textContent = 'Quantity must be greater than or equal to 0.01';
-                     isValid = false;
-                 } else {
-                     quantityError.textContent = '';
-                 }
-             } else {
-                 console.log('One or more elements not found for item:', i);
-             }
-         }
+				 if (quantity.value.trim() === '' || parseFloat(quantity.value) < 0.01) {
+					 quantityError.textContent = 'Quantity must be greater than or equal to 0.01';
+					 isValid = false;
+				 } else {
+					 quantityError.textContent = '';
+				 }
+			 } else {
+				 console.log('One or more elements not found for item:', i);
+			 }
+		 }
 
-         return isValid;
-     }
+		 return isValid;
+	 }
 
 </script>

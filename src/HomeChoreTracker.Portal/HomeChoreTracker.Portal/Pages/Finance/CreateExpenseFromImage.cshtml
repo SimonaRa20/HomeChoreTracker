@@ -15,80 +15,100 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
+@if (!User.Identity.IsAuthenticated)
+{
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+			<a class="btn btn-secondary btn-sm mb-2" asp-page="./CreateExpenseFromImage"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
 
-<div class="row">
-	<div class="col-lg-12">
-		<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
-		<a class="btn btn-secondary btn-sm mb-2" asp-page="./CreateExpenseFromImage"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
-
-		<div class="card mb-4 py-3 mt-2 border-left-primary">
-			<div class="card-body">
-				<form method="post" enctype="multipart/form-data" >
-					<div class="form-group">
-						<label for="TypeId">Type</label>
-						<select class="form-control" id="TypeId" name="CreateNewExpense.FinancialCategoryId" asp-for="CreateNewExpense.FinancialCategoryId">
-							<option value="0">Create new type</option>
-							@if (Model.FinancialCategories != null)
-							{
-								@foreach (var category in Model.FinancialCategories)
+			<div class="card mb-4 py-3 mt-2 border-left-primary">
+				<div class="card-body">
+					<form method="post" enctype="multipart/form-data">
+						<div class="form-group">
+							<label for="TypeId">Type</label>
+							<select class="form-control" id="TypeId" name="CreateNewExpense.FinancialCategoryId" asp-for="CreateNewExpense.FinancialCategoryId">
+								<option value="0">Create new type</option>
+								@if (Model.FinancialCategories != null)
 								{
-									<option value="@category.Id">@category.Name</option>
+									@foreach (var category in Model.FinancialCategories)
+									{
+										<option value="@category.Id">@category.Name</option>
+									}
 								}
-							}
-						</select>
-					</div>
-					<div class="form-group" id="newTypeField">
-						<label for="NewType">New Type</label>
-						<input type="text" class="form-control" id="NewType" name="CreateNewExpense.NewFinancialCategory" asp-for="CreateNewExpense.NewFinancialCategory">
-					</div>
-
-					<div class="form-group">
-						<label for="HomeId">Select Home</label>
-						<select class="form-control" id="HomeId" name="CreateNewExpense.HomeId" asp-for="CreateNewExpense.HomeId">
-							<option value=""></option>
-							@foreach (var home in Model.Homes)
-							{
-								<option value="@home.Id">@home.Title</option>
-							}
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="ExpenseImage">Expense Image</label>
-						<input type="file" class="form-control-file" accept="image/*" id="ExpenseImage" name="ExpenseImage" asp-for="CreateNewExpense.ExpenseImage">
-					</div>
-					<div class="text-danger">
-						@if (!ModelState.IsValid)
-						{
-							<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
-								@foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+							</select>
+						</div>
+						<div class="form-group" id="newTypeField">
+							<label for="NewType">New Type</label>
+							<input type="text" class="form-control" id="NewType" name="CreateNewExpense.NewFinancialCategory" asp-for="CreateNewExpense.NewFinancialCategory">
+						</div>
+						<div class="form-group">
+							<label for="HomeId">Select Home</label>
+							<select class="form-control" id="HomeId" name="CreateNewExpense.HomeId" asp-for="CreateNewExpense.HomeId">
+								<option value=""></option>
+								@foreach (var home in Model.Homes)
 								{
-									<li>@error.ErrorMessage</li>
+									<option value="@home.Id">@home.Title</option>
 								}
-							</ul>
-						}
-					</div>
-
-					<div class="form-group">
-						<button type="submit" class="btn btn-primary">Create</button>
-					</div>
-				</form>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="ExpenseImage">Expense Image</label>
+							<input type="file" class="form-control-file" accept="image/*" id="ExpenseImage" name="ExpenseImage" asp-for="CreateNewExpense.ExpenseImage">
+						</div>
+						<div class="text-danger">
+							@if (!ModelState.IsValid)
+							{
+								<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+									@foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+									{
+										<li>@error.ErrorMessage</li>
+									}
+								</ul>
+							}
+						</div>
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary">Create</button>
+						</div>
+					</form>
+				</div>
 			</div>
 		</div>
 
-		<script>
-			document.getElementById('TypeId').addEventListener('change', function () {
-				var selectedCategoryId = this.value;
-				var newTypeField = document.getElementById('newTypeField');
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 
-				// If the selected category ID is "0" (string), show the new type field; otherwise, hide it
-				if (selectedCategoryId === "0") {
-					newTypeField.style.display = 'block';
-				} else {
-					newTypeField.style.display = 'none';
-				}
-			});
-		</script>
+<script>
+	document.getElementById('TypeId').addEventListener('change', function () {
+		var selectedCategoryId = this.value;
+		var newTypeField = document.getElementById('newTypeField');
+
+		if (selectedCategoryId === "0") {
+			newTypeField.style.display = 'block';
+		} else {
+			newTypeField.style.display = 'none';
+		}
+	});
+</script>

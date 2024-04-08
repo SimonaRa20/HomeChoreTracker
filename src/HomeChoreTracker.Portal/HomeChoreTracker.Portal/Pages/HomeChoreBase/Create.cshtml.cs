@@ -39,11 +39,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     var apiUrl = _config["ApiUrl"] + "/HomeChoreBase";
-
                     var json = JsonConvert.SerializeObject(CreateHomeChoreBase);
-
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
-
                     var response = await httpClient.PostAsync(apiUrl, content);
 
                     if (response.IsSuccessStatusCode)

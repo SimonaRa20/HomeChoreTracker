@@ -16,147 +16,151 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
-@if (User.Identity.IsAuthenticated)
+@if (!User.Identity.IsAuthenticated)
 {
-<div class="row">
-	<div class="col-lg-12">
-		<a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.PurchaseId"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Purchases</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./AddPurchase" asp-route-id="@Model.PurchaseId"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-secondary btn-sm mb-2" href="/Purchase/@Model.PurchaseId"><i class="fa fa-archive mr-2" aria-hidden="true"></i>Purchases</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./AddPurchase" asp-route-id="@Model.PurchaseId"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create purchase</a>
 
-		<div class="card mb-4 py-3 border-left-primary">
-
-			<div class="card-body">
-				<div class="d-sm-flex align-items-center justify-content-between mb-4">
-					<h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
-					<div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
-						<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="card-body">
+					<div class="d-sm-flex align-items-center justify-content-between mb-4">
+						<h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+						<div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
+							<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
+						</div>
 					</div>
-				</div>
-				@if (Model.Purchases != null && Model.Purchases.Any())
-				{
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Date</th>
-								<th>Items count</th>
-								<th>Is Complete</th>
-								<th>Manage</th>
-							</tr>
-						</thead>
-						<tbody>
-							@foreach (var purchase in Model.Purchases)
-							{
+					@if (Model.Purchases != null && Model.Purchases.Any())
+					{
+						<table class="table">
+							<thead>
 								<tr>
-									<td>@purchase.PurchaseDate.ToString("M/d/yyyy")</td>
-									<td>
-										@purchase.Items.Count
-									</td>
-									<td>@(purchase.IsCompleted ? "Yes" : "No")</td>
-									<td>
-										<button class='btn btn-sm' onclick="DisplayPurchaseDetailModal('@purchase.Id')">
-											<i class="fa fa-check" aria-hidden="true"></i>
-										</button>
-
-										<button class='btn btn-sm' onclick="DisplayPurchaseEditModal('@purchase.Id')">
-											<i class='fa fa-pencil-alt'></i>
-										</button>
-
-										<a class='btn btn-sm btnDelete' data-toggle="modal" data-target="#DeleteModal-@purchase.Id" >
-											<i class='fa fa-trash'></i>
-										</a>
-										<div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@purchase.Id">
-											<div class="modal-dialog" role="document">
-												<div class="modal-content">
-													<div class="modal-header">
-														<h5 class="modal-title">Delete Confirmation</h5>
-														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-															<span aria-hidden="true">&times;</span>
-														</button>
-													</div>
-													<div class="modal-body">
-														<p>Are you sure you want to delete this purchase?</p>
-													</div>
-													<div class="modal-footer">
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-														<form method="post" asp-page-handler="Delete" asp-route-purchaseId="@purchase.Id" asp-route-selectedHomeId="@Model.PurchaseId" id="deleteForm">
-															<button type="submit" class="btn btn-danger">Delete</button>
-														</form>
-
+									<th>Date</th>
+									<th>Items count</th>
+									<th>Is Complete</th>
+									<th>Manage</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var purchase in Model.Purchases)
+								{
+									<tr>
+										<td>@purchase.PurchaseDate.ToString("M/d/yyyy")</td>
+										<td>
+											@purchase.Items.Count
+										</td>
+										<td>@(purchase.IsCompleted ? "Yes" : "No")</td>
+										<td>
+											<button class='btn btn-sm' onclick="DisplayPurchaseDetailModal('@purchase.Id')">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</button>
+											<button class='btn btn-sm' onclick="DisplayPurchaseEditModal('@purchase.Id')">
+												<i class='fa fa-pencil-alt'></i>
+											</button>
+											<a class='btn btn-sm btnDelete' data-toggle="modal" data-target="#DeleteModal-@purchase.Id">
+												<i class='fa fa-trash'></i>
+											</a>
+											<div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@purchase.Id">
+												<div class="modal-dialog" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title">Delete Confirmation</h5>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<p>Are you sure you want to delete this purchase?</p>
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+															<form method="post" asp-page-handler="Delete" asp-route-purchaseId="@purchase.Id" asp-route-selectedHomeId="@Model.PurchaseId" id="deleteForm">
+																<button type="submit" class="btn btn-danger">Delete</button>
+															</form>
+														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-									</td>
-								</tr>
-							}
-						</tbody>
-					</table>
-				}
-				else
-				{
-					<p>No home purchases found.</p>
-				}
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					}
+					else
+					{
+						<p>No home purchases found.</p>
+					}
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-
-<div class="modal fade" id="purchaseDetailModal" tabindex="-1" role="dialog" aria-labelledby="purchaseDetailModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="purchaseDetailModalLabel">Purchase Details</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<div id="purchaseDetailContent"></div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="purchaseEditModal" tabindex="-1" role="dialog" aria-labelledby="purchaseEditModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="purchaseEditModalLabel">Update Purchase Items</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<div id="purchaseEditContent"></div>
-			</div>
-			<div id="errorMessage" style="color: red; text-align: center;"></div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" id="saveChangesEditBtn">Save Changes</button>
+	<div class="modal fade" id="purchaseDetailModal" tabindex="-1" role="dialog" aria-labelledby="purchaseDetailModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="purchaseDetailModalLabel">Purchase Details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div id="purchaseDetailContent"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-
-<form id="updateShoppingItemsForm" method="post" asp-page-handler="UpdateShoppingItems">
-	<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
-	<input type="hidden" name="purchaseId" value="@Model.PurchaseId" />
-</form>
-
-
-<form id="updateShoppingPurchaseForm" method="post" asp-page-handler="UpdateShoppingPurchase">
-	<input type="hidden" id="purchaseIdInput" name="purchaseId" />
-	<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
-</form>
-
+	<div class="modal fade" id="purchaseEditModal" tabindex="-1" role="dialog" aria-labelledby="purchaseEditModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="purchaseEditModalLabel">Update Purchase Items</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div id="purchaseEditContent"></div>
+				</div>
+				<div id="errorMessage" style="color: red; text-align: center;"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="saveChangesEditBtn">Save Changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<form id="updateShoppingItemsForm" method="post" asp-page-handler="UpdateShoppingItems">
+		<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
+		<input type="hidden" name="purchaseId" value="@Model.PurchaseId" />
+	</form>
+	<form id="updateShoppingPurchaseForm" method="post" asp-page-handler="UpdateShoppingPurchase">
+		<input type="hidden" id="purchaseIdInput" name="purchaseId" />
+		<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
+	</form>
 }
 else
 {
-	Response.Redirect("/Auth/Login");
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 <script>
 
@@ -181,14 +185,14 @@ else
 					content += "<li style='margin-bottom: 10px;' id='item_" + item.id + "'>";
 					content += "<label for='title_" + item.id + "'>Title:</label>";
 					content += "<input type='text' class='form-control' id='title_" + item.id + "' value='" + item.title + "'>";
-					
+
 					content += "<div class='error-message-title' style='color: red'></div>";
-					
+
 					content += "<label for='quantity_" + item.id + "'>Quantity:</label>";
 					content += "<input type='number' class='form-control' id='quantity_" + item.id + "' value='" + item.quantity + "'>";
-					
+
 					content += "<div class='error-message-quantity' style='color: red'></div>"
-					
+
 					content += "<label for='quantityType_" + item.id + "'>Quantity Type:</label>";
 					content += "<select class='form-control' id='quantityType_" + item.id + "'>" + getQuantityTypeOptions(item.quantityType) + "</select>";
 					content += "<label for='productType_" + item.id + "'>Product Type:</label>";
@@ -226,7 +230,7 @@ else
 			"GardeningSupplies", "Tools", "Batteries", "LightBulbs", "Stationery", "HomeDecor", "StorageContainers",
 			"Electronics", "OfficeSupplies", "MedicalSupplies", "Books", "Toys", "Clothing", "Shoes", "Accessories",
 			"Kitchenware", "Cookware", "Appliances", "Furniture"
-		]; 
+		];
 
 		for (var i = 0; i < productTypes.length; i++) {
 			options += "<option value='" + i + "' " + (i == selectedType ? "selected" : "") + ">" + productTypes[i] + "</option>";
@@ -245,14 +249,10 @@ else
 		var newItemHtml = "<li style='margin-bottom: 10px;' id='item_" + newItemId + "'>";
 		newItemHtml += "<label for='title_" + newItemId + "'>Title:</label>";
 		newItemHtml += "<input type='text' class='form-control' id='title_" + newItemId + "' value=''>";
-		
 		newItemHtml += "<div class='error-message-title' style='color: red'></div>"
-		
 		newItemHtml += "<label for='quantity_" + newItemId + "'>Quantity:</label>";
 		newItemHtml += "<input type='number' class='form-control' id='quantity_" + newItemId + "' value=''>";
-		
 		newItemHtml += "<div class='error-message-quantity' style='color: red'></div>"
-		
 		newItemHtml += "<label for='quantityType_" + newItemId + "'>Quantity Type:</label>";
 		newItemHtml += "<select class='form-control' id='quantityType_" + newItemId + "'><option value='0'>Grams</option><option value='1'>Kilograms</option><option value='2'>Liters</option><option value='3'>Milliliters</option><option value='4'>Pieces</option></select>";
 		newItemHtml += "<label for='productType_" + newItemId + "'>Product Type:</label>";
@@ -359,7 +359,6 @@ else
 		return isValid;
 	}
 
-
 	function DisplayPurchaseDetailModal(purchaseId) {
 		$.ajax({
 			url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,
@@ -379,8 +378,6 @@ else
 				content += "</ul>";
 				content += "</p>";
 				$('#purchaseDetailContent').html(content);
-
-				// Set the PurchaseId in the modal form
 				$('#purchaseIdInput').val(purchaseId);
 
 				$('#purchaseDetailModal').modal('show');

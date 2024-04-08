@@ -17,103 +17,122 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
 
-
-<div class="row">
-	<div class="col-lg-12">
-		<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
-        <a class="btn btn-light btn-sm mb-2"  asp-page="./CreateExpenseFromImage">
-            <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image
-        </a>
-        <a class="btn btn-secondary btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
+@if (!User.Identity.IsAuthenticated)
+{
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpenseFromImage">
+				<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image
+			</a>
+			<a class="btn btn-secondary btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
+		</div>
 	</div>
-</div>
-<div class="card mb-4 py-3 mt-2 border-left-primary">
-    <div class="card-body">
-        <form method="post" asp-action="GenerateReport">
-            <div class="form-group">
-                <label for="StartDate">Start date</label>
-                <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" asp-for="StartDate">
-                <span asp-validation-for="StartDate" class="text-danger"></span>
-                <span id="startDateErrorMessage" class="text-danger" style="display:none;">Start date is required</span>
-            </div>
-            <div class="form-group">
-                <label for="EndDate">End date</label>
-                <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" asp-for="EndDate">
-                <span asp-validation-for="EndDate" class="text-danger"></span>
-                <span id="endDateErrorMessage" class="text-danger" style="display:none;">End date is required</span>
-            </div>
-            <div id="dateValidationMessage" class="text-danger"></div>
-
-            <button type="submit" class="btn btn-primary">Generate report</button>
-        </form>
-    </div>
-</div>
+	<div class="card mb-4 py-3 mt-2 border-left-primary">
+		<div class="card-body">
+			<form method="post" asp-action="GenerateReport">
+				<div class="form-group">
+					<label for="StartDate">Start date</label>
+					<input type="datetime-local" class="form-control" id="StartDate" name="StartDate" asp-for="StartDate">
+					<span asp-validation-for="StartDate" class="text-danger"></span>
+					<span id="startDateErrorMessage" class="text-danger" style="display:none;">Start date is required</span>
+				</div>
+				<div class="form-group">
+					<label for="EndDate">End date</label>
+					<input type="datetime-local" class="form-control" id="EndDate" name="EndDate" asp-for="EndDate">
+					<span asp-validation-for="EndDate" class="text-danger"></span>
+					<span id="endDateErrorMessage" class="text-danger" style="display:none;">End date is required</span>
+				</div>
+				<div id="dateValidationMessage" class="text-danger"></div>
+				<button type="submit" class="btn btn-primary">Generate report</button>
+			</form>
+		</div>
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 
 <script>
-    function getTodayISOString() {
-        var now = new Date();
-        var year = now.getFullYear();
-        var month = (now.getMonth() + 1).toString().padStart(2, '0');
-        var day = now.getDate().toString().padStart(2, '0');
-        var hours = now.getHours().toString().padStart(2, '0');
-        var minutes = now.getMinutes().toString().padStart(2, '0');
+	function getTodayISOString() {
+		var now = new Date();
+		var year = now.getFullYear();
+		var month = (now.getMonth() + 1).toString().padStart(2, '0');
+		var day = now.getDate().toString().padStart(2, '0');
+		var hours = now.getHours().toString().padStart(2, '0');
+		var minutes = now.getMinutes().toString().padStart(2, '0');
 
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
+	}
 
-    function getMonthBeforeISOString() {
-        var now = new Date();
-        now.setMonth(now.getMonth() - 1);
-        var year = now.getFullYear();
-        var month = (now.getMonth() + 1).toString().padStart(2, '0');
-        var day = now.getDate().toString().padStart(2, '0');
-        var hours = now.getHours().toString().padStart(2, '0');
-        var minutes = now.getMinutes().toString().padStart(2, '0');
+	function getMonthBeforeISOString() {
+		var now = new Date();
+		now.setMonth(now.getMonth() - 1);
+		var year = now.getFullYear();
+		var month = (now.getMonth() + 1).toString().padStart(2, '0');
+		var day = now.getDate().toString().padStart(2, '0');
+		var hours = now.getHours().toString().padStart(2, '0');
+		var minutes = now.getMinutes().toString().padStart(2, '0');
 
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
+	}
 
-    document.getElementById('StartDate').value = getMonthBeforeISOString();
+	document.getElementById('StartDate').value = getMonthBeforeISOString();
 
-    document.getElementById('EndDate').value = getTodayISOString();
+	document.getElementById('EndDate').value = getTodayISOString();
 </script>
 <script>
-    function validateDates() {
-        var startDateInput = document.getElementById('StartDate');
-        var endDateInput = document.getElementById('EndDate');
-        var startDateErrorMessage = document.getElementById('startDateErrorMessage');
-        var endDateErrorMessage = document.getElementById('endDateErrorMessage');
+	function validateDates() {
+		var startDateInput = document.getElementById('StartDate');
+		var endDateInput = document.getElementById('EndDate');
+		var startDateErrorMessage = document.getElementById('startDateErrorMessage');
+		var endDateErrorMessage = document.getElementById('endDateErrorMessage');
 
-        if (!startDateInput.value) {
-            startDateErrorMessage.style.display = 'inline';
-            return false;
-        } else {
-            startDateErrorMessage.style.display = 'none';
-        }
+		if (!startDateInput.value) {
+			startDateErrorMessage.style.display = 'inline';
+			return false;
+		} else {
+			startDateErrorMessage.style.display = 'none';
+		}
 
-        if (!endDateInput.value) {
-            endDateErrorMessage.style.display = 'inline';
-            return false;
-        } else {
-            endDateErrorMessage.style.display = 'none';
-        }
+		if (!endDateInput.value) {
+			endDateErrorMessage.style.display = 'inline';
+			return false;
+		} else {
+			endDateErrorMessage.style.display = 'none';
+		}
 
-        if (endDateInput.value < startDateInput.value) {
-            document.getElementById('dateValidationMessage').innerText = "End date cannot be earlier than start date";
-            return false;
-        } else {
-            document.getElementById('dateValidationMessage').innerText = "";
-        }
+		if (endDateInput.value < startDateInput.value) {
+			document.getElementById('dateValidationMessage').innerText = "End date cannot be earlier than start date";
+			return false;
+		} else {
+			document.getElementById('dateValidationMessage').innerText = "";
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    document.querySelector('form').addEventListener('submit', function (event) {
-        if (!validateDates()) {
-            event.preventDefault();
-        }
-    });
+	document.querySelector('form').addEventListener('submit', function (event) {
+		if (!validateDates()) {
+			event.preventDefault();
+		}
+	});
 </script>

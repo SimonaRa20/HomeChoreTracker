@@ -2,8 +2,6 @@ using HomeChoreTracker.Portal.Models.Auth;
 using HomeChoreTracker.Portal.Models.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
 
 namespace HomeChoreTracker.Portal.Pages.Homes
 {
@@ -46,12 +44,10 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 
                     if (isAuthenticated)
                     {
-                        // If the user is logged in, redirect to the home page
                         return RedirectToPage("/Index");
                     }
                     else
                     {
-                        // If the user is not logged in, redirect to the login page
                         return RedirectToPage("/Auth/Login");
                     }
                 }
@@ -61,10 +57,7 @@ namespace HomeChoreTracker.Portal.Pages.Homes
                     ModelState.AddModelError(string.Empty, errorMessage);
                     return Page();
                 }
-
             }
-
-            return Page();
         }
 
     }

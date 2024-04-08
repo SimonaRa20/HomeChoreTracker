@@ -38,9 +38,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				if (response.IsSuccessStatusCode)
 				{
 					Homes = await response.Content.ReadFromJsonAsync<List<HomeResponse>>();
-
 					var apiUrlCategories = $"{_config["ApiUrl"]}/Finance/CategoriesExpense";
-
 					var responseCategories = await httpClient.GetAsync(apiUrlCategories);
 
 					if (responseCategories.IsSuccessStatusCode)
@@ -77,7 +75,6 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 					var apiUrl = _config["ApiUrl"] + "/Finance/expense";
-
 					var response = await httpClient.PostAsJsonAsync(apiUrl, CreateNewExpense);
 
 					if (response.IsSuccessStatusCode)

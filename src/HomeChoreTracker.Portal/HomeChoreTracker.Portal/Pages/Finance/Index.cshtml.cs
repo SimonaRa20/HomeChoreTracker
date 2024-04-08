@@ -84,7 +84,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
         private async Task<T> GetApiResponse<T>(HttpClient httpClient, string apiUrl)
         {
             var response = await httpClient.GetAsync(apiUrl);
-            response.EnsureSuccessStatusCode(); // Throw if not a success code
+            response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<T>();
         }

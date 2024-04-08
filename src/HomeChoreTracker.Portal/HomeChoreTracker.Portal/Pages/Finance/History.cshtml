@@ -16,319 +16,327 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
+@if (!User.Identity.IsAuthenticated)
+{
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpenseFromImage"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
+			<a class="btn btn-secondary btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
 
-<div class="row">
-	<div class="col-lg-12">
-		<a class="btn btn-light btn-sm mb-2" href="/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./CreateExpenseFromImage">
-			<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image
-		</a>
-		<a class="btn btn-light btn-sm mb-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
-		<a class="btn btn-secondary btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
-
-		<div class="card mb-4 py-3 mt-2 border-left-primary">
-			<div class="card-body">
-				@if (Model.TransferHistory != null && Model.TransferHistory.Any())
-				{
-					<table class="table">
-						<thead>
-							<tr class="text-center">
-								<th>Type</th>
-								<th>Title</th>
-								<th>Date</th>
-								<th>Amount</th>
-								<th>Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							@foreach (var transfer in Model.TransferHistory)
-							{
+			<div class="card mb-4 py-3 mt-2 border-left-primary">
+				<div class="card-body">
+					@if (Model.TransferHistory != null && Model.TransferHistory.Any())
+					{
+						<table class="table">
+							<thead>
 								<tr class="text-center">
-									<td>@transfer.Data.Category.Name</td>
-									<td>@transfer.Data.Title</td>
-									<td>@transfer.Data.Time.ToString("MM/dd/yyyy")</td>
-									<td class="@((transfer.Type == "Expense") ? "text-danger" : "text-success")">
-										@if (transfer.Type == "Expense")
-										{
-											@("-" + transfer.Data.Amount.ToString("0.00"))
-										}
-										else
-										{
-											@(transfer.Data.Amount.ToString("0.00"))
-										}
-									</td>
-									<td>
-										@if (transfer.Type == "Expense")
-										{
-											<button class='btn btn-sm' onclick="DisplayExpenseDetailModal('@transfer.Data.Id')">
-												<i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-											</button>
-										}
-										else
-										{
-											<button class='btn btn-sm' onclick="DisplayIncomeDetailModal('@transfer.Data.Id')">
-												<i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-											</button>
-										}
-										@if (transfer.Type == "Income")
-										{
-											<button class='btn btn-sm' onclick="DisplayEditIncomeModal('@transfer.Data.Id')">
-												<i class='fa fa-pencil-alt'></i>
-											</button>
-										}
-										else
-										{
-											<button class='btn btn-sm' onclick="DisplayEditExpenseModal('@transfer.Data.Id')">
-												<i class='fa fa-pencil-alt'></i>
-											</button>
-										}
-										<a class='btn btn-sm btnDelete' data-toggle="modal" data-target="#DeleteModal-@transfer.Data.Id" data-title="@transfer.Data.Title" data-type="@transfer.Type">
-											<i class='fa fa-trash'></i>
-										</a>
-										<div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@transfer.Data.Id">
-											<div class="modal-dialog" role="document">
-												<div class="modal-content">
-													<div class="modal-header">
-														<h5 class="modal-title">Delete Confirmation</h5>
-														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-															<span aria-hidden="true">&times;</span>
-														</button>
-													</div>
-													<div class="modal-body">
-														<p>Are you sure you want to delete this '<span class="delete-item-title"></span>' <span class="delete-item-type"></span>?</p>
-													</div>
-													<div class="modal-footer">
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-														<form method="post" asp-page-handler="Delete" asp-route-id="@transfer.Data.Id" id="deleteForm">
-															<input type="hidden" name="DeleteItemType" value="@transfer.Type" />
-															<button type="submit" class="btn btn-danger">Delete</button>
-														</form>
-
+									<th>Type</th>
+									<th>Title</th>
+									<th>Date</th>
+									<th>Amount</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var transfer in Model.TransferHistory)
+								{
+									<tr class="text-center">
+										<td>@transfer.Data.Category.Name</td>
+										<td>@transfer.Data.Title</td>
+										<td>@transfer.Data.Time.ToString("MM/dd/yyyy")</td>
+										<td class="@((transfer.Type == "Expense") ? "text-danger" : "text-success")">
+											@if (transfer.Type == "Expense")
+											{
+												@("-" + transfer.Data.Amount.ToString("0.00"))
+											}
+											else
+											{
+												@(transfer.Data.Amount.ToString("0.00"))
+											}
+										</td>
+										<td>
+											@if (transfer.Type == "Expense")
+											{
+												<button class='btn btn-sm' onclick="DisplayExpenseDetailModal('@transfer.Data.Id')">
+													<i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+												</button>
+											}
+											else
+											{
+												<button class='btn btn-sm' onclick="DisplayIncomeDetailModal('@transfer.Data.Id')">
+													<i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+												</button>
+											}
+											@if (transfer.Type == "Income")
+											{
+												<button class='btn btn-sm' onclick="DisplayEditIncomeModal('@transfer.Data.Id')">
+													<i class='fa fa-pencil-alt'></i>
+												</button>
+											}
+											else
+											{
+												<button class='btn btn-sm' onclick="DisplayEditExpenseModal('@transfer.Data.Id')">
+													<i class='fa fa-pencil-alt'></i>
+												</button>
+											}
+											<a class='btn btn-sm btnDelete' data-toggle="modal" data-target="#DeleteModal-@transfer.Data.Id" data-title="@transfer.Data.Title" data-type="@transfer.Type">
+												<i class='fa fa-trash'></i>
+											</a>
+											<div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@transfer.Data.Id">
+												<div class="modal-dialog" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title">Delete Confirmation</h5>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<p>Are you sure you want to delete this '<span class="delete-item-title"></span>' <span class="delete-item-type"></span>?</p>
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+															<form method="post" asp-page-handler="Delete" asp-route-id="@transfer.Data.Id" id="deleteForm">
+																<input type="hidden" name="DeleteItemType" value="@transfer.Type" />
+																<button type="submit" class="btn btn-danger">Delete</button>
+															</form>
+														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-									</td>
-								</tr>
-							}
-						</tbody>
-					</table>
-					<div>
-						<ul class="pagination">
-							@if (Model.ShowPrevious)
-							{
-								<li class="page-item">
-									<a asp-page="/Finance/History" asp-route-currentpage="@(Model.CurrentPage -1)"
-									   class="page-link">Previous</a>
-								</li>
-							}
-							@if (Model.ShowNext)
-							{
-								<li class="page-item">
-									<a asp-page="/Finance/History" asp-route-currentpage="@(Model.CurrentPage + 1)"
-									   class="page-link">Next</a>
-								</li>
-							}
-						</ul>
-					</div>
-				}
-				else
-				{
-					<p>No incomes or expenses found.</p>
-				}
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="detailIncomeModal" tabindex="-1" role="dialog" aria-labelledby="detailIncomeModalLabel"
-	 aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="detailIncomeModalLabel">Income Details</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<p id="incomeTitle"></p>
-				<p id="incomeAmount"></p>
-				<p id="incomeDescription"></p>
-				<p id="incomeTime"></p>
-				<p id="incomeType"></p>
-				<p id="incomeHome"></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="detailExpenseModal" tabindex="-1" role="dialog" aria-labelledby="detailExpenseModalLabel"
-	 aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="detailExpenseModalLabel">Expense Details</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<p id="expenseTitle"></p>
-				<p id="expenseAmount"></p>
-				<p id="expenseDescription"></p>
-				<p id="expenseTime"></p>
-				<p id="expenseType"></p>
-				<p id="expenseHome"></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="editIncomeModal" tabindex="-1" role="dialog" aria-labelledby="editIncomeModalLabel" 
-	 aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="editIncomeModalLabel">Edit income</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form method="post" asp-page-handler="EditIncome" onsubmit="return validateEditIncomeForm()">
-					<input type="hidden" id="editIncomeId" name="id" value="" />
-					<div class="form-group" method="post">
-						<label for="editIncomeTitle">Title</label>
-						<input asp-for="EditIncome.Title" name="EditIncomeTitle" type="text" class="form-control" id="editIncomeTitle">
-						<span id="editIncomeTitleError" class="text-danger"></span>
-					</div>
-					<div class="form-group" method="post">
-						<label for="editIncomeAmount">Amount</label>
-						<input asp-for="EditIncome.Amount" name="EditIncomeAmount" step="0.01" min="0.01" type="number" class="form-control" id="editIncomeAmount">
-						<span id="editIncomeAmountError" class="text-danger"></span>
-					</div>
-					<div class="form-group" method="post">
-						<label for="editIncomeDescription">Description</label>
-						<input asp-for="EditIncome.Description" name="EditIncomeDescription" type="text" class="form-control" id="editIncomeDescription">
-					</div>
-					<div class="form-group" method="post">
-						<label for="editIncomeTime">Time</label>
-						<input asp-for="EditIncome.Time" name="EditIncomeTime" type="datetime-local" class="form-control" id="editIncomeTime">
-						<span id="editIncomeTimeError" class="text-danger"></span>
-					</div>
-					@if (Model.FinancialCategoriesIncome != null)
-					{
-						<div class="form-group">
-							<label for="editIncomeType">Type</label>
-							<select class="form-control" id="editIncomeType" name="EditIncomeType" onchange="toggleIncomeNewTypeField()">
-								<option value="0">Create new type</option>
-								@foreach (var home in Model.FinancialCategoriesIncome)
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+						<div>
+							<ul class="pagination">
+								@if (Model.ShowPrevious)
 								{
-									<option value="@home.Id">@home.Name</option>
+									<li class="page-item">
+										<a asp-page="/Finance/History" asp-route-currentpage="@(Model.CurrentPage -1)"
+										   class="page-link">Previous</a>
+									</li>
+								}
+								@if (Model.ShowNext)
+								{
+									<li class="page-item">
+										<a asp-page="/Finance/History" asp-route-currentpage="@(Model.CurrentPage + 1)"
+										   class="page-link">Next</a>
+									</li>
+								}
+							</ul>
+						</div>
+					}
+					else
+					{
+						<p>No incomes or expenses found.</p>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="detailIncomeModal" tabindex="-1" role="dialog" aria-labelledby="detailIncomeModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="detailIncomeModalLabel">Income Details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p id="incomeTitle"></p>
+					<p id="incomeAmount"></p>
+					<p id="incomeDescription"></p>
+					<p id="incomeTime"></p>
+					<p id="incomeType"></p>
+					<p id="incomeHome"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="detailExpenseModal" tabindex="-1" role="dialog" aria-labelledby="detailExpenseModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="detailExpenseModalLabel">Expense Details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p id="expenseTitle"></p>
+					<p id="expenseAmount"></p>
+					<p id="expenseDescription"></p>
+					<p id="expenseTime"></p>
+					<p id="expenseType"></p>
+					<p id="expenseHome"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="editIncomeModal" tabindex="-1" role="dialog" aria-labelledby="editIncomeModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editIncomeModalLabel">Edit income</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form method="post" asp-page-handler="EditIncome" onsubmit="return validateEditIncomeForm()">
+						<input type="hidden" id="editIncomeId" name="id" value="" />
+						<div class="form-group" method="post">
+							<label for="editIncomeTitle">Title</label>
+							<input asp-for="EditIncome.Title" name="EditIncomeTitle" type="text" class="form-control" id="editIncomeTitle">
+							<span id="editIncomeTitleError" class="text-danger"></span>
+						</div>
+						<div class="form-group" method="post">
+							<label for="editIncomeAmount">Amount</label>
+							<input asp-for="EditIncome.Amount" name="EditIncomeAmount" step="0.01" min="0.01" type="number" class="form-control" id="editIncomeAmount">
+							<span id="editIncomeAmountError" class="text-danger"></span>
+						</div>
+						<div class="form-group" method="post">
+							<label for="editIncomeDescription">Description</label>
+							<input asp-for="EditIncome.Description" name="EditIncomeDescription" type="text" class="form-control" id="editIncomeDescription">
+						</div>
+						<div class="form-group" method="post">
+							<label for="editIncomeTime">Time</label>
+							<input asp-for="EditIncome.Time" name="EditIncomeTime" type="datetime-local" class="form-control" id="editIncomeTime">
+							<span id="editIncomeTimeError" class="text-danger"></span>
+						</div>
+						@if (Model.FinancialCategoriesIncome != null)
+						{
+							<div class="form-group">
+								<label for="editIncomeType">Type</label>
+								<select class="form-control" id="editIncomeType" name="EditIncomeType" onchange="toggleIncomeNewTypeField()">
+									<option value="0">Create new type</option>
+									@foreach (var home in Model.FinancialCategoriesIncome)
+									{
+										<option value="@home.Id">@home.Name</option>
+									}
+								</select>
+							</div>
+						}
+						<div class="form-group" id="newIncomeTypeField" style="display:none;">
+							<label for="NewType">New Type</label>
+							<input type="text" class="form-control" id="NewIncomeType" name="NewIncomeFinancialCategory">
+						</div>
+						<div class="form-group">
+							<label for="editIncomeHome">Home</label>
+							<select class="form-control" id="editIncomeHome" name="EditIncomeHome">
+								<option value="">Select a home</option>
+								@foreach (var home in Model.Homes)
+								{
+									<option value="@home.Id">@home.Title</option>
 								}
 							</select>
 						</div>
-					}
-					<div class="form-group" id="newIncomeTypeField" style="display:none;">
-						<label for="NewType">New Type</label>
-						<input type="text" class="form-control" id="NewIncomeType" name="NewIncomeFinancialCategory">
-					</div>
-
-					<div class="form-group">
-						<label for="editIncomeHome">Home</label>
-						<select class="form-control" id="editIncomeHome" name="EditIncomeHome" >
-							<option value="">Select a home</option>
-							@foreach (var home in Model.Homes)
-							{
-								<option value="@home.Id">@home.Title</option>
-							}
-						</select>
-					</div>
-					<button type="submit" class="btn btn-primary">Save changes</button>
-				</form>
+						<button type="submit" class="btn btn-primary">Save changes</button>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-
-<div class="modal fade" id="editExpenseModal" tabindex="-1" role="dialog" aria-labelledby="editExpenseModalLabel"
-	 aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="editExpenseModalLabel">Edit expense</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form method="post" asp-page-handler="EditExpense" onsubmit="return validateEditExpenseForm()">
-					<input type="hidden" id="editExpenseId" name="id" value="" />
-					<div class="form-group" method="post">
-						<label for="editExpenseTitle">Title</label>
-						<input asp-for="EditExpense.Title" name="EditExpenseTitle" type="text" class="form-control" id="editExpenseTitle" >
-						<span id="editExpenseTitleError" class="text-danger"></span>
-					</div>
-					<div class="form-group" method="post">
-						<label for="editExpenseAmount">Amount</label>
-						<input asp-for="EditExpense.Amount" name="EditExpenseAmount" type="number" step="0.01" min="0.01" class="form-control" id="editExpenseAmount">
-						<span id="editExpenseAmountError" class="text-danger"></span>
-					</div>
-					<div class="form-group" method="post">
-						<label for="editExpenseDescription">Description</label>
-						<input asp-for="EditExpense.Description" name="EditExpenseDescription" type="text" class="form-control" id="editExpenseDescription">
-					</div>
-					<div class="form-group" method="post">
-						<label for="editExpenseTime">Time</label>
-						<input asp-for="EditExpense.Time" name="EditExpenseTime" type="datetime-local" class="form-control" id="editExpenseTime">
-						<span id="editExpenseTimeError" class="text-danger"></span>
-					</div>
-
-					@if (Model.FinancialCategoriesExpense != null)
-					{
+	<div class="modal fade" id="editExpenseModal" tabindex="-1" role="dialog" aria-labelledby="editExpenseModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editExpenseModalLabel">Edit expense</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form method="post" asp-page-handler="EditExpense" onsubmit="return validateEditExpenseForm()">
+						<input type="hidden" id="editExpenseId" name="id" value="" />
+						<div class="form-group" method="post">
+							<label for="editExpenseTitle">Title</label>
+							<input asp-for="EditExpense.Title" name="EditExpenseTitle" type="text" class="form-control" id="editExpenseTitle">
+							<span id="editExpenseTitleError" class="text-danger"></span>
+						</div>
+						<div class="form-group" method="post">
+							<label for="editExpenseAmount">Amount</label>
+							<input asp-for="EditExpense.Amount" name="EditExpenseAmount" type="number" step="0.01" min="0.01" class="form-control" id="editExpenseAmount">
+							<span id="editExpenseAmountError" class="text-danger"></span>
+						</div>
+						<div class="form-group" method="post">
+							<label for="editExpenseDescription">Description</label>
+							<input asp-for="EditExpense.Description" name="EditExpenseDescription" type="text" class="form-control" id="editExpenseDescription">
+						</div>
+						<div class="form-group" method="post">
+							<label for="editExpenseTime">Time</label>
+							<input asp-for="EditExpense.Time" name="EditExpenseTime" type="datetime-local" class="form-control" id="editExpenseTime">
+							<span id="editExpenseTimeError" class="text-danger"></span>
+						</div>
+						@if (Model.FinancialCategoriesExpense != null)
+						{
+							<div class="form-group">
+								<label for="editExpenseType">Type</label>
+								<select class="form-control" id="editExpenseType" name="EditExpenseType" onchange="toggleExpenseNewTypeField()">
+									<option value="0">Create new type</option>
+									@foreach (var home in Model.FinancialCategoriesExpense)
+									{
+										<option value="@home.Id">@home.Name</option>
+									}
+								</select>
+							</div>
+						}
+						<div class="form-group" id="newExpenseTypeField" style="display:none;">
+							<label for="NewType">New Type</label>
+							<input type="text" class="form-control" id="NewExpenseType" name="NewExpenseFinancialCategory">
+						</div>
 						<div class="form-group">
-							<label for="editExpenseType">Type</label>
-							<select class="form-control" id="editExpenseType" name="EditExpenseType" onchange="toggleExpenseNewTypeField()">
-								<option value="0">Create new type</option>
-								@foreach (var home in Model.FinancialCategoriesExpense)
+							<label for="editExpenseHome">Home</label>
+							<select class="form-control" id="editExpenseHome" name="EditExpenseHome">
+								<option value="">Select a home</option>
+								@foreach (var home in Model.Homes)
 								{
-									<option value="@home.Id">@home.Name</option>
+									<option value="@home.Id">@home.Title</option>
 								}
 							</select>
 						</div>
-					}
-
-					<div class="form-group" id="newExpenseTypeField" style="display:none;">
-						<label for="NewType">New Type</label>
-						<input type="text" class="form-control" id="NewExpenseType" name="NewExpenseFinancialCategory">
-					</div>
-			
-					<div class="form-group">
-						<label for="editExpenseHome">Home</label>
-						<select class="form-control" id="editExpenseHome" name="EditExpenseHome">
-							<option value="">Select a home</option>
-							@foreach (var home in Model.Homes)
-							{
-								<option value="@home.Id">@home.Title</option>
-							}
-						</select>
-					</div>
-				
-					<button type="submit" class="btn btn-primary">Save changes</button>
-				</form>
+						<button type="submit" class="btn btn-primary">Save changes</button>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 <script>
 	function toggleIncomeNewTypeField() {
 		var selectedValue = $('#editIncomeType').val();
@@ -352,8 +360,6 @@
 		}
 	}
 </script>
-
-
 
 <script>
 	function validateEditIncomeForm() {
@@ -501,7 +507,6 @@
 
 					var newTypeField = document.getElementById('newIncomeTypeField');
 
-					// If the selected category ID is "0" (string), show the new type field; otherwise, hide it
 					if (data.financialCategoryId === "0") {
 						newTypeField.style.display = 'block';
 					} else {
@@ -518,7 +523,6 @@
 			}
 		});
 	}
-
 
 	function DisplayEditExpenseModal(choreId) {
 		$('#editExpenseId').val(choreId);
@@ -540,11 +544,9 @@
 					$('#editExpenseType option').filter(function () {
 						return $(this).val() == data.financialCategoryId;
 					}).prop('selected', true);
-					
 
 					var newTypeField = document.getElementById('newExpenseTypeField');
 
-					// If the selected category ID is "0" (string), show the new type field; otherwise, hide it
 					if (data.financialCategoryId === "0") {
 						newTypeField.style.display = 'block';
 					} else {

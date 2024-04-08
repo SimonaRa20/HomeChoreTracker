@@ -52,8 +52,6 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
             }
         }
 
-       
-
 		public async Task<IActionResult> OnGetPurchaseDetailAsync(int purchaseId)
         {
             var token = User.FindFirstValue("Token");

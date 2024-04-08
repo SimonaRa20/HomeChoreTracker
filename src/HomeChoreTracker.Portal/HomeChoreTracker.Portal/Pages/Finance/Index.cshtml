@@ -1,112 +1,114 @@
 ﻿@page
 @model HomeChoreTracker.Portal.Pages.Finance.IndexModel
 @{
-    Layout = "~/Pages/Shared/_Layout.cshtml";
+	Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 @section HeadContent
 {
-    <title>@ViewData["Title"] - Home Chore Tracker</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet" asp-append-version="true">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <!-- Add the following lines to include required Bootstrap and jQuery files -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<!-- Add the following lines to include required Bootstrap and jQuery files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
-<div class="row">
-    <div class="col-lg-12">
-        <div class="d-flex flex-wrap">
-            <a class="btn btn-secondary btn-sm mb-2 mr-2" href="~/Finance">
-                <i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics
-            </a>
-
-            <a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateIncome">
-                <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income
-            </a>
-
-            <a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateExpense">
-                <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense
-            </a>
-
-            <a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateExpenseFromImage">
-                <i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image
-            </a>
-
-            <a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./GenerateReport">
-                <i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report
-            </a>
-
-            <a class="btn btn-light btn-sm mb-2" asp-page="./History">
-                <i class="fa fa-history mr-2" aria-hidden="true"></i>History
-            </a>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-4">
-        <div class="card mb-4 border-left-primary">
-            <div class="card-body">
-                <h7>Current month total balance</h7>
-                <h3>@Model.CurrentMonthTotalBalance Eur</h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="card mb-4 border-left-success">
-            <div class="card-body">
-                <h7>Current month total income</h7>
-                <h3>@Model.CurrentMonthTotalIncome Eur</h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="card mb-4 border-left-danger">
-            <div class="card-body">
-                <h7>Current month total expense</h7>
-                <h3>@Model.CurrentMonthTotalExpense Eur</h3>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card shadow mb-4">
-            <div class="card-body text-center">
-                <h5>Report</h5>
-                <div class="chart-bar">
-                    <canvas id="monthlyChart" class="chart-canvas"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                <h5>Expense Categories</h5>
-                <div class="chart-pie-container">
-                    <canvas id="expenseChart" class="chart-canvas"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                <h5>Income Categories</h5>
-                <div class="chart-pie-container">
-                    <canvas id="incomeChart" class="chart-canvas"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@if (!User.Identity.IsAuthenticated)
+{
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="d-flex flex-wrap">
+				<a class="btn btn-secondary btn-sm mb-2 mr-2" href="~/Finance"><i class="fa fa-signal mr-2" aria-hidden="true"></i>Statistics</a>
+				<a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateIncome"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create income</a>
+				<a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateExpense"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense</a>
+				<a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./CreateExpenseFromImage"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create expense from image</a>
+				<a class="btn btn-light btn-sm mb-2 mr-2" asp-page="./GenerateReport"><i class="fa fa-file mr-2" aria-hidden="true"></i>Generate report</a>
+				<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-history mr-2" aria-hidden="true"></i>History</a>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-4">
+			<div class="card mb-4 border-left-primary">
+				<div class="card-body">
+					<h7>Current month total balance</h7>
+					<h3>@Model.CurrentMonthTotalBalance Eur</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-4">
+			<div class="card mb-4 border-left-success">
+				<div class="card-body">
+					<h7>Current month total income</h7>
+					<h3>@Model.CurrentMonthTotalIncome Eur</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-4">
+			<div class="card mb-4 border-left-danger">
+				<div class="card-body">
+					<h7>Current month total expense</h7>
+					<h3>@Model.CurrentMonthTotalExpense Eur</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card shadow mb-4">
+				<div class="card-body text-center">
+					<h5>Report</h5>
+					<div class="chart-bar">
+						<canvas id="monthlyChart" class="chart-canvas"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-6">
+			<div class="card shadow mb-4">
+				<div class="card-body">
+					<h5>Expense Categories</h5>
+					<div class="chart-pie-container">
+						<canvas id="expenseChart" class="chart-canvas"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6">
+			<div class="card shadow mb-4">
+				<div class="card-body">
+					<h5>Income Categories</h5>
+					<div class="chart-pie-container">
+						<canvas id="incomeChart" class="chart-canvas"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -115,159 +117,156 @@
 <script src="vendor/chart.js/Chart.min.js"></script>
 <script src="js/demo/chart-bar-demo.js"></script>
 <script>
-    function createBarChart() {
-        var monthlySummaries = @Html.Raw(Json.Serialize(Model.MonthlySummaries));
-        console.log(monthlySummaries);
+	function createBarChart() {
+		var monthlySummaries = @Html.Raw(Json.Serialize(Model.MonthlySummaries));
+		console.log(monthlySummaries);
 
-        if (monthlySummaries && monthlySummaries.length > 0) {
-            var labels = monthlySummaries.map(summary => summary.monthYear);
-            var incomeData = monthlySummaries.map(summary => summary.totalIncome);
-            var expenseData = monthlySummaries.map(summary => summary.totalExpense);
+		if (monthlySummaries && monthlySummaries.length > 0) {
+			var labels = monthlySummaries.map(summary => summary.monthYear);
+			var incomeData = monthlySummaries.map(summary => summary.totalIncome);
+			var expenseData = monthlySummaries.map(summary => summary.totalExpense);
 
-            var ctx = document.getElementById('monthlyChart').getContext('2d');
-            var chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Income',
-                        data: incomeData,
-                        backgroundColor: '#1cc88a'
-                    }, {
-                        label: 'Expense',
-                        data: expenseData,
-                        backgroundColor: '#e74a3b'
-                    }]
-                },
-                options: {
-                    responsive: true, // Make the chart responsive
-                    maintainAspectRatio: false, // Don't maintain aspect ratio
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    }
-                }
-            });
-            chart.canvas.parentNode.style.height = '400px';
-            // Update canvas size whenever the window is resized
-            window.addEventListener('resize', function () {
-                chart.canvas.parentNode.style.width = '100%';
-                chart.canvas.parentNode.style.height = 'auto';
-            });
-        } else {
-            console.error("Monthly summaries data is null, undefined, or empty.");
-        }
-    }
+			var ctx = document.getElementById('monthlyChart').getContext('2d');
+			var chart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: labels,
+					datasets: [{
+						label: 'Income',
+						data: incomeData,
+						backgroundColor: '#1cc88a'
+					}, {
+						label: 'Expense',
+						data: expenseData,
+						backgroundColor: '#e74a3b'
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+					}
+				}
+			});
+			chart.canvas.parentNode.style.height = '400px';
+			window.addEventListener('resize', function () {
+				chart.canvas.parentNode.style.width = '100%';
+				chart.canvas.parentNode.style.height = 'auto';
+			});
+		} else {
+			console.error("Monthly summaries data is null, undefined, or empty.");
+		}
+	}
 
-    // Call the function after the page is loaded
-    document.addEventListener("DOMContentLoaded", function () {
-        createBarChart();
-    });
+	document.addEventListener("DOMContentLoaded", function () {
+		createBarChart();
+	});
 </script>
 <script>
-    function createChart() {
-        var expenseCategories = @Html.Raw(Json.Serialize(Model.ExpenseCategories));
-        var incomeCategories = @Html.Raw(Json.Serialize(Model.IncomeCategories));
+	function createChart() {
+		var expenseCategories = @Html.Raw(Json.Serialize(Model.ExpenseCategories));
+		var incomeCategories = @Html.Raw(Json.Serialize(Model.IncomeCategories));
 
-        if (expenseCategories && Object.keys(expenseCategories).length > 0) {
-            var expenseLabels = Object.keys(expenseCategories);
-            var expenseData = Object.values(expenseCategories);
+		if (expenseCategories && Object.keys(expenseCategories).length > 0) {
+			var expenseLabels = Object.keys(expenseCategories);
+			var expenseData = Object.values(expenseCategories);
 
-            var ctxExpense = document.getElementById('expenseChart').getContext('2d');
-            var expenseChart = new Chart(ctxExpense, {
-                type: 'pie',
-                data: {
-                    labels: expenseLabels,
-                    datasets: [{
-                        data: expenseData,
-                        backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(255, 159, 64)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(54, 162, 235)',
-                            'rgb(153, 102, 255)',
-                            'rgb(201, 203, 207)',
-                            'rgb(200, 50, 132)',
-                            'rgb(100, 159, 64)',
-                            'rgb(100, 205, 86)',
-                            'rgb(175, 192, 192)',
-                            'rgb(154, 162, 235)',
-                            'rgb(153, 52, 255)'
-                        ]
-                    }]
-                },
-                options: {
-                    legend: {
-                        position: 'right'
-                    },
-                    aspectRatio: 1,
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
+			var ctxExpense = document.getElementById('expenseChart').getContext('2d');
+			var expenseChart = new Chart(ctxExpense, {
+				type: 'pie',
+				data: {
+					labels: expenseLabels,
+					datasets: [{
+						data: expenseData,
+						backgroundColor: [
+							'rgb(255, 99, 132)',
+							'rgb(255, 159, 64)',
+							'rgb(255, 205, 86)',
+							'rgb(75, 192, 192)',
+							'rgb(54, 162, 235)',
+							'rgb(153, 102, 255)',
+							'rgb(201, 203, 207)',
+							'rgb(200, 50, 132)',
+							'rgb(100, 159, 64)',
+							'rgb(100, 205, 86)',
+							'rgb(175, 192, 192)',
+							'rgb(154, 162, 235)',
+							'rgb(153, 52, 255)'
+						]
+					}]
+				},
+				options: {
+					legend: {
+						position: 'right'
+					},
+					aspectRatio: 1,
+					responsive: true,
+					maintainAspectRatio: false
+				}
+			});
 
-        } else {
-            var expenseCanvas = document.getElementById('expenseChart');
-            expenseCanvas.parentNode.innerHTML = "There are currently no expense categories.";
-        }
+		} else {
+			var expenseCanvas = document.getElementById('expenseChart');
+			expenseCanvas.parentNode.innerHTML = "There are currently no expense categories.";
+		}
 
-        if (incomeCategories && Object.keys(incomeCategories).length > 0) {
-            var incomeLabels = Object.keys(incomeCategories);
-            var incomeData = Object.values(incomeCategories);
+		if (incomeCategories && Object.keys(incomeCategories).length > 0) {
+			var incomeLabels = Object.keys(incomeCategories);
+			var incomeData = Object.values(incomeCategories);
 
-            var ctxIncome = document.getElementById('incomeChart').getContext('2d');
-            var incomeChart = new Chart(ctxIncome, {
-                type: 'pie',
-                data: {
-                    labels: incomeLabels,
-                    datasets: [{
-                        data: incomeData,
-                        backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(255, 159, 64)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(54, 162, 235)',
-                            'rgb(153, 102, 255)',
-                            'rgb(201, 203, 207)',
-                            'rgb(200, 50, 132)',
-                            'rgb(100, 159, 64)',
-                        ]
-                    }]
-                },
-                options: {
-                    legend: {
-                        position: 'right'
-                    },
-                    aspectRatio: 1,
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
+			var ctxIncome = document.getElementById('incomeChart').getContext('2d');
+			var incomeChart = new Chart(ctxIncome, {
+				type: 'pie',
+				data: {
+					labels: incomeLabels,
+					datasets: [{
+						data: incomeData,
+						backgroundColor: [
+							'rgb(255, 99, 132)',
+							'rgb(255, 159, 64)',
+							'rgb(255, 205, 86)',
+							'rgb(75, 192, 192)',
+							'rgb(54, 162, 235)',
+							'rgb(153, 102, 255)',
+							'rgb(201, 203, 207)',
+							'rgb(200, 50, 132)',
+							'rgb(100, 159, 64)',
+						]
+					}]
+				},
+				options: {
+					legend: {
+						position: 'right'
+					},
+					aspectRatio: 1,
+					responsive: true,
+					maintainAspectRatio: false
+				}
+			});
 
-        } else {
-            var incomeCanvas = document.getElementById('incomeChart');
-            incomeCanvas.parentNode.innerHTML = "There are currently no income categories.";
-        }
-    }
+		} else {
+			var incomeCanvas = document.getElementById('incomeChart');
+			incomeCanvas.parentNode.innerHTML = "There are currently no income categories.";
+		}
+	}
 
-
-    document.addEventListener("DOMContentLoaded", function () {
-        createChart();
-    });
+	document.addEventListener("DOMContentLoaded", function () {
+		createChart();
+	});
 </script>
 <style>
-    .chart-canvas {
-        max-width: 100%;
-        height: auto;
-    }
+	.chart-canvas {
+		max-width: 100%;
+		height: auto;
+	}
 
-    .chart-pie-container {
-        max-height: 400px; /* Adjust the max height as needed */
-        overflow-y: auto; /* Enable vertical scrolling if needed */
-    }
+	.chart-pie-container {
+		max-height: 400px;
+		overflow-y: auto;
+	}
 </style>
