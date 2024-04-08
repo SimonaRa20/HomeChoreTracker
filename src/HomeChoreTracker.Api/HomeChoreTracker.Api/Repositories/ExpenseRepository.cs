@@ -150,6 +150,11 @@ namespace HomeChoreTracker.Api.Repositories
 			return await _dbContext.FinancialCategories.Where(x => x.Type.Equals(FinancialType.Expense) && x.Id.Equals(id)).FirstOrDefaultAsync();
 		}
 
+		public async Task<FinancialCategory> CheckCategory(string financialCategory)
+		{
+			return await _dbContext.FinancialCategories.FirstOrDefaultAsync(x => x.Type.Equals(FinancialType.Expense) && x.Name.Equals(financialCategory));
+		}
+
 		public async Task<decimal> GetTotalExpenseForCategory(DateTime startDate, DateTime endDate, int userId, int categoryId)
 		{
 			return await _dbContext.FinancialRecords
