@@ -24,6 +24,13 @@ namespace HomeChoreTracker.Portal.Pages.Forum
         [BindProperty]
         public AdviceRequest EditAdvice { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string Search { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string TypeFilter { get; set; }
+
+
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
@@ -31,7 +38,7 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             EditAdvice = new AdviceRequest();
         }
 
-        public async Task<IActionResult> OnGetAsync(string search, string type)
+        public async Task<IActionResult> OnGetAsync(string search)
         {
             var token = User.FindFirstValue("Token");
             UserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -48,11 +55,6 @@ namespace HomeChoreTracker.Portal.Pages.Forum
                     if (!string.IsNullOrEmpty(search))
                     {
                         Advices = Advices.Where(a => a.Title.Contains(search) || a.Description.Contains(search)).ToList();
-                    }
-
-                    if (!string.IsNullOrEmpty(type))
-                    {
-                        Advices = Advices.Where(a => string.Equals(a.Type.ToString(), type, StringComparison.OrdinalIgnoreCase)).ToList();
                     }
 
                     return Page();
@@ -128,7 +130,7 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             ClearFieldErrors(key => key == "Description");
             if (!ModelState.IsValid)
             {
-                await OnGetAsync(null, null);
+                await OnGetAsync(null);
                 return Page();
             }
 
@@ -159,7 +161,7 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-                await OnGetAsync(null, null);
+                await OnGetAsync(null);
                 return Page();
             }
         }
