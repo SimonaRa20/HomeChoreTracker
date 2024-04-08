@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -21,42 +22,40 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
 
-        public List<TaskAssignmentResponse> HomeChoreResponse { get; set; }
-        public List<UserGetResponse> HomeMembers { get; set; }
-        public CalendarModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		[BindProperty]
+		public int Id { get; set; }
+
+		[BindProperty]
+		public int UserId { get; set; }
+
+		[BindProperty]
+		public AssignedHomeMember AssignedHomeMember { get; set; }
+
+		public List<TaskAssignmentResponse> HomeChoreResponse { get; set; } = new List<TaskAssignmentResponse> { };
+        public List<UserGetResponse> HomeMembers { get; set; } = new List<UserGetResponse> { };
+		public bool Unauthorized { get; set; }
+
+		public CalendarModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
         }
 
-        [BindProperty]
-        public int Id { get; set; }
-
-        [BindProperty]
-        public int UserId { get; set; }
-
-
-        [BindProperty]
-        public AssignedHomeMember AssignedHomeMember { get; set; }
-
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Id = id;
-
             UserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var token = User.FindFirstValue("Token");
+
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/HomeChore/Chore/Calendar/{id}";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
                     HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<TaskAssignmentResponse>>();
-
                     var events = HomeChoreResponse.Select(chore => new
                     {
                         id = chore.Id,
@@ -71,18 +70,22 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         votes = chore.TotalVotes,
                     });
 
-
                     var apiUrlMembers = $"{_config["ApiUrl"]}/Home/HomeMembers?homeId={Id}";
-
                     var responseMembers = await httpClient.GetAsync(apiUrlMembers);
 
                     if (responseMembers.IsSuccessStatusCode)
                     {
                         HomeMembers = await responseMembers.Content.ReadFromJsonAsync<List<UserGetResponse>>();
                     }
-                    return Page();
+
+					return Page();
                 }
-                else
+				else if (response.StatusCode == HttpStatusCode.Forbidden)
+				{
+					Unauthorized = true; 
+                    return Page();
+				}
+				else
                 {
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
@@ -95,12 +98,13 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             {
                 return Page();
             }
+
             var token = User.FindFirstValue("Token");
+
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var apiUrl = _config["ApiUrl"] + $"/Calendar/{homeId}";
-
                 var selectedMemberId = Request.Form["AssignedHomeMember.HomeMemberId"];
 
                 if (string.IsNullOrEmpty(selectedMemberId))
@@ -122,6 +126,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 }
 
                 var response = await httpClient.PutAsJsonAsync(apiUrl, AssignedHomeMember);
+
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
@@ -144,9 +149,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 try
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                     var voteApiUrl = $"{_config["ApiUrl"]}/HomeChore/VoteTask/{taskId}/{vote}";
-
                     var response = await httpClient.PutAsync(voteApiUrl, null);
 
                     if (response.IsSuccessStatusCode)
@@ -177,11 +180,9 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var apiUrl = _config["ApiUrl"] + $"/Calendar/AssignTasksToMembers/{homeId}";
-
-                // Create an empty StringContent since no content needs to be sent
                 var emptyContent = new StringContent("");
-
                 var response = await httpClient.PostAsync(apiUrl, emptyContent);
+
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
@@ -194,6 +195,5 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 }
             }
         }
-
     }
 }

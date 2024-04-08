@@ -38,18 +38,15 @@ namespace HomeChoreTracker.Portal.Pages.Auth
                     var loginResponse = await response.Content.ReadFromJsonAsync<UserLoginResponse>();
 
                     var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, loginResponse.Id.ToString()),
-                    new Claim(ClaimTypes.Name, loginResponse.UserName),
-                    new Claim(ClaimTypes.Role, loginResponse.Role),
-                    new Claim("Token", loginResponse.Token)
-                };
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, loginResponse.Id.ToString()),
+                        new Claim(ClaimTypes.Name, loginResponse.UserName),
+                        new Claim(ClaimTypes.Role, loginResponse.Role),
+                        new Claim("Token", loginResponse.Token)
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    var authProperties = new AuthenticationProperties
-                    {
-                    };
+                    var authProperties = new AuthenticationProperties {};
 
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,

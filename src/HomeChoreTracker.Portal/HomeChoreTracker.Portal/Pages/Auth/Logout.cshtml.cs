@@ -6,7 +6,13 @@ namespace HomeChoreTracker.Portal.Pages.Auth
 {
     public class LogoutModel : PageModel
     {
-        public async Task<IActionResult> OnPostAsync()
+		public async Task<IActionResult> OnGetAsync()
+		{
+			await HttpContext.SignOutAsync();
+			return RedirectToPage("/Index");
+		}
+
+		public async Task<IActionResult> OnPostAsync()
         {
             await HttpContext.SignOutAsync();
             return RedirectToPage("/Index");

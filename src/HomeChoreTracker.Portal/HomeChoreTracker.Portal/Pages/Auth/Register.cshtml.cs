@@ -17,6 +17,7 @@ namespace HomeChoreTracker.Portal.Pages.Auth
             _httpClientFactory = httpClientFactory;
             _config = config;
         }
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)

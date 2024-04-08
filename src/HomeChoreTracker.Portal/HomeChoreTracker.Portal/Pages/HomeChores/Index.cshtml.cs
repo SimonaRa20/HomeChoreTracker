@@ -4,6 +4,7 @@ using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using DayOfWeek = HomeChoreTracker.Portal.Constants.DayOfWeek;
@@ -12,19 +13,19 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 {
     public class IndexModel : PageModel
     {
-		[BindProperty]
-		public int HomeId { get; set; }
-		
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
 
         public List<HomeChoreResponse> HomeChoreResponse { get; set; }
+		public bool Unauthorized { get; set; }
 
-        [BindProperty]
+		[BindProperty]
         public HomeChoreBaseEditRequest EditHomeChore { get; set; }
 
+		[BindProperty]
+		public int HomeId { get; set; }
 
-        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
@@ -38,9 +39,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -48,7 +47,12 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<HomeChoreResponse>>();
                     return Page();
                 }
-                else
+				else if (response.StatusCode == HttpStatusCode.Forbidden)
+				{
+					Unauthorized = true;
+					return Page();
+				}
+				else
                 {
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
@@ -62,7 +66,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var apiUrl = $"{_config["ApiUrl"]}/HomeChore/{taskId}";
-
                 var response = await httpClient.DeleteAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -83,20 +86,17 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/HomeChore/Chore/{choreId}";
                 var response = await httpClient.GetAsync(apiUrl);
-
                 var choreDetails = new HomeChoreResponse();
+
                 if (response.IsSuccessStatusCode)
                 {
                     choreDetails = await response.Content.ReadFromJsonAsync<HomeChoreResponse>();
 
                     if (choreDetails != null)
                     {
-                        // Directly assign choreDetails.DaysOfWeek to daysOfWeekList
                         var daysOfWeekList = choreDetails.DaysOfWeek;
-
                         string choreTypeText = ((HomeChoreType)choreDetails.ChoreType).ToString();
                         string choreTimeText = ((TimeLong)choreDetails.Time).ToString();
                         string choreLevelTypeText = ((LevelType)choreDetails.LevelType).ToString();
@@ -104,7 +104,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         string choreMonthlyRepeatTypeText = ((MonthlyRepeatType)choreDetails.MonthlyRepeatType).ToString();
                         string descriptionText = choreDetails.Description ?? "-";
                         string repeatingDataText = GetRepeatingDataText(choreDetails);
-
                         return new JsonResult(new
                         {
                             id = choreDetails.Id,
@@ -142,7 +141,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             ClearFieldErrors(key => key == "Name");
             if (!ModelState.IsValid)
             {
-                await OnGetAsync(HomeId); // Refresh the data
+                await OnGetAsync(HomeId);
                 return Page();
             }
 
@@ -153,10 +152,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     var apiUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
-
                     var val = Request.Form["editDaysOfWeek"];
-
-                    // Update EditHomeChore with form values
                     EditHomeChore.Name = Request.Form["editName"];
                     EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
@@ -186,7 +182,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-                await OnGetAsync(HomeId); // Refresh the data
+                await OnGetAsync(HomeId);
                 return Page();
             }
         }

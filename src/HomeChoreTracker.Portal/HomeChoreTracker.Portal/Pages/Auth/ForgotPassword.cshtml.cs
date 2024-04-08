@@ -35,7 +35,6 @@ namespace HomeChoreTracker.Portal.Pages.Auth
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 var apiUrl = _config["ApiUrl"] + "/Auth/RestorePassword";
-
                 var response = await httpClient.PostAsJsonAsync(apiUrl, Email);
 
                 if (response.IsSuccessStatusCode)
@@ -50,6 +49,5 @@ namespace HomeChoreTracker.Portal.Pages.Auth
                 }
             }
         }
-
     }
 }

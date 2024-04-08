@@ -47,7 +47,15 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-                var homeChoreBase = await _homeChoreBaseRepository.GetChoreBase(taskId);
+
+				bool isMember = await _homeRepository.OrHomeMember(homeId, id);
+
+				if (!isMember)
+				{
+					return Forbid();
+				}
+
+				var homeChoreBase = await _homeChoreBaseRepository.GetChoreBase(taskId);
 
                 await _homeChoreRepository.AddHomeChoreBase(homeChoreBase, homeId);
 
@@ -126,7 +134,14 @@ namespace HomeChoreTracker.Api.Controllers
         public async Task<IActionResult> CreateHomeChoreBase(int homeId, HomeChoreRequest homeChoreBaseRequest)
         {
             int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-            HomeChoreTask task = await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest, id, homeId);
+			bool isMember = await _homeRepository.OrHomeMember(homeId, id);
+
+			if (!isMember)
+			{
+				return Forbid();
+			}
+
+			HomeChoreTask task = await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest, id, homeId);
 
             await _homeChoreRepository.Save();
             if (task == null)
@@ -145,7 +160,15 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
-                var homeChore = await _homeChoreRepository.GetAll(id);
+				int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+				bool isMember = await _homeRepository.OrHomeMember(id, userId);
+
+				if (!isMember)
+				{
+					return Forbid();
+				}
+
+				var homeChore = await _homeChoreRepository.GetAll(id);
 
                 return Ok(homeChore);
             }
@@ -504,7 +527,6 @@ namespace HomeChoreTracker.Api.Controllers
                         {
                             DateTime assignmentDate = startDate.AddDays(i * 7);
 
-                            // Find the next occurrence of the selected day of the week
                             int daysToAdd = ((int)selectedDay - (int)assignmentDate.DayOfWeek + 7) % 7;
                             assignmentDate = assignmentDate.AddDays(daysToAdd);
 
@@ -604,7 +626,15 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetHomeChoresToCalendar(int id)
         {
-            var homeChores = await _homeChoreRepository.GetCalendar(id);
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			bool isMember = await _homeRepository.OrHomeMember(id, userId);
+
+			if (!isMember)
+			{
+				return Forbid();
+			}
+
+			var homeChores = await _homeChoreRepository.GetCalendar(id);
             if (homeChores == null)
             {
                 return NotFound($"Home chore base with ID {id} not found");

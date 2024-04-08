@@ -2,483 +2,461 @@
 @model HomeChoreTracker.Portal.Pages.HomeChores.IndexModel
 
 @{
-    Layout = "~/Pages/Shared/_Layout.cshtml";
+	Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 @section HeadContent
 {
-    <title>@ViewData["Title"] - Home Chore Tracker</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet" asp-append-version="true">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <!-- Add the following lines to include required Bootstrap and jQuery files -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<!-- Add the following lines to include required Bootstrap and jQuery files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
 
-@if (User.Identity.IsAuthenticated)
+@if (!User.Identity.IsAuthenticated)
 {
-    <div class="row">
-        <div class="col-lg-12">
-            <a class="btn btn-secondary btn-sm mb-2" href="/HomeChores/@Model.HomeId"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.HomeId"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.HomeId"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.HomeId"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Home Calendar</a>
-            <div class="card mb-4 py-3 border-left-primary">
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-secondary btn-sm mb-2" href="/HomeChores/@Model.HomeId"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.HomeId"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.HomeId"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.HomeId"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Home Calendar</a>
 
-                <div class="card-body">
-                    
-                    @if (Model.HomeChoreResponse != null && Model.HomeChoreResponse.Any())
-                    {
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Chore Type</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var choreBase in Model.HomeChoreResponse)
-                                {
-                                    <tr>
-                                        <td>@choreBase.Name</td>
-                                        <td>@choreBase.ChoreType</td>
-                                        <td>
-                                                @if (choreBase.StartDate != null)
-                                                {
-                                                <p>@choreBase.StartDate.Value.ToString("yyyy/MM/dd")</p>
-                                                }
-                                                else
-                                                {
-                                                <p>-</p>
-                                                }
-                                        </td>
-
-                                        <td>
-                                            @if (!string.IsNullOrEmpty(choreBase.EndDate.ToString()))
-                                            {
-                                                <p>@choreBase.EndDate.Value.ToString("yyyy/MM/dd")</p>
-                                            }
-                                            else
-                                            {
-                                                <p>-</p>
-                                            }
-                                        </td>
-                                        <td>
-                                            <button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
-                                                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                            </button>
-                                            <button class='btn btn-sm' onclick="DisplayEditModal('@choreBase.Id')">
-                                                <i class='fa fa-pencil-alt'></i>
-                                            </button>
-                                            <a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
-                        
-                                            <div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Delete Confirmation</h5>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p>Are you sure you want to delete this '@choreBase.Name' home chore?</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                            <form method="post" asp-page-handler="Delete" asp-route-taskId="@choreBase.Id">
-                                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-                    else
-                    {
-                        <p>No home chore bases found.</p>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Chore Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p id="choreName"></p>
-                    <p id="choreType"></p>
-                    <p id="description"></p>
-                    <p id="time"></p>
-                    <p id="repeatingData"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit @Model.EditHomeChore.Name Chore</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" asp-page-handler="Edit" id="editForm">
-                        <input type="hidden" id="editChoreId" name="id" value="" />
-                        <input type="hidden" id="editHomeId" name="homeId" value="@Model.HomeId" />
-                        <div class="form-group">
-                            <label for="editName">Name</label>
-                            <input asp-for="EditHomeChore.Name" name="editName" class="form-control" id="editName" />
-                            <div id="nameError" class="text-danger" style="display: none;">Name is required.</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="editChoreType">Chore Type</label>
-                            <select class="form-control" id="editChoreType" name="editChoreType" asp-for="EditHomeChore.ChoreType" required>
-                                @foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.HomeChoreType)))
-                                {
-                                    <option value="@((int)choreType)">@choreType</option>
-                                }
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="editDescription">Description</label>
-                            <textarea asp-for="EditHomeChore.Description" name="editDescription" class="form-control" id="editDescription"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="editPoints">Points</label>
-                            <input asp-for="EditHomeChore.Points" name="editPoints" class="form-control" id="editPoints" />
-                            <div id="pointsError" class="text-danger" style="display: none;">Points are required.</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="editLevelType">Level Type</label>
-                            <select class="form-control" name="editLevelType" id="editLevelType" asp-for="EditHomeChore.LevelType" required>
-                                @foreach (var levelType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.LevelType)))
-                                {
-                                    <option value="@((int)levelType)">@levelType</option>
-                                }
-                            </select>
-                        </div>
-
-                 
-
-                        <div class="form-group">
-                            <label for="editTime">Time</label>
-                            <select class="form-control" name="editTimeLong" id="editTimeLong" asp-for="EditHomeChore.Time" required>
-                                @foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
-                                {
-                                    <option value="@((int)time)">@time</option>
-                                }
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="editInterval">Interval</label>
-                            <input asp-for="EditHomeChore.Interval" name="editInterval" class="form-control" id="editInterval" />
-                            <div id="intervalError" class="text-danger" style="display: none;">Interval is required.</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="editUnit">Unit</label>
-                            <select class="form-control" id="editRepeatUnit" name="editRepeatUnit" asp-for="EditHomeChore.Unit" required>
-                                @foreach (var unit in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.RepeatUnit)))
-                                {
-                                    <option value="@((int)unit)">@unit</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group" id="editDayOfWeekField" style="display: none;">
-                            @foreach (var dayOfWeek in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.DayOfWeek)))
-                            {
-                                var checkboxId = "editDayOfWeek_" + (int)dayOfWeek;
-                                var checkboxName = "editDaysOfWeek";
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="@checkboxId" name="@checkboxName" value="@((int)dayOfWeek)">
-                                    <label class="form-check-label" for="@checkboxId">@dayOfWeek</label>
-                                </div>
-                            }
-                        </div>
-
-                        <div class="form-group" id="editDayOfMonthField" style="display: none;">
-                            <label for="editDayOfMonth">Day of Month</label>
-                            <input type="number" class="form-control" name="editDayOfMonth" id="editDayOfMonth" asp-for="EditHomeChore.DayOfMonth" min="1" max="31" value="1">
-                        </div>
-                        <div class="form-group" id="editMonthlyRepeatTypeField" style="display: none;">
-                            <label for="editMonthlyRepeatType">Monthly Repeat Type</label>
-                            <select class="form-control" name="editMonthlyRepeatType" id="editMonthlyRepeatType" asp-for="EditHomeChore.MonthlyRepeatType">
-                                @foreach (var monthlyRepeatType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.MonthlyRepeatType)))
-                                {
-                                    <option value="@((int)monthlyRepeatType)">@monthlyRepeatType</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="StartDate">Start date</label>
-                            <input type="date" class="form-control" id="editStartDate" name="editStartDate" asp-for="EditHomeChore.StartDate" required>
-                            <span asp-validation-for="EditHomeChore.StartDate" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="EndDate">End date</label>
-                            <input type="date" class="form-control" id="editEndDate" name="editEndDate" asp-for="EditHomeChore.EndDate" required>
-                            <span asp-validation-for="EditHomeChore.EndDate" class="text-danger"></span>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="card-body">
+					@if (Model.Unauthorized)
+					{
+						<p>You don't have permission to view this content.</p>
+					}
+					else
+					{
+						@if (Model.HomeChoreResponse != null && Model.HomeChoreResponse.Any())
+						{
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Chore Type</th>
+										<th>Start Date</th>
+										<th>End Date</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var choreBase in Model.HomeChoreResponse)
+									{
+										<tr>
+											<td>@choreBase.Name</td>
+											<td>@choreBase.ChoreType</td>
+											<td>
+												@if (choreBase.StartDate != null)
+												{
+													<p>@choreBase.StartDate.Value.ToString("yyyy/MM/dd")</p>
+												}
+												else
+												{
+													<p>-</p>
+												}
+											</td>
+											<td>
+												@if (!string.IsNullOrEmpty(choreBase.EndDate.ToString()))
+												{
+													<p>@choreBase.EndDate.Value.ToString("yyyy/MM/dd")</p>
+												}
+												else
+												{
+													<p>-</p>
+												}
+											</td>
+											<td>
+												<button class='btn btn-sm' onclick="DisplayDetailModal('@choreBase.Id')">
+													<i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+												</button>
+												<button class='btn btn-sm' onclick="DisplayEditModal('@choreBase.Id')">
+													<i class='fa fa-pencil-alt'></i>
+												</button>
+												<a class='btn btn-sm' id='btnDelete' data-toggle="modal" data-target="#DeleteModal-@choreBase.Id"><i class='fa fa-trash'></i></a>
+												<div class="modal" tabindex="-1" role="dialog" id="DeleteModal-@choreBase.Id">
+													<div class="modal-dialog" role="document">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h5 class="modal-title">Delete Confirmation</h5>
+																<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																	<span aria-hidden="true">&times;</span>
+																</button>
+															</div>
+															<div class="modal-body">
+																<p>Are you sure you want to delete this '@choreBase.Name' home chore?</p>
+															</div>
+															<div class="modal-footer">
+																<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+																<form method="post" asp-page-handler="Delete" asp-route-taskId="@choreBase.Id">
+																	<button type="submit" class="btn btn-danger">Delete</button>
+																</form>
+															</div>
+														</div>
+													</div>
+											</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						}
+						else
+						{
+							<p>No home chore bases found.</p>
+						}
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="detailModalLabel">Chore Details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p id="choreName"></p>
+					<p id="choreType"></p>
+					<p id="description"></p>
+					<p id="time"></p>
+					<p id="repeatingData"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editModalLabel">Edit @Model.EditHomeChore.Name Chore</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form method="post" asp-page-handler="Edit" id="editForm">
+						<input type="hidden" id="editChoreId" name="id" value="" />
+						<input type="hidden" id="editHomeId" name="homeId" value="@Model.HomeId" />
+						<div class="form-group">
+							<label for="editName">Name</label>
+							<input asp-for="EditHomeChore.Name" name="editName" class="form-control" id="editName" />
+							<div id="nameError" class="text-danger" style="display: none;">Name is required.</div>
+						</div>
+						<div class="form-group">
+							<label for="editChoreType">Chore Type</label>
+							<select class="form-control" id="editChoreType" name="editChoreType" asp-for="EditHomeChore.ChoreType" required>
+								@foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.HomeChoreType)))
+								{
+									<option value="@((int)choreType)">@choreType</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="editDescription">Description</label>
+							<textarea asp-for="EditHomeChore.Description" name="editDescription" class="form-control" id="editDescription"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="editPoints">Points</label>
+							<input asp-for="EditHomeChore.Points" name="editPoints" class="form-control" id="editPoints" />
+							<div id="pointsError" class="text-danger" style="display: none;">Points are required.</div>
+						</div>
+						<div class="form-group">
+							<label for="editLevelType">Level Type</label>
+							<select class="form-control" name="editLevelType" id="editLevelType" asp-for="EditHomeChore.LevelType" required>
+								@foreach (var levelType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.LevelType)))
+								{
+									<option value="@((int)levelType)">@levelType</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="editTime">Time</label>
+							<select class="form-control" name="editTimeLong" id="editTimeLong" asp-for="EditHomeChore.Time" required>
+								@foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
+								{
+									<option value="@((int)time)">@time</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="editInterval">Interval</label>
+							<input asp-for="EditHomeChore.Interval" name="editInterval" class="form-control" id="editInterval" />
+							<div id="intervalError" class="text-danger" style="display: none;">Interval is required.</div>
+						</div>
+						<div class="form-group">
+							<label for="editUnit">Unit</label>
+							<select class="form-control" id="editRepeatUnit" name="editRepeatUnit" asp-for="EditHomeChore.Unit" required>
+								@foreach (var unit in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.RepeatUnit)))
+								{
+									<option value="@((int)unit)">@unit</option>
+								}
+							</select>
+						</div>
+						<div class="form-group" id="editDayOfWeekField" style="display: none;">
+							@foreach (var dayOfWeek in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.DayOfWeek)))
+							{
+								var checkboxId = "editDayOfWeek_" + (int)dayOfWeek;
+								var checkboxName = "editDaysOfWeek";
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="checkbox" id="@checkboxId" name="@checkboxName" value="@((int)dayOfWeek)">
+									<label class="form-check-label" for="@checkboxId">@dayOfWeek</label>
+								</div>
+							}
+						</div>
+						<div class="form-group" id="editDayOfMonthField" style="display: none;">
+							<label for="editDayOfMonth">Day of Month</label>
+							<input type="number" class="form-control" name="editDayOfMonth" id="editDayOfMonth" asp-for="EditHomeChore.DayOfMonth" min="1" max="31" value="1">
+						</div>
+						<div class="form-group" id="editMonthlyRepeatTypeField" style="display: none;">
+							<label for="editMonthlyRepeatType">Monthly Repeat Type</label>
+							<select class="form-control" name="editMonthlyRepeatType" id="editMonthlyRepeatType" asp-for="EditHomeChore.MonthlyRepeatType">
+								@foreach (var monthlyRepeatType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.MonthlyRepeatType)))
+								{
+									<option value="@((int)monthlyRepeatType)">@monthlyRepeatType</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="StartDate">Start date</label>
+							<input type="date" class="form-control" id="editStartDate" name="editStartDate" asp-for="EditHomeChore.StartDate" required>
+							<span asp-validation-for="EditHomeChore.StartDate" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<label for="EndDate">End date</label>
+							<input type="date" class="form-control" id="editEndDate" name="editEndDate" asp-for="EditHomeChore.EndDate" required>
+							<span asp-validation-for="EditHomeChore.EndDate" class="text-danger"></span>
+						</div>
+						<button type="submit" class="btn btn-primary">Save changes</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 <script>
-    $(document).ready(function () {
-        $('#editForm').submit(function (event) {
-            var name = $('#editName').val().trim();
-            var points = $('#editPoints').val().trim();
-            var interval = $('#editInterval').val().trim();
+	$(document).ready(function () {
+		$('#editForm').submit(function (event) {
+			var name = $('#editName').val().trim();
+			var points = $('#editPoints').val().trim();
+			var interval = $('#editInterval').val().trim();
 
-            if (name === '') {
-                $('#nameError').text('Name is required.').show();
-                event.preventDefault(); // Prevent form submission
-            } else {
-                $('#nameError').hide();
-            }
+			if (name === '') {
+				$('#nameError').text('Name is required.').show();
+				event.preventDefault(); // Prevent form submission
+			} else {
+				$('#nameError').hide();
+			}
 
-            if (points === '') {
-                $('#pointsError').text('Points are required.').show();
-                event.preventDefault(); // Prevent form submission
-            } else {
-                $('#pointsError').hide();
-            }
+			if (points === '') {
+				$('#pointsError').text('Points are required.').show();
+				event.preventDefault(); // Prevent form submission
+			} else {
+				$('#pointsError').hide();
+			}
 
-            if (interval === '') {
-                $('#intervalError').text('Interval is required.').show();
-                event.preventDefault(); // Prevent form submission
-            } else {
-                $('#intervalError').hide();
-            }
-        });
-    });
-    $(document).ready(function () {
-        $('#editRepeatUnit').change(function () {
-            var unit = $(this).val();
-            if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Day)') {
-                $('#editDayOfWeekField').hide();
-                $('#editDayOfMonthField').hide();
-                $('#editMonthlyRepeatTypeField').hide();
-            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Week)') {
-                $('#editDayOfWeekField').show();
-                $('#editDayOfMonthField').hide();
-                $('#editMonthlyRepeatTypeField').hide();
-            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Month)') {
-                $('#editDayOfWeekField').hide();
-                $('#editDayOfMonthField').show();
-                $('#editMonthlyRepeatTypeField').show();
-            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Year)') {
-                $('#editDayOfWeekField').hide();
-                $('#editDayOfMonthField').hide();
-                $('#editMonthlyRepeatTypeField').hide();
-            }
-        });
+			if (interval === '') {
+				$('#intervalError').text('Interval is required.').show();
+				event.preventDefault(); // Prevent form submission
+			} else {
+				$('#intervalError').hide();
+			}
+		});
+	});
 
-        // Trigger change event to ensure proper initialization
-        $('#editRepeatUnit').trigger('change');
-    });
+	$(document).ready(function () {
+		$('#editRepeatUnit').change(function () {
+			var unit = $(this).val();
+			if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Day)') {
+				$('#editDayOfWeekField').hide();
+				$('#editDayOfMonthField').hide();
+				$('#editMonthlyRepeatTypeField').hide();
+			} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Week)') {
+				$('#editDayOfWeekField').show();
+				$('#editDayOfMonthField').hide();
+				$('#editMonthlyRepeatTypeField').hide();
+			} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Month)') {
+				$('#editDayOfWeekField').hide();
+				$('#editDayOfMonthField').show();
+				$('#editMonthlyRepeatTypeField').show();
+			} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Year)') {
+				$('#editDayOfWeekField').hide();
+				$('#editDayOfMonthField').hide();
+				$('#editMonthlyRepeatTypeField').hide();
+			}
+		});
 
-</script>
-
-
-<script>
-    var currentChoreId; // Variable to store the current chore ID
-
-    function DisplayDetailModal(choreId) {
-
-        // Make an AJAX request to fetch detailed information about the chore
-        $.ajax({
-            url: '@Url.Page("/HomeChores/Index")?handler=Detail&choreId=' + choreId,
-            type: 'GET',
-            success: function (data) {
-                // Populate the modal with the retrieved data
-                $('#detailModalLabel').text("Detailed info: " + data.name);
-                $('#choreName').text("Name: " + data.name);
-                $('#choreType').text("Chore Type: " + data.choreType);
-                $('#description').text("Description: " + data.description);
-                $('#time').text("How long time take to do this task: " + data.time); // Add time
-                $('#repeatingData').text("Repeating Data: " + data.repeatingData); // Add repeating data
-                
-                console.log(data.name)
-                console.log(data.choreType)
-                console.log(data.description)
-                console.log(data.time)
-                console.log(data.repeatingData)
-                // Show the modal
-                $('#detailModal').modal('show');
-            },
-            error: function (error) {
-                console.error('Error fetching chore details:', error);
-            }
-        });
-    }
-    function clearEditModalFields() {
-        $('#editName').val('');
-        $('#editDescription').val('');
-        $('#editPoints').val('');
-        $('#editStartDate').val('');
-        $('#editEndDate').val('');
-        $('#editInterval').val('');
-        $('#editDayOfMonth').val('');
-        $('#editChoreType').val('');
-        $('#editTimeLong').val('');
-        $('#editLevelType').val('');
-        $('#editRepeatUnit').val('');
-        $('#editMonthlyRepeatType').val('');
-
-        // Clear checkbox for days of week
-        $('input[name="editDaysOfWeek"]').prop('checked', false);
-    }
-
-    function DisplayEditModal(choreId) {
-        console.log(choreId)
-        clearEditModalFields();
-        currentChoreId = choreId; // Store the current chore ID
-        // Set the chore ID in the hidden input field
-
-        $('#editChoreId').val(choreId);
-        // Make an AJAX request to fetch detailed information about the chore
-        $.ajax({
-            url: '@Url.Page("/HomeChores/Index")?handler=Detail&choreId=' + choreId,
-            type: 'GET',
-            success: function (data) {
-                console.log('Received data:', data); // Log the received data
-                // Check if data is not empty and contains the expected properties
-                if (data && data.name) {
-                    // Populate the edit modal with the retrieved data
-                    $('#editName').val(data.name);
-                    $('#editDescription').val(data.description);
-                    // Set the selected option for chore type
-
-                    $('#editPoints').val(data.points);
-
-                    if (data.startDate) {
-                        $('#editStartDate').val(new Date(data.startDate).toISOString().substr(0, 10));
-                    }
-                    if (data.endDate) {
-                        $('#editEndDate').val(new Date(data.endDate).toISOString().substr(0, 10));
-                    }
-                    var timeLongText = data.time;
-                    $('#editTimeLong option').filter(function () {
-                        return $(this).text() === timeLongText;
-                    }).prop('selected', true);
-                    var levelTypeText = data.levelType;
-                    $('#editLevelType option').filter(function () {
-                        return $(this).text() === levelTypeText;
-                    }).prop('selected', true);
-                    $('#editInterval').val(data.interval);
-
-                    var unitTypeText = data.unit;
-                    $('#editRepeatUnit option').filter(function () {
-                        return $(this).text() === unitTypeText;
-                    }).prop('selected', true);
-
-                    var monthlyRepeatTypeText = data.monthlyRepeatType;
-                    $('#editMonthlyRepeatType option').filter(function () {
-                        return $(this).text() === monthlyRepeatTypeText;
-                    }).prop('selected', true);
-
-                    $('#editDayOfMonth').val(data.dayOfMonth);
-
-                    var choreTypeText = data.choreType;
-                    $('#editChoreType option').filter(function () {
-                        return $(this).text() === choreTypeText;
-                    }).prop('selected', true);
-
-                    if (data.daysOfWeek) {
-                        console.log('Days of Week:', data.daysOfWeek);
-                        data.daysOfWeek.forEach(function (day) {
-                            var checkboxId = 'editDayOfWeek_' + day;
-                            $('#' + checkboxId).prop('checked', true);
-                            console.log(day);
-                            console.log(checkboxId);
-                        });
-                    }
-
-
-                    var unit = unitTypeText;
-                    if (unit === 'Day') {
-                        $('#editDayOfWeekField').hide();
-                        $('#editDayOfMonthField').hide();
-                        $('#editMonthlyRepeatTypeField').hide();
-                    } else if (unit === 'Week') {
-                        $('#editDayOfWeekField').show();
-                        $('#editDayOfMonthField').hide();
-                        $('#editMonthlyRepeatTypeField').hide();
-                    } else if (unit === 'Month') {
-                        $('#editDayOfWeekField').hide();
-                        $('#editDayOfMonthField').show();
-                        $('#editMonthlyRepeatTypeField').show();
-                    } else if (unit === 'Year') {
-                        $('#editDayOfWeekField').hide();
-                        $('#editDayOfMonthField').hide();
-                        $('#editMonthlyRepeatTypeField').hide();
-                    }
-                    // Dynamically update the modal title with the chore name
-                    $('#editModalLabel').text("Edit '" +  data.name + "' chore");
-
-                    // Show the edit modal
-                    $('#editModal').modal('show');
-                } else {
-                    console.error('Invalid data format:', data);
-                }
-            },
-            error: function (error) {
-                console.error('Error fetching chore details:', error);
-                // Optionally, display an error message to the user
-            }
-        });
-    }
+		$('#editRepeatUnit').trigger('change');
+	});
 
 </script>
 
 <script>
-    $(document).ready(function () {
-        // Get today's date
-        var today = new Date().toISOString().split('T')[0];
+	var currentChoreId;
 
-        // Set default values for start date and end date if they are null
-        if ($('#editStartDate').val() === '') {
-            $('#editStartDate').val(today);
-        }
-        if ($('#editEndDate').val() === '') {
-            // Add one month to today's date
-            var endDate = new Date();
-            endDate.setMonth(endDate.getMonth() + 1);
-            var endDateString = endDate.toISOString().split('T')[0];
-            $('#editEndDate').val(endDateString);
-        }
-    });
+	function DisplayDetailModal(choreId) {
+		$.ajax({
+			url: '@Url.Page("/HomeChores/Index")?handler=Detail&choreId=' + choreId,
+			type: 'GET',
+			success: function (data) {
+				$('#detailModalLabel').text("Detailed info: " + data.name);
+				$('#choreName').text("Name: " + data.name);
+				$('#choreType').text("Chore Type: " + data.choreType);
+				$('#description').text("Description: " + data.description);
+				$('#time').text("How long time take to do this task: " + data.time);
+				$('#repeatingData').text("Repeating Data: " + data.repeatingData);
+
+				$('#detailModal').modal('show');
+			},
+			error: function (error) {
+				console.error('Error fetching chore details:', error);
+			}
+		});
+	}
+
+	function clearEditModalFields() {
+		$('#editName').val('');
+		$('#editDescription').val('');
+		$('#editPoints').val('');
+		$('#editStartDate').val('');
+		$('#editEndDate').val('');
+		$('#editInterval').val('');
+		$('#editDayOfMonth').val('');
+		$('#editChoreType').val('');
+		$('#editTimeLong').val('');
+		$('#editLevelType').val('');
+		$('#editRepeatUnit').val('');
+		$('#editMonthlyRepeatType').val('');
+
+		$('input[name="editDaysOfWeek"]').prop('checked', false);
+	}
+
+	function DisplayEditModal(choreId) {
+		clearEditModalFields();
+		currentChoreId = choreId;
+		$('#editChoreId').val(choreId);
+		$.ajax({
+			url: '@Url.Page("/HomeChores/Index")?handler=Detail&choreId=' + choreId,
+			type: 'GET',
+			success: function (data) {
+				if (data && data.name) {
+					$('#editName').val(data.name);
+					$('#editDescription').val(data.description);
+					$('#editPoints').val(data.points);
+					if (data.startDate) {
+						$('#editStartDate').val(new Date(data.startDate).toISOString().substr(0, 10));
+					}
+					if (data.endDate) {
+						$('#editEndDate').val(new Date(data.endDate).toISOString().substr(0, 10));
+					}
+					var timeLongText = data.time;
+					$('#editTimeLong option').filter(function () {
+						return $(this).text() === timeLongText;
+					}).prop('selected', true);
+					var levelTypeText = data.levelType;
+					$('#editLevelType option').filter(function () {
+						return $(this).text() === levelTypeText;
+					}).prop('selected', true);
+					$('#editInterval').val(data.interval);
+					var unitTypeText = data.unit;
+					$('#editRepeatUnit option').filter(function () {
+						return $(this).text() === unitTypeText;
+					}).prop('selected', true);
+					var monthlyRepeatTypeText = data.monthlyRepeatType;
+					$('#editMonthlyRepeatType option').filter(function () {
+						return $(this).text() === monthlyRepeatTypeText;
+					}).prop('selected', true);
+					$('#editDayOfMonth').val(data.dayOfMonth);
+					var choreTypeText = data.choreType;
+					$('#editChoreType option').filter(function () {
+						return $(this).text() === choreTypeText;
+					}).prop('selected', true);
+					if (data.daysOfWeek) {
+						data.daysOfWeek.forEach(function (day) {
+							var checkboxId = 'editDayOfWeek_' + day;
+							$('#' + checkboxId).prop('checked', true);
+						});
+					}
+
+					var unit = unitTypeText;
+					if (unit === 'Day') {
+						$('#editDayOfWeekField').hide();
+						$('#editDayOfMonthField').hide();
+						$('#editMonthlyRepeatTypeField').hide();
+					} else if (unit === 'Week') {
+						$('#editDayOfWeekField').show();
+						$('#editDayOfMonthField').hide();
+						$('#editMonthlyRepeatTypeField').hide();
+					} else if (unit === 'Month') {
+						$('#editDayOfWeekField').hide();
+						$('#editDayOfMonthField').show();
+						$('#editMonthlyRepeatTypeField').show();
+					} else if (unit === 'Year') {
+						$('#editDayOfWeekField').hide();
+						$('#editDayOfMonthField').hide();
+						$('#editMonthlyRepeatTypeField').hide();
+					}
+					$('#editModalLabel').text("Edit '" + data.name + "' chore");
+
+					$('#editModal').modal('show');
+				} else {
+					console.error('Invalid data format:', data);
+				}
+			},
+			error: function (error) {
+				console.error('Error fetching chore details:', error);
+			}
+		});
+	}
+
+</script>
+
+<script>
+	$(document).ready(function () {
+		var today = new Date().toISOString().split('T')[0];
+
+		if ($('#editStartDate').val() === '') {
+			$('#editStartDate').val(today);
+		}
+		if ($('#editEndDate').val() === '') {
+			var endDate = new Date();
+			endDate.setMonth(endDate.getMonth() + 1);
+			var endDateString = endDate.toISOString().split('T')[0];
+			$('#editEndDate').val(endDateString);
+		}
+	});
 </script>

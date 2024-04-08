@@ -2,180 +2,197 @@
 @model HomeChoreTracker.Portal.Pages.HomeChores.CreateModel
 @section HeadContent
 {
-    <title>@ViewData["Title"] - Home Chore Tracker</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet" asp-append-version="true">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <!-- Add the following lines to include required Bootstrap and jQuery files -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<!-- Add the following lines to include required Bootstrap and jQuery files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 }
 
-
-@if (User.Identity.IsAuthenticated)
+@if (!User.Identity.IsAuthenticated)
 {
-<div class="row">
-    <div class="col-lg-12">
-        <a class="btn btn-light btn-sm mb-2" href="/HomeChores/@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
-        <a class="btn btn-secondary btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.Id"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.Id"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Home Calendar</a>
-        <div class="card mb-4 py-3 mt-2 border-left-primary">
-            <div class="card-body">
-                <form method="post" asp-action="Create">
-                    <div class="form-group">
-                            <input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
-                        <label for="Name">Name</label>
-                        <input type="text" class="form-control" id="Name" name="CreateHomeChore.Name" asp-for="CreateHomeChore.Name">
-                        <span asp-validation-for="CreateHomeChore.Name" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="ChoreType">Chore Type</label>
-                        <select class="form-control" id="ChoreType" name="CreateHomeChore.ChoreType" asp-for="CreateHomeChore.ChoreType" required>
-                            @foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.HomeChoreType)))
-                            {
-                                <option value="@((int)choreType)">@choreType</option>
-                            }
-                        </select>
-                        <span asp-validation-for="CreateHomeChore.ChoreType" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="Description">Description</label>
-                        <input type="text" class="form-control" id="Description" name="CreateHomeChore.Description" asp-for="CreateHomeChore.Description">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Points">Points</label>
-                        <input type="number" class="form-control" id="Points" name="CreateHomeChore.Points" asp-for="CreateHomeChore.Points" min="1" step="1" value="1">
-                            <span asp-validation-for="CreateHomeChore.Points" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="LevelType">Level Type</label>
-                        <select class="form-control" id="LevelType" name="CreateHomeChore.LevelType" asp-for="CreateHomeChore.LevelType" required>
-                            @foreach (var levelType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.LevelType)))
-                            {
-                                <option value="@((int)levelType)">@levelType</option>
-                            }
-                        </select>
-                        <span asp-validation-for="CreateHomeChore.LevelType" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="Time">Time</label>
-                        <select class="form-control" id="Time" name="CreateHomeChore.Time" asp-for="CreateHomeChore.Time" required>
-                            @foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
-                            {
-                                <option value="@((int)time)">@time</option>
-                            }
-                        </select>
-                        <span asp-validation-for="CreateHomeChore.Time" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="Interval">Interval</label>
-                        <input type="number" class="form-control" id="Interval" name="CreateHomeChore.Interval" asp-for="CreateHomeChore.Interval" min="1" step="1" value="1">
-                            <span asp-validation-for="CreateHomeChore.Interval" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Unit">Unit</label>
-                        <select class="form-control" id="Unit" name="CreateHomeChore.Unit" asp-for="CreateHomeChore.Unit" required>
-                            @foreach (var unit in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.RepeatUnit)))
-                            {
-                                <option value="@((int)unit)">@unit</option>
-                            }
-                        </select>
-                        <span asp-validation-for="CreateHomeChore.Unit" class="text-danger"></span>
-                    </div>
-                    <div class="form-group" id="dayOfWeekField" style="display: none;">
-                        <label>Days of Week</label><br>
-                        @foreach (var dayOfWeek in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.DayOfWeek)))
-                        {
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="dayOfWeek_@(dayOfWeek)" name="CreateHomeChore.DaysOfWeek" value="@((int)dayOfWeek)">
-                                <label class="form-check-label" for="dayOfWeek_@(dayOfWeek)">@dayOfWeek</label>
-                            </div>
-                        }
-                        <span asp-validation-for="CreateHomeChore.DaysOfWeek" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group" id="dayOfMonthField" style="display: none;">
-                        <label for="DayOfMonth">Day of Month</label>
-                        <input type="number" class="form-control" id="DayOfMonth" name="CreateHomeChore.DayOfMonth" asp-for="CreateHomeChore.DayOfMonth" min="1" max="31" value="1">
-                    </div>
-
-                    <div class="form-group" id="monthlyRepeatTypeField" style="display: none;">
-                        <label for="MonthlyRepeatType">Monthly Repeat Type</label>
-                        <select class="form-control" id="MonthlyRepeatType" name="CreateHomeChore.MonthlyRepeatType" asp-for="CreateHomeChore.MonthlyRepeatType">
-                            @foreach (var monthlyRepeatType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.MonthlyRepeatType)))
-                            {
-                                <option value="@((int)monthlyRepeatType)">@monthlyRepeatType</option>
-                            }
-                        </select>
-                        <span asp-validation-for="CreateHomeChore.MonthlyRepeatType" class="text-danger"></span>
-                    </div>
-
-                        <div class="form-group">
-                            <label for="StartDate">Start date</label>
-                            <input type="date" class="form-control" id="StartDate" name="CreateHomeChore.StartDate" asp-for="CreateHomeChore.StartDate" required>
-                            <span asp-validation-for="CreateHomeChore.StartDate" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="EndDate">End date</label>
-                            <input type="date" class="form-control" id="EndDate" name="CreateHomeChore.EndDate" asp-for="CreateHomeChore.EndDate" required>
-                            <span asp-validation-for="CreateHomeChore.EndDate" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="IsPublic">Is Public? (If select yes, this task can be add other homes, and for every home use you will get 5 points)</label>
-                            <select class="form-control" id="IsPublic" name="CreateHomeChore.IsPublic" asp-for="CreateHomeChore.IsPublic" required>
-                                <option value="true">Yes</option>
-                                <option value="false">No</option>
-                            </select>
-                        </div>
-
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+	Response.Redirect("/Auth/Login");
 }
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-light btn-sm mb-2" href="/HomeChores/@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Home chores</a>
+			<a class="btn btn-secondary btn-sm mb-2" asp-page="./Create" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./AddHomeChoreFromDefaultList" asp-route-id="@Model.Id"><i class="fa fa-list mr-2" aria-hidden="true"></i>Add Home Chore From Default List</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./Calendar" asp-route-id="@Model.Id"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>Home Calendar</a>
+			<div class="card mb-4 py-3 mt-2 border-left-primary">
+				<div class="card-body">
+					@if (Model.Unauthorized)
+					{
+						<p>You don't have permission to view this content.</p>
+					}
+					else
+					{
+						<form method="post" asp-action="Create">
+							<div class="form-group">
+								<input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
+								<label for="Name">Name</label>
+								<input type="text" class="form-control" id="Name" name="CreateHomeChore.Name" asp-for="CreateHomeChore.Name">
+								<span asp-validation-for="CreateHomeChore.Name" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="ChoreType">Chore Type</label>
+								<select class="form-control" id="ChoreType" name="CreateHomeChore.ChoreType" asp-for="CreateHomeChore.ChoreType" required>
+									@foreach (var choreType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.HomeChoreType)))
+									{
+										<option value="@((int)choreType)">@choreType</option>
+									}
+								</select>
+								<span asp-validation-for="CreateHomeChore.ChoreType" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="Description">Description</label>
+								<input type="text" class="form-control" id="Description" name="CreateHomeChore.Description" asp-for="CreateHomeChore.Description">
+							</div>
+							<div class="form-group">
+								<label for="Points">Points</label>
+								<input type="number" class="form-control" id="Points" name="CreateHomeChore.Points" asp-for="CreateHomeChore.Points" min="1" step="1" value="1">
+								<span asp-validation-for="CreateHomeChore.Points" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="LevelType">Level Type</label>
+								<select class="form-control" id="LevelType" name="CreateHomeChore.LevelType" asp-for="CreateHomeChore.LevelType" required>
+									@foreach (var levelType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.LevelType)))
+									{
+										<option value="@((int)levelType)">@levelType</option>
+									}
+								</select>
+								<span asp-validation-for="CreateHomeChore.LevelType" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="Time">Time</label>
+								<select class="form-control" id="Time" name="CreateHomeChore.Time" asp-for="CreateHomeChore.Time" required>
+									@foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
+									{
+										<option value="@((int)time)">@time</option>
+									}
+								</select>
+								<span asp-validation-for="CreateHomeChore.Time" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="Interval">Interval</label>
+								<input type="number" class="form-control" id="Interval" name="CreateHomeChore.Interval" asp-for="CreateHomeChore.Interval" min="1" step="1" value="1">
+								<span asp-validation-for="CreateHomeChore.Interval" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="Unit">Unit</label>
+								<select class="form-control" id="Unit" name="CreateHomeChore.Unit" asp-for="CreateHomeChore.Unit" required>
+									@foreach (var unit in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.RepeatUnit)))
+									{
+										<option value="@((int)unit)">@unit</option>
+									}
+								</select>
+								<span asp-validation-for="CreateHomeChore.Unit" class="text-danger"></span>
+							</div>
+							<div class="form-group" id="dayOfWeekField" style="display: none;">
+								<label>Days of Week</label><br>
+								@foreach (var dayOfWeek in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.DayOfWeek)))
+								{
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="dayOfWeek_@(dayOfWeek)" name="CreateHomeChore.DaysOfWeek" value="@((int)dayOfWeek)">
+										<label class="form-check-label" for="dayOfWeek_@(dayOfWeek)">@dayOfWeek</label>
+									</div>
+								}
+								<span asp-validation-for="CreateHomeChore.DaysOfWeek" class="text-danger"></span>
+							</div>
+							<div class="form-group" id="dayOfMonthField" style="display: none;">
+								<label for="DayOfMonth">Day of Month</label>
+								<input type="number" class="form-control" id="DayOfMonth" name="CreateHomeChore.DayOfMonth" asp-for="CreateHomeChore.DayOfMonth" min="1" max="31" value="1">
+							</div>
+							<div class="form-group" id="monthlyRepeatTypeField" style="display: none;">
+								<label for="MonthlyRepeatType">Monthly Repeat Type</label>
+								<select class="form-control" id="MonthlyRepeatType" name="CreateHomeChore.MonthlyRepeatType" asp-for="CreateHomeChore.MonthlyRepeatType">
+									@foreach (var monthlyRepeatType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.MonthlyRepeatType)))
+									{
+										<option value="@((int)monthlyRepeatType)">@monthlyRepeatType</option>
+									}
+								</select>
+								<span asp-validation-for="CreateHomeChore.MonthlyRepeatType" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="StartDate">Start date</label>
+								<input type="date" class="form-control" id="StartDate" name="CreateHomeChore.StartDate" asp-for="CreateHomeChore.StartDate" required>
+								<span asp-validation-for="CreateHomeChore.StartDate" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="EndDate">End date</label>
+								<input type="date" class="form-control" id="EndDate" name="CreateHomeChore.EndDate" asp-for="CreateHomeChore.EndDate" required>
+								<span asp-validation-for="CreateHomeChore.EndDate" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label for="IsPublic">Is Public? (If select yes, this task can be add other homes, and for every home use you will get 5 points)</label>
+								<select class="form-control" id="IsPublic" name="CreateHomeChore.IsPublic" asp-for="CreateHomeChore.IsPublic" required>
+									<option value="true">Yes</option>
+									<option value="false">No</option>
+								</select>
+							</div>
+							<button type="submit" class="btn btn-primary">Create</button>
+						</form>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
 <script>
-    $(document).ready(function () {
-        function addMonths(date, months) {
-            var d = new Date(date);
-            d.setMonth(d.getMonth() + months);
-            return d.toISOString().slice(0, 10);
-        }
+	$(document).ready(function () {
+		function addMonths(date, months) {
+			var d = new Date(date);
+			d.setMonth(d.getMonth() + months);
+			return d.toISOString().slice(0, 10);
+		}
 
-        var today = new Date().toISOString().slice(0, 10);
-        $('#StartDate').val(today);
+		var today = new Date().toISOString().slice(0, 10);
+		$('#StartDate').val(today);
 
-        var oneMonthFromToday = addMonths(today, 1);
-        $('#EndDate').val(oneMonthFromToday);
+		var oneMonthFromToday = addMonths(today, 1);
+		$('#EndDate').val(oneMonthFromToday);
 
-        $('#Unit').change(function () {
-            var unit = $(this).val();
-            if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Day)') {
-                $('#dayOfWeekField').hide();
-                $('#dayOfMonthField').hide();
-                $('#monthlyRepeatTypeField').hide();
-            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Week)') {
-                $('#dayOfWeekField').show();
-                $('#dayOfMonthField').hide();
-                $('#monthlyRepeatTypeField').hide();
-            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Month)') {
-                $('#dayOfWeekField').hide();
-                $('#dayOfMonthField').show();
-                $('#monthlyRepeatTypeField').show();
-            } else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Year)') {
-                $('#dayOfWeekField').hide();
-                $('#dayOfMonthField').hide();
-                $('#monthlyRepeatTypeField').hide();
-            }
-        });
-    });
+		$('#Unit').change(function () {
+			var unit = $(this).val();
+			if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Day)') {
+				$('#dayOfWeekField').hide();
+				$('#dayOfMonthField').hide();
+				$('#monthlyRepeatTypeField').hide();
+			} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Week)') {
+				$('#dayOfWeekField').show();
+				$('#dayOfMonthField').hide();
+				$('#monthlyRepeatTypeField').hide();
+			} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Month)') {
+				$('#dayOfWeekField').hide();
+				$('#dayOfMonthField').show();
+				$('#monthlyRepeatTypeField').show();
+			} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Year)') {
+				$('#dayOfWeekField').hide();
+				$('#dayOfMonthField').hide();
+				$('#monthlyRepeatTypeField').hide();
+			}
+		});
+	});
 </script>
