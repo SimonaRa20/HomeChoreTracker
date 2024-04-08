@@ -180,7 +180,7 @@ public class CalendarController : Controller
                 List<BusyInterval> busyIntervals = await _userRepository.GetUserBusyIntervals(minPointsMember.Key);
 
                 HomeChoreTask hometask = await _homeChoreRepository.Get(task.TaskId);
-                List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, task.StartDate, user.CalendarEvents, hometask.Time, userTasksAssigned, busyIntervals);
+                List<(DateTime start, DateTime end)> suitableIntervals = FindHomersSuitableTimeIntervals(user, task.StartDate, user.CalendarEvents, hometask.Time, userTasksAssigned, busyIntervals);
 
                 if (suitableIntervals.Any())
                 {
@@ -190,7 +190,8 @@ public class CalendarController : Controller
                 }
                 else
                 {
-                    return BadRequest("No suitable time intervals found for the task.");
+                    await _homeChoreRepository.RemoveTaskAssignment(task.Id);
+                    continue;
                 }
 
                 await _homeChoreRepository.UpdateTaskAssignment(task);
@@ -204,6 +205,34 @@ public class CalendarController : Controller
         {
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
+    }
+
+    private List<(DateTime start, DateTime end)> FindHomersSuitableTimeIntervals(User user, DateTime startTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals)
+    {
+        List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
+        DateTime currentDate = startTime.Date;
+        TimeSpan startDayTime = user.StartDayTime;
+        TimeSpan endDayTime = user.EndDayTime;
+
+        while (true)
+        {
+            suitableIntervals = GetSuitableIntervalsForDay(user, currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals);
+
+            if (suitableIntervals.Any())
+            {
+                break;
+            }
+
+            currentDate = currentDate.AddDays(1);
+
+            if (currentDate - startTime.Date > TimeSpan.FromDays(7))
+            {
+                suitableIntervals = new List<(DateTime, DateTime)>();
+                break;
+            }
+        }
+
+        return suitableIntervals;
     }
 
     [HttpPut("{id}")]

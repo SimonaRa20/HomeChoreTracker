@@ -338,5 +338,15 @@ namespace HomeChoreTracker.Api.Repositories
         {
             return await _dbContext.TaskVotes.Where(x => x.TaskAssignmentId == taskId).SumAsync(v => v.Value);
         }
+
+        public async Task RemoveTaskAssignment(int taskId)
+        {
+            TaskAssignment task = await _dbContext.TaskAssignments.Where(x => x.Id.Equals(taskId)).FirstOrDefaultAsync();
+            if (task != null)
+            {
+                _dbContext.TaskAssignments.Remove(task);
+            }
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }
