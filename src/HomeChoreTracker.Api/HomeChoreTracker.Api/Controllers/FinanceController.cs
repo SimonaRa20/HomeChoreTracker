@@ -76,17 +76,31 @@ namespace HomeChoreTracker.Api.Controllers
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
             var user = await _userRepository.GetUserById(userId);
             var income = new FinancialRecord();
-            if (incomeRequest.FinancialCategoryId == 0)
-            {
-                FinancialCategory newfinancialCategory = new FinancialCategory
-                {
-                    Name = incomeRequest.NewFinancialCategory,
-                    Type = FinancialType.Income,
-                    UserId = userId,
-                    HomeId = incomeRequest.HomeId
-                };
 
-                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+			if (incomeRequest.FinancialCategoryId == 0)
+            {
+                FinancialCategory category = await _incomeRepository.CheckCategory(incomeRequest.NewFinancialCategory);
+
+                FinancialCategory addedCategory = new FinancialCategory();
+
+
+				if (category == null)
+                {
+					FinancialCategory newfinancialCategory = new FinancialCategory
+					{
+						Name = incomeRequest.NewFinancialCategory,
+						Type = FinancialType.Income,
+						UserId = userId,
+						HomeId = incomeRequest.HomeId
+					};
+
+					addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+				}
+                else
+                {
+                    addedCategory = category;
+				}
+
 
                 income = new FinancialRecord
                 {
@@ -147,15 +161,28 @@ namespace HomeChoreTracker.Api.Controllers
             var income = new FinancialRecord();
             if (incomeRequest.FinancialCategoryId == 0)
             {
-                FinancialCategory newfinancialCategory = new FinancialCategory
-                {
-                    Name = incomeRequest.NewFinancialCategory,
-                    Type = FinancialType.Income,
-                    UserId = userId,
-                    HomeId = incomeRequest.HomeId
-                };
+				FinancialCategory category = await _incomeRepository.CheckCategory(incomeRequest.NewFinancialCategory);
 
-                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+				FinancialCategory addedCategory = new FinancialCategory();
+
+
+				if (category == null)
+				{
+					FinancialCategory newfinancialCategory = new FinancialCategory
+					{
+						Name = incomeRequest.NewFinancialCategory,
+						Type = FinancialType.Income,
+						UserId = userId,
+						HomeId = incomeRequest.HomeId
+					};
+
+					addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+				}
+				else
+				{
+					addedCategory = category;
+				}
+
 
                 income = new FinancialRecord
                 {
@@ -449,15 +476,25 @@ namespace HomeChoreTracker.Api.Controllers
                     var expense = new FinancialRecord();
                     if (expenseRequest.FinancialCategoryId == 0)
                     {
-                        FinancialCategory newfinancialCategory = new FinancialCategory
-                        {
-                            Name = expenseRequest.NewFinancialCategory,
-                            Type = FinancialType.Expense,
-                            UserId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value),
-                            HomeId = expenseRequest.HomeId
-                        };
+						FinancialCategory category = await _expenseRepository.CheckCategory(expenseRequest.NewFinancialCategory);
 
-                        FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+						FinancialCategory addedCategory = new FinancialCategory();
+						if (category == null)
+						{
+							FinancialCategory newfinancialCategory = new FinancialCategory
+							{
+								Name = expenseRequest.NewFinancialCategory,
+								Type = FinancialType.Income,
+								UserId = userId,
+								HomeId = expenseRequest.HomeId
+							};
+
+							addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+						}
+						else
+						{
+							addedCategory = category;
+						}
 
                         expense = new FinancialRecord
                         {
@@ -602,17 +639,27 @@ namespace HomeChoreTracker.Api.Controllers
             var expense = new FinancialRecord();
             if (expenseRequest.FinancialCategoryId == 0)
             {
-                FinancialCategory newfinancialCategory = new FinancialCategory
-                {
-                    Name = expenseRequest.NewFinancialCategory,
-                    Type = FinancialType.Expense,
-                    UserId = userId,
-                    HomeId = expenseRequest.HomeId
-                };
+				FinancialCategory category = await _expenseRepository.CheckCategory(expenseRequest.NewFinancialCategory);
 
-                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+				FinancialCategory addedCategory = new FinancialCategory();
+				if (category == null)
+				{
+					FinancialCategory newfinancialCategory = new FinancialCategory
+					{
+						Name = expenseRequest.NewFinancialCategory,
+						Type = FinancialType.Income,
+						UserId = userId,
+						HomeId = expenseRequest.HomeId
+					};
 
-                expense = new FinancialRecord
+					addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+				}
+				else
+				{
+					addedCategory = category;
+				}
+
+				expense = new FinancialRecord
                 {
                     Title = expenseRequest.Title,
                     Amount = expenseRequest.Amount,
@@ -673,17 +720,27 @@ namespace HomeChoreTracker.Api.Controllers
 
             if (expenseRequest.FinancialCategoryId == 0)
             {
-                FinancialCategory newfinancialCategory = new FinancialCategory
-                {
-                    Name = expenseRequest.NewFinancialCategory,
-                    Type = FinancialType.Expense,
-                    UserId = userId,
-                    HomeId = expenseRequest.HomeId
-                };
+				FinancialCategory category = await _expenseRepository.CheckCategory(expenseRequest.NewFinancialCategory);
 
-                FinancialCategory addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+				FinancialCategory addedCategory = new FinancialCategory();
+				if (category == null)
+				{
+					FinancialCategory newfinancialCategory = new FinancialCategory
+					{
+						Name = expenseRequest.NewFinancialCategory,
+						Type = FinancialType.Income,
+						UserId = userId,
+						HomeId = expenseRequest.HomeId
+					};
 
-                expense = new FinancialRecord
+					addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+				}
+				else
+				{
+					addedCategory = category;
+				}
+
+				expense = new FinancialRecord
                 {
                     Id = id,
                     Title = expenseRequest.Title,

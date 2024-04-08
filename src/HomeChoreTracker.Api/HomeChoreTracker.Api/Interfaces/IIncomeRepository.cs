@@ -21,7 +21,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<int> GetHomeIncomeCountByCategory(int category, int id);
         Task<List<FinancialRecord>> GetIncomesByDateRange(DateTime startDate, DateTime endDate, int userId);
         Task<FinancialCategory> AddCategory(FinancialCategory financialCategory);
-        Task<List<FinancialCategory>> GetIncomeCategories();
+		Task<FinancialCategory> CheckCategory(string financialCategory);
+		Task<List<FinancialCategory>> GetIncomeCategories();
 		Task<FinancialCategory> GetIncomeCategory(int id);
 		Task<decimal> GetTotalIncomeForCategory(DateTime startDate, DateTime endDate, int userId, int categoryId);
 	}

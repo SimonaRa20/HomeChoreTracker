@@ -48,8 +48,13 @@ namespace HomeChoreTracker.Api.Repositories
 			return financialCategory;
         }
 
+		public async Task<FinancialCategory> CheckCategory(string financialCategory)
+		{
+			return await _dbContext.FinancialCategories.FirstOrDefaultAsync(x => x.Type.Equals(FinancialType.Income) && x.Name.Equals(financialCategory));
+		}
 
-        public async Task AddIncome(FinancialRecord income)
+
+		public async Task AddIncome(FinancialRecord income)
 		{
 			await _dbContext.FinancialRecords.AddAsync(income);
 			await Save();
