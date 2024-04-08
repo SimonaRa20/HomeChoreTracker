@@ -1,149 +1,139 @@
 ﻿@page
 @model HomeChoreTracker.Portal.Pages.Gamification.IndexModel
 @{
-    ViewData["Title"] = "Home Chores";
+	ViewData["Title"] = "Home Chores";
 }
 
 @if (!User.Identity.IsAuthenticated)
 {
-    Response.Redirect("/Auth/Login");
+	Response.Redirect("/Auth/Login");
 }
 else if (User.IsInRole("Admin"))
 {
-    <div class="row">
-        <div class="col-lg-12">
-                <a class="btn btn-secondary btn-sm mb-2" href="/Gamification"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Level list</a>
-                <a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
-               
-            <div class="card mb-4 py-3 border-left-primary">
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-secondary btn-sm mb-2" href="/Gamification"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Level list</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
 
-                <div class="card-body">
-
-                        @if (Model.LevelResponse != null && Model.LevelResponse.Any())
-                    {
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Level</th>
-                                    <th>Points</th>
-                                    <th>Image</th>
-                                        <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                    @foreach (var level in Model.LevelResponse)
-                                {
-                                    <tr>
-                                            <td>@level.LevelId</td>
-                                            <td>@level.PointsRequired</td>
-                                        <td>
-                                                @if (level.Image != null && level.Image.Length > 0)
-                                                {
-                                                    <div style="overflow: hidden; width:100px;overflow: hidden;">
-                                                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(level.Image)" alt="Level Image" class="card-img-top w-100" style="object-fit: cover; height:100%" />
-                                                    </div>
-                                                }
-                                        </td>
-
-                                       
-                                        <td>
-                                                <button type="button" class="btn btn-sm btn-edit" style="margin-bottom:-8px; margin-top:-8px" data-toggle="modal" data-target="#EditModal-@level.Id"><i class="fas fa-pencil-alt"></i></button>
-                                                <div class="modal fade" id="EditModal-@level.Id" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel-@level.Id" aria-hidden="true">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Edit Level</h5>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <form method="post" asp-page-handler="EditLevel" id="editLevelForm-@level.Id" data-level-id="@level.Id" onsubmit="return validateEditForm(this);" enctype="multipart/form-data">
-                                                                    <input type="hidden" name="id" value="@level.Id" />
-                                                                    <div class="form-group">
-                                                                        <label for="EditPointsRequired">Points:</label>
-                                                                        <input type="number" class="form-control" id="EditPointsRequired-@level.Id" name="EditPointsRequired"  value="@level.PointsRequired" />
-                                                                        <span id="editPointsRequiredError-@level.Id" class="text-danger"></span>
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <div>
-                                                                            @if (level.Image != null && level.Image.Length > 0)
-                                                                            {
-                                                                                <label for="EditImage">Previous image:</label>
-                                                                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(level.Image)" alt="Previous Level Image" class="img-thumbnail" style="max-height: 100px;" />
-                                                                            }
-                                                                            <div class="form-group row">
-                                                                                <label for="EditImage" class="col-sm-6 col-form-label">Set new image:</label>
-                                                                                <div class="col-sm-6">
-                                                                                    <input type="file" class="form-control-file mt-2" id="EditImage-@level.Id" name="EditImage" />
-                                                                                </div>
-                                                                            </div>
-
-                                                                        </div>
-                                                                    </div>
-                                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        </td>
-                                    </tr>
-                                    }
-                            </tbody>
-                        </table>
-                    }
-                    else{
-                            <p>No level found.</p>
-                    }
-                </div>
-            </div>
-        </div>
-        </div>
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="card-body">
+					@if (Model.LevelResponse != null && Model.LevelResponse.Any())
+					{
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Level</th>
+									<th>Points</th>
+									<th>Image</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var level in Model.LevelResponse)
+								{
+									<tr>
+										<td>@level.LevelId</td>
+										<td>@level.PointsRequired</td>
+										<td>
+											@if (level.Image != null && level.Image.Length > 0)
+											{
+												<div style="overflow: hidden; width:100px;overflow: hidden;">
+													<img src="data:image/jpeg;base64,@Convert.ToBase64String(level.Image)" alt="Level Image" class="card-img-top w-100" style="object-fit: cover; height:100%" />
+												</div>
+											}
+										</td>
+										<td>
+											<button type="button" class="btn btn-sm btn-edit" style="margin-bottom:-8px; margin-top:-8px" data-toggle="modal" data-target="#EditModal-@level.Id"><i class="fas fa-pencil-alt"></i></button>
+											<div class="modal fade" id="EditModal-@level.Id" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel-@level.Id" aria-hidden="true">
+												<div class="modal-dialog" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title">Edit Level</h5>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<form method="post" asp-page-handler="EditLevel" id="editLevelForm-@level.Id" data-level-id="@level.Id" onsubmit="return validateEditForm(this);" enctype="multipart/form-data">
+																<input type="hidden" name="id" value="@level.Id" />
+																<div class="form-group">
+																	<label for="EditPointsRequired">Points:</label>
+																	<input type="number" class="form-control" id="EditPointsRequired-@level.Id" name="EditPointsRequired" value="@level.PointsRequired" />
+																	<span id="editPointsRequiredError-@level.Id" class="text-danger"></span>
+																</div>
+																<div class="form-group">
+																	<div>
+																		@if (level.Image != null && level.Image.Length > 0)
+																		{
+																			<label for="EditImage">Previous image:</label>
+																			<img src="data:image/jpeg;base64,@Convert.ToBase64String(level.Image)" alt="Previous Level Image" class="img-thumbnail" style="max-height: 100px;" />
+																		}
+																		<div class="form-group row">
+																			<label for="EditImage" class="col-sm-6 col-form-label">Set new image:</label>
+																			<div class="col-sm-6">
+																				<input type="file" class="form-control-file mt-2" id="EditImage-@level.Id" name="EditImage" />
+																			</div>
+																		</div>
+																	</div>
+																</div>
+																<button type="submit" class="btn btn-primary">Save Changes</button>
+															</form>
+														</div>
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					}
+					else
+					{
+						<p>No level found.</p>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
 }
 else
 {
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card mb-4 py-3 border-left-primary">
-
-                <div class="collapse show">
-                    <div class="card-body">
-                        <p>You don't have permission to view this content.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function validateEditForm(form) {
-        console.log('Start edit.');
-        var isValid = true;
+	function validateEditForm(form) {
+		var isValid = true;
 
-        var id = $(form).data('level-id'); // Fetch the id from data attribute
-        var editPointsRequiredTime = $('#EditPointsRequired-' + id).val();
+		var id = $(form).data('level-id');
+		var editPointsRequiredTime = $('#EditPointsRequired-' + id).val();
 
-        $('#editPointsRequiredError-' + id).text('');
+		$('#editPointsRequiredError-' + id).text('');
 
-        // Check if start time and end time are empty
-        if (editPointsRequiredTime.trim() === '') {
-            $('#editPointsRequiredError-' + id).text('Points are required.');
-            isValid = false;
-        }
+		if (editPointsRequiredTime.trim() === '') {
+			$('#editPointsRequiredError-' + id).text('Points are required.');
+			isValid = false;
+		}
 
-        if (editPointsRequiredTime < 0) {
-            $('#editPointsRequiredError-' + id).text('Points have to be more than 0');
-            isValid = false;
-        }
-        console.log('End edit.');
+		if (editPointsRequiredTime < 0) {
+			$('#editPointsRequiredError-' + id).text('Points have to be more than 0');
+			isValid = false;
+		}
 
-        // If all validations pass, submit the form
-        return isValid;
-    }
-
+		return isValid;
+	}
 
 </script>
 

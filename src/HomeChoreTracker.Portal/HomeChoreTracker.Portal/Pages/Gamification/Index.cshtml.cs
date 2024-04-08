@@ -82,7 +82,6 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
 
                         var response = await httpClient.PutAsync(apiUrl, content);
 
-
                         if (response.IsSuccessStatusCode)
                         {
                             return await OnGetAsync();
@@ -93,7 +92,6 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
                             return Page();
                         }
                     }
-                    
                 }
             }
             catch (Exception ex)

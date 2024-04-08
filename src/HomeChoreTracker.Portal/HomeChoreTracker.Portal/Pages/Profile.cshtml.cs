@@ -38,17 +38,13 @@ namespace HomeChoreTracker.Portal.Pages
                 using (var httpClient = _httpClientFactory.CreateClient())
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                     var apiUrl = _config["ApiUrl"] + "/User";
-
                     var response = await httpClient.GetAsync(apiUrl);
 
                     if (response.IsSuccessStatusCode)
                     {
                         UserProfile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
-
                         var apiUrlInterval = _config["ApiUrl"] + "/User/BusyIntervals";
-
                         var responseInterval = await httpClient.GetAsync(apiUrlInterval);
 
                         if (responseInterval.IsSuccessStatusCode)
@@ -66,7 +62,6 @@ namespace HomeChoreTracker.Portal.Pages
             return Redirect("/");
         }
 
-
         public async Task<IActionResult> OnPostAsync()
         {
             try
@@ -75,10 +70,7 @@ namespace HomeChoreTracker.Portal.Pages
                 using (var httpClient = _httpClientFactory.CreateClient())
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                     var apiUrl = _config["ApiUrl"] + "/User/Update";
-
-
                     var response = await httpClient.PutAsJsonAsync(apiUrl, UserProfile);
 
                     if (response.IsSuccessStatusCode)
@@ -133,6 +125,7 @@ namespace HomeChoreTracker.Portal.Pages
                 return Page();
             }
         }
+
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
             var token = User.FindFirstValue("Token");

@@ -19,7 +19,6 @@ namespace HomeChoreTracker.Portal.Pages.Forum
         private readonly IConfiguration _config;
 
         public List<AdviceResponse> Advices { get; set; }
-
         public int UserId { get; set; }
 
         [BindProperty]
@@ -39,22 +38,18 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                
                 var apiUrl = $"{_config["ApiUrl"]}/Forum";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
                     Advices = await response.Content.ReadFromJsonAsync<List<AdviceResponse>>();
 
-                    // Filter advices based on the search query
                     if (!string.IsNullOrEmpty(search))
                     {
                         Advices = Advices.Where(a => a.Title.Contains(search) || a.Description.Contains(search)).ToList();
                     }
 
-                    // Filter advices based on the type
                     if (!string.IsNullOrEmpty(type))
                     {
                         Advices = Advices.Where(a => string.Equals(a.Type.ToString(), type, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -76,7 +71,6 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var apiUrl = $"{_config["ApiUrl"]}/Forum/{id}";
-
                 var response = await httpClient.DeleteAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -97,11 +91,10 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/Forum/{id}";
                 var response = await httpClient.GetAsync(apiUrl);
-
                 var adviceDetails = new AdviceDetailedResponse();
+
                 if (response.IsSuccessStatusCode)
                 {
                     adviceDetails = await response.Content.ReadFromJsonAsync<AdviceDetailedResponse>();
@@ -135,7 +128,7 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             ClearFieldErrors(key => key == "Description");
             if (!ModelState.IsValid)
             {
-                await OnGetAsync(null, null); // Refresh the data
+                await OnGetAsync(null, null);
                 return Page();
             }
 
@@ -146,12 +139,10 @@ namespace HomeChoreTracker.Portal.Pages.Forum
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     var apiUrl = $"{_config["ApiUrl"]}/Forum/{id}";
-
                     EditAdvice.Title = Request.Form["EditName"];
                     EditAdvice.Type = Enum.Parse<HomeChoreType>(Request.Form["EditAdviceType"]);
                     EditAdvice.Description = Request.Form["EditDescription"];
                     EditAdvice.IsPublic = bool.Parse(Request.Form["EditIsPublic"]);
-
                     var response = await httpClient.PutAsJsonAsync(apiUrl, EditAdvice);
 
                     if (response.IsSuccessStatusCode)
@@ -168,10 +159,11 @@ namespace HomeChoreTracker.Portal.Pages.Forum
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-                await OnGetAsync(null, null); // Refresh the data
+                await OnGetAsync(null, null);
                 return Page();
             }
         }
+
         private void ClearFieldErrors(Func<string, bool> predicate)
         {
             foreach (var field in ModelState)

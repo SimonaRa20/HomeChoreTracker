@@ -27,9 +27,7 @@
                 <a class="btn btn-secondary btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
 
                 <div class="card mb-4 py-3 border-left-primary">
-
                     <div class="card-body">
-
                         <form method="post" asp-action="Create" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="LevelId">Level</label>
@@ -45,8 +43,6 @@
                                 <input type="file" class="form-control-file" id="Image" name="Image" asp-for="CreateLevel.Image" accept="image/*" />
                                 <span class="text-danger" id="image-error"></span>
                             </div>
-
-
                             <button type="submit" class="btn btn-primary">Create</button>
                         </form>
                     </div>
@@ -77,7 +73,6 @@
         $('form').submit(function () {
             var isValid = true;
 
-            // Validate Points
             var points = $('#Points').val().trim();
             if (points === '') {
                 $('#points-error').text('Points are required.');
@@ -86,7 +81,6 @@
                 $('#points-error').text('');
             }
 
-            // Validate Image
             var image = $('#Image').val().trim();
             if (image === '') {
                 $('#image-error').text('Image is required.');

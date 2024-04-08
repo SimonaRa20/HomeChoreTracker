@@ -2,100 +2,108 @@
 @model HomeChoreTracker.Portal.Pages.RatingsModel
 @if (!User.Identity.IsAuthenticated)
 {
-    Response.Redirect("/Auth/Login");
+	Response.Redirect("/Auth/Login");
 }
-@if (User.IsInRole("User"))
+else if (User.IsInRole("User"))
 {
-    <style>
-        .blurred {
-            filter: blur(4px);
-        }
-    </style>
-    <div class="row">
-        <div class="col-lg-12">
-            <a class="btn btn-light btn-sm mb-2" href="/"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>My Calendar</a>
-            <a class="btn btn-light btn-sm mb-2" asp-page="/BadgeWallet"><i class="fa fa-wallet mr-2" aria-hidden="true"></i>My Badge Wallet</a>
-            <a class="btn btn-secondary btn-sm mb-2" asp-page="/Ratings"><i class="fa fa-star mr-2" aria-hidden="true"></i>Ratings</a>
-            <div class="card mb-4 py-3 border-left-primary">
-                <div class="card-body">
-                    <h3>Ratings</h3>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="text-center">
-                                <h5>Rating By Badges</h5>
-                                @if (Model.GetRatingsByBadges != null && Model.GetRatingsByBadges.Any())
-                                {
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>UserName</th>
-                                                <th>Badges</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>@Model.GetRatingsByBadges[0].UserName</td>
-                                                <td>@Model.GetRatingsByBadges[0].EarnedBadgesCount</td>
-                                            </tr>
-                                            @foreach (var rate in Model.GetRatingsByBadges.Skip(1))
-                                            {
-                                                <tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
-                                                    <td>@rate.UserName</td>
-                                                    <td>@rate.EarnedBadgesCount</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
+	<style>
+		.blurred {
+			filter: blur(4px);
+		}
+	</style>
 
-                                else
-                                {
-                                    <p>No ratings badge found.</p>
-                                }
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="text-center">
-                                <h5>Rating By Points</h5>
-                                @if (Model.GetRatingsByPoints != null && Model.GetRatingsByPoints.Any())
-                                {
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>UserName</th>
-                                                <th>Points</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>@Model.GetRatingsByPoints[0].UserName</td>
-                                                <td>@Model.GetRatingsByPoints[0].EarnedPoints</td>
-                                            </tr>
-                                            @foreach (var rate in Model.GetRatingsByPoints.Skip(1))
-                                            {
-                                                <tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
-                                                    <td>@rate.UserName</td>
-                                                    <td>@rate.EarnedPoints</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
-                                else
-                                {
-                                    <p>No ratings points found.</p>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-light btn-sm mb-2" href="/"><i class="fa fa-calendar mr-2" aria-hidden="true"></i>My Calendar</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="/BadgeWallet"><i class="fa fa-wallet mr-2" aria-hidden="true"></i>My Badge Wallet</a>
+			<a class="btn btn-secondary btn-sm mb-2" asp-page="/Ratings"><i class="fa fa-star mr-2" aria-hidden="true"></i>Ratings</a>
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="card-body">
+					<h3>Ratings</h3>
+					<div class="row">
+						<div class="col-lg-6">
+							<div class="text-center">
+								<h5>Rating By Badges</h5>
+								@if (Model.GetRatingsByBadges != null && Model.GetRatingsByBadges.Any())
+								{
+									<table class="table">
+										<thead>
+											<tr>
+												<th>UserName</th>
+												<th>Badges</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>@Model.GetRatingsByBadges[0].UserName</td>
+												<td>@Model.GetRatingsByBadges[0].EarnedBadgesCount</td>
+											</tr>
+											@foreach (var rate in Model.GetRatingsByBadges.Skip(1))
+											{
+												<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
+													<td>@rate.UserName</td>
+													<td>@rate.EarnedBadgesCount</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								}
+								else
+								{
+									<p>No ratings badge found.</p>
+								}
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="text-center">
+								<h5>Rating By Points</h5>
+								@if (Model.GetRatingsByPoints != null && Model.GetRatingsByPoints.Any())
+								{
+									<table class="table">
+										<thead>
+											<tr>
+												<th>UserName</th>
+												<th>Points</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>@Model.GetRatingsByPoints[0].UserName</td>
+												<td>@Model.GetRatingsByPoints[0].EarnedPoints</td>
+											</tr>
+											@foreach (var rate in Model.GetRatingsByPoints.Skip(1))
+											{
+												<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
+													<td>@rate.UserName</td>
+													<td>@rate.EarnedPoints</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								}
+								else
+								{
+									<p>No ratings points found.</p>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 else
 {
-    <div class="row">
-        <h5>You don't have permission.</h5>
-    </div>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }

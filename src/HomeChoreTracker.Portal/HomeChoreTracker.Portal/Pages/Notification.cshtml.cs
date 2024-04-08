@@ -19,7 +19,6 @@ namespace HomeChoreTracker.Portal.Pages
         public int Count { get; set; }
         public int PageSize { get; set; } = 10;
         public int TotalPages { get; set; }
-
         public bool ShowPrevious => CurrentPage > 1;
         public bool ShowNext => CurrentPage < TotalPages;
 
@@ -35,12 +34,11 @@ namespace HomeChoreTracker.Portal.Pages
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 int pageSize = PageSize;
                 int skip = (CurrentPage - 1) * pageSize;
                 var apiUrl = $"{_config["ApiUrl"]}/Notification/all/skip{skip}/take{pageSize}";
-
                 var response = await httpClient.GetAsync(apiUrl);
+
                 if (response.IsSuccessStatusCode)
                 {
                     Notifications = await response.Content.ReadFromJsonAsync<List<NotificationResponse>>();
@@ -55,10 +53,8 @@ namespace HomeChoreTracker.Portal.Pages
                     }
                     return Page();
                 }
-               
                 else
                 {
-                    // Handle error scenario
                     return Page();
                 }
             }
@@ -70,9 +66,7 @@ namespace HomeChoreTracker.Portal.Pages
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/Notification";
-
                 var response = await httpClient.PutAsync(apiUrl, null);
 
                 if (response.IsSuccessStatusCode)
@@ -81,7 +75,6 @@ namespace HomeChoreTracker.Portal.Pages
                 }
                 else
                 {
-                    // Handle error scenario
                     return Page();
                 }
             }

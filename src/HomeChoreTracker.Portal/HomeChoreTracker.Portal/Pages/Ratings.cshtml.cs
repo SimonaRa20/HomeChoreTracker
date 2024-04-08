@@ -12,7 +12,6 @@ namespace HomeChoreTracker.Portal.Pages
 
         public List<RatingsResponse> GetRatingsByBadges { get; set; }
         public List<RatingsResponse> GetRatingsByPoints { get; set; }
-
         public int UserId { get; set; }
 
         public RatingsModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
@@ -28,16 +27,13 @@ namespace HomeChoreTracker.Portal.Pages
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = _config["ApiUrl"] + "/Gamification/RatingsByBadges";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
                     GetRatingsByBadges = await response.Content.ReadFromJsonAsync<List<RatingsResponse>>();
                     var apiUrlGetRatingsByPoints = _config["ApiUrl"] + "/Gamification/RatingsByPoints";
-
                     var responseGetRatingsByPoints = await httpClient.GetAsync(apiUrlGetRatingsByPoints);
 
                     if (responseGetRatingsByPoints.IsSuccessStatusCode)
@@ -48,7 +44,6 @@ namespace HomeChoreTracker.Portal.Pages
                 }
                 else
                 {
-                    // Handle error scenario
                     return Page();
                 }
             }

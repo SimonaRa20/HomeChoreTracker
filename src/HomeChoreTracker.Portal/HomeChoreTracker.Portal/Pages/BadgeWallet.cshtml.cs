@@ -26,9 +26,7 @@ namespace HomeChoreTracker.Portal.Pages
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = _config["ApiUrl"] + "/Gamification/BadgeWallet";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -38,7 +36,6 @@ namespace HomeChoreTracker.Portal.Pages
                 }
                 else
                 {
-                    // Handle error scenario
                     return Page();
                 }
             }

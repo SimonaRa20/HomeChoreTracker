@@ -23,9 +23,7 @@ namespace HomeChoreTracker.Portal.ViewComponents
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/Home";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -35,7 +33,6 @@ namespace HomeChoreTracker.Portal.ViewComponents
                 }
                 else
                 {
-                    // Handle error scenario
                     return Content("Failed to retrieve homes list");
                 }
             }

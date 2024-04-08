@@ -28,7 +28,6 @@
                     <button class='btn btn-secondary btn-sm' id='btnCalendar' data-toggle="modal" data-target="#CalendarModal"><i class="fa fa-download mr-2" aria-hidden="true"></i>Import Google Calendar events</button>
                     <button class="btn btn-secondary btn-sm" id="btnExport"><i class="fa fa-upload mr-2" aria-hidden="true"></i>Export Home Chores</button>
                 </div>
-
                 <div class="modal" tabindex="-1" role="dialog" id="CalendarModal">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -39,7 +38,6 @@
                                 </button>
                             </div>
                             <form method="post" asp-action="Index" enctype="multipart/form-data">
-
                                 <div class="modal-body">
                                     <div class="form-group">
                                         <label for="File">Import ics file</label>
@@ -54,47 +52,43 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="modal" tabindex="-1" role="dialog" id="exampleModal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Selected home chore</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" asp-page-handler="IsDone">
-                <div class="modal-body">
-                    <p><strong>Name:</strong> <span id="modalTitle"></span></p>
-                    <p><strong>Description:</strong> <span id="modalDescription"></span></p>
-                    <p><strong>Home chore type:</strong> <span id="modalChoreType"></span></p>
-                    <p><strong>Points:</strong> <span id="modalPoints"></span></p>
-                    <p><strong>Level Type:</strong> <span id="modalLevelType"></span></p>
-                    <p><strong>How long have to take:</strong> <span id="modalTime"></span></p>
-                    <p><strong>Date:</strong> <span id="modalStartDate"></span> / <span id="modalEndDate"></span></p>
-                   <div class="form-check">
-    <input type="hidden" id="modalId" name="id" value="" />
-    <div id="doneCheckbox">
-        <input type="checkbox" class="form-check-input" id="done" name="done">
-        <label class="form-check-label" for="isDoneCheckbox">Check if task is done</label>
-    </div>
-</div>
-</div>
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Selected home chore</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form method="post" asp-page-handler="IsDone">
+                                <div class="modal-body">
+                                    <p><strong>Name:</strong> <span id="modalTitle"></span></p>
+                                    <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+                                    <p><strong>Home chore type:</strong> <span id="modalChoreType"></span></p>
+                                    <p><strong>Points:</strong> <span id="modalPoints"></span></p>
+                                    <p><strong>Level Type:</strong> <span id="modalLevelType"></span></p>
+                                    <p><strong>How long have to take:</strong> <span id="modalTime"></span></p>
+                                    <p><strong>Date:</strong> <span id="modalStartDate"></span> / <span id="modalEndDate"></span></p>
+                                    <div class="form-check">
+                                        <input type="hidden" id="modalId" name="id" value="" />
+                                        <div id="doneCheckbox">
+                                            <input type="checkbox" class="form-check-input" id="done" name="done"/>
+                                             <label class="form-check-label" for="isDoneCheckbox">Check if task is done</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <div id="saveButton">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                    </div>
+                                </div>
 
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-    <div id="saveButton">
-        <button type="submit" class="btn btn-primary">Save</button>
-    </div>
-</div>
-
-            </form>
-        </div>
-    </div>
-</div>
-
-
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 <div id="calendar" class="m-2"></div>
             </div>
         </div>
@@ -104,6 +98,7 @@ else
 {
     Response.Redirect("/Gamification");
 }
+
 <script>
     $.getScript("https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js").done(function () {
         $('#calendar').fullCalendar({
@@ -188,14 +183,12 @@ else
                         console.log(response.isDone)
 
                         if (response.isDone) {
-            // Hide the "Save" button
-            $('#saveButton').hide();
-             $('#doneCheckbox').hide();
-        } else {
-            // Show the "Save" button
-            $('#saveButton').show();
-             $('#doneCheckbox').show();
-        }
+                            $('#saveButton').hide();
+                            $('#doneCheckbox').hide();
+                        } else {
+                            $('#saveButton').show();
+                            $('#doneCheckbox').show();
+                        }
 
                         $('#modalId').val(response.id);
                         console.log(response)
@@ -223,7 +216,6 @@ else
                     var blob = new Blob([response], { type: 'text/calendar' });
 
                     var url = window.URL.createObjectURL(blob);
-
                     var downloadLink = document.createElement('a');
                     downloadLink.href = url;
                     downloadLink.download = 'HomeChores.ics';
@@ -244,7 +236,6 @@ else
             }
         });
     });
-
 </script>
 
 <style>

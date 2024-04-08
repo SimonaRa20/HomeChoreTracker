@@ -2,53 +2,51 @@
 
 @if (Model.Count > 0)
 {
-    <li class="nav-item dropdown no-arrow mx-1">
-        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-bell fa-fw fa-2x"></i>
-            <!-- Counter - Alerts -->
-            <span class="badge badge-danger badge-counter" style="font-size: 16px;">@Model.Count</span>
-        </a>
-        <!-- Dropdown - Alerts -->
-        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-             aria-labelledby="alertsDropdown">
-            <h6 class="dropdown-header">
-                Notifications
-            </h6>
-            @foreach (var notification in Model)
-            {
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="mr-3">
-                        <div class="icon-circle bg-secondary">
-                            <i class="fa fa-solid fa-paper-plane text-white"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="small text-gray-500">@notification.Time</div>
-                        @notification.Title.
-                    </div>
-                </a>
-            }
-            <form method="post">
-                <button type="submit" class="dropdown-item text-center small text-gray-500" asp-page="Notification" asp-page-handler="MarkAllAsRead">Mark all as read</button>
-            </form>
-            <a class="dropdown-item text-center small text-gray-500" asp-page="/Notification">Show All Notifications</a>
-        </div>
-    </li>
+	<li class="nav-item dropdown no-arrow mx-1">
+		<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+		   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<i class="fas fa-bell fa-fw fa-2x"></i>
+			<span class="badge badge-danger badge-counter" style="font-size: 16px;">@Model.Count</span>
+		</a>
+		<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+			 aria-labelledby="alertsDropdown">
+			<h6 class="dropdown-header">
+				Notifications
+			</h6>
+			@foreach (var notification in Model)
+			{
+				<a class="dropdown-item d-flex align-items-center" href="#">
+					<div class="mr-3">
+						<div class="icon-circle bg-secondary">
+							<i class="fa fa-solid fa-paper-plane text-white"></i>
+						</div>
+					</div>
+					<div>
+						<div class="small text-gray-500">@notification.Time</div>
+						@notification.Title.
+					</div>
+				</a>
+			}
+			<form method="post">
+				<button type="submit" class="dropdown-item text-center small text-gray-500" asp-page="Notification" asp-page-handler="MarkAllAsRead">Mark all as read</button>
+			</form>
+			<a class="dropdown-item text-center small text-gray-500" asp-page="/Notification">Show All Notifications</a>
+		</div>
+	</li>
 }
 else
 {
-    <li class="nav-item dropdown no-arrow mx-1">
-        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-bell fa-fw fa-2x"></i>
-        </a>
-        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-             aria-labelledby="alertsDropdown">
-            <h6 class="dropdown-header">
-                Notifications
-            </h6>
-            <a class="dropdown-item text-center small text-gray-500" asp-page="/Notification">Show All Notifications</a>
-        </div>
-    </li>
+	<li class="nav-item dropdown no-arrow mx-1">
+		<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+		   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<i class="fas fa-bell fa-fw fa-2x"></i>
+		</a>
+		<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+			 aria-labelledby="alertsDropdown">
+			<h6 class="dropdown-header">
+				Notifications
+			</h6>
+			<a class="dropdown-item text-center small text-gray-500" asp-page="/Notification">Show All Notifications</a>
+		</div>
+	</li>
 }

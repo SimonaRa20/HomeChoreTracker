@@ -46,15 +46,12 @@ namespace HomeChoreTracker.Portal.Pages
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/Calendar";
-
                 var response = await httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
                     Events = await response.Content.ReadFromJsonAsync<List<Event>>();
-
                     var events = Events.Select(chore => new
                     {
                         id = chore.Id,
@@ -64,7 +61,6 @@ namespace HomeChoreTracker.Portal.Pages
                     });
 
                     var apiUrlHomeChore = $"{_config["ApiUrl"]}/Calendar/Chores";
-
                     var responseHomeChore = await httpClient.GetAsync(apiUrlHomeChore);
 
                     if (response.IsSuccessStatusCode)
@@ -82,8 +78,6 @@ namespace HomeChoreTracker.Portal.Pages
                             type = chore.Task.ChoreType.ToString(),
                             time = chore.Task.Time.ToString(),
                         });
-
-
                     }
                     return Page();
                 }
@@ -94,7 +88,6 @@ namespace HomeChoreTracker.Portal.Pages
                         await HttpContext.SignOutAsync();
                         return RedirectToPage("/Index");
                     }
-
                     return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
                 }
             }
@@ -113,7 +106,6 @@ namespace HomeChoreTracker.Portal.Pages
                     using (var formData = new MultipartFormDataContent())
                     {
                         formData.Add(new StreamContent(CalendarRequest.File.OpenReadStream()), "File", CalendarRequest.File.FileName);
-
                         var response = await httpClient.PostAsync(apiUrl, formData);
 
                         if (response.IsSuccessStatusCode)
@@ -149,10 +141,9 @@ namespace HomeChoreTracker.Portal.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     var calendarFileBytes = await response.Content.ReadAsByteArrayAsync();
-                    var contentType = "text/calendar"; // Set the content type to indicate that this is a calendar file
-                    var fileName = "HomeChores.ics"; // Set the file name
+                    var contentType = "text/calendar";
+                    var fileName = "HomeChores.ics";
 
-                    // Return the calendar file as a FileResult
                     return File(calendarFileBytes, contentType, fileName);
                 }
                 else
@@ -168,7 +159,6 @@ namespace HomeChoreTracker.Portal.Pages
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
                 var apiUrl = $"{_config["ApiUrl"]}/Calendar/Chore/{id}";
                 var response = await httpClient.GetAsync(apiUrl);
 
@@ -192,8 +182,6 @@ namespace HomeChoreTracker.Portal.Pages
                 using (var httpClient = _httpClientFactory.CreateClient())
                 {
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-
                     var done = Request.Form["done"];
                     bool isDone = false;
                     if (done == "on")
@@ -205,10 +193,7 @@ namespace HomeChoreTracker.Portal.Pages
                         isDone = false;
                     }
 
-
                     var apiUrl = $"{_config["ApiUrl"]}/HomeChore/ChoreIsDone/{id}?isDone={isDone}";
-
-
                     var response = await httpClient.PostAsync(apiUrl, null);
 
                     if (response.IsSuccessStatusCode)

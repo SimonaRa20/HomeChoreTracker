@@ -34,7 +34,6 @@ namespace HomeChoreTracker.Portal.Pages.Forum
 				{
 					httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 					var apiUrl = _config["ApiUrl"] + "/Forum";
-
 					var response = await httpClient.PostAsJsonAsync(apiUrl, CreateAdvice);
 
 					if (response.IsSuccessStatusCode)

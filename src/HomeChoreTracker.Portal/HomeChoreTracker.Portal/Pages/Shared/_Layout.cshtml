@@ -42,7 +42,6 @@
                             <span>Manage default home chores</span>
                         </a>
                     </li>
-
                 }
 
                 @if (User.IsInRole("User"))
@@ -55,6 +54,7 @@
                     </a>
                     <hr class="sidebar-divider">
                     <div class="sidebar-heading">Homes actions</div>
+
                     @await Component.InvokeAsync("HomesList")
 
                     @await Component.InvokeAsync("HomeChoreList")
@@ -67,9 +67,6 @@
                             <span>Manage homes</span>
                         </a>
                     </li>
-
-
-
                     <div class="sidebar-heading">Finance</div>
                     <li class="nav-item">
                         <a class="nav-link" href="~/Finance">
@@ -77,9 +74,6 @@
                             <span>Budget</span>
                         </a>
                     </li>
-
-                  
-
                     <div class="sidebar-heading">Forum</div>
                     <li class="nav-item">
                         <a class="nav-link" href="~/Forum">
@@ -87,23 +81,18 @@
                             <span>Advices</span>
                         </a>
                     </li>
-
-
                     <hr class="sidebar-divider d-none d-md-block">
                     <div class="text-center d-none d-md-inline">
                         <button class="rounded-circle border-0" id="sidebarToggle"></button>
                     </div>
                 }
             </ul>
-
             <div id="content-wrapper" class="d-flex flex-column">
                 <div id="content">
-
                     <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                         <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                             <i class="fa fa-bars"></i>
                         </button>
-
                         <ul class="navbar-nav ml-auto">
                             @if (User.IsInRole("User"))
                             {
@@ -126,7 +115,6 @@
                             </li>
                         </ul>
                     </nav>
-
                     <div class="container-fluid">
                         @RenderBody()
                     </div>
