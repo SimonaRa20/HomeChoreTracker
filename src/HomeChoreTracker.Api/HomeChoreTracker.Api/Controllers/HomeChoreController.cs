@@ -97,12 +97,12 @@ namespace HomeChoreTracker.Api.Controllers
                         if (!hasBadge)
                         {
                             BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(id);
-                            wallet.CreateFirstExpense = true;
+                            wallet.CreatedTaskWasUsedOtherHome = true;
                             await _gamificationRepository.UpdateBadgeWallet(wallet);
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first purchase'",
+                                Title = $"You earned badge 'Created task was used other home'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)id,
@@ -263,7 +263,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                         Notification noti = new Notification
                         {
-                            Title = $"You earned badge 'Create first task'",
+                            Title = $"You earned badge 'Done first task'",
                             IsRead = false,
                             Time = DateTime.Now,
                             UserId = (int)user.Id,
@@ -283,7 +283,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first cleaning task'",
+                                Title = $"You earned badge 'Done first cleaning task'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)user.Id,
@@ -303,7 +303,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first laundry task'",
+                                Title = $"You earned badge 'Done first laundry task'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)user.Id,
@@ -323,7 +323,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first kitchen task'",
+                                Title = $"You earned badge 'Done first kitchen task'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)user.Id,
@@ -343,7 +343,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first bathroom task'",
+                                Title = $"You earned badge 'Done first bathroom task'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)user.Id,
@@ -363,7 +363,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first bedroom task'",
+                                Title = $"You earned badge 'Done first bedroom task'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)user.Id,
@@ -383,7 +383,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first outdoors task'",
+                                Title = $"You earned badge 'Done first outdoors task'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)user.Id,
@@ -403,7 +403,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                             Notification noti = new Notification
                             {
-                                Title = $"You earned badge 'Create first organize task'",
+                                Title = $"You earned badge 'Done first organize task'",
                                 IsRead = false,
                                 Time = DateTime.Now,
                                 UserId = (int)user.Id,

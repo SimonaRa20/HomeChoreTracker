@@ -169,11 +169,10 @@
 </script>
 <script>
     function createChart() {
-
         var expenseCategories = @Html.Raw(Json.Serialize(Model.ExpenseCategories));
         var incomeCategories = @Html.Raw(Json.Serialize(Model.IncomeCategories));
-        // Expense pie chart
-        if (expenseCategories) {
+
+        if (expenseCategories && Object.keys(expenseCategories).length > 0) {
             var expenseLabels = Object.keys(expenseCategories);
             var expenseData = Object.values(expenseCategories);
 
@@ -203,14 +202,20 @@
                 },
                 options: {
                     legend: {
-                        position: 'right' // Move legend to the right
-                    }
+                        position: 'right'
+                    },
+                    aspectRatio: 1,
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
+
+        } else {
+            var expenseCanvas = document.getElementById('expenseChart');
+            expenseCanvas.parentNode.innerHTML = "There are currently no expense categories.";
         }
 
-        // Income pie chart
-        if (incomeCategories) {
+        if (incomeCategories && Object.keys(incomeCategories).length > 0) {
             var incomeLabels = Object.keys(incomeCategories);
             var incomeData = Object.values(incomeCategories);
 
@@ -231,21 +236,25 @@
                             'rgb(201, 203, 207)',
                             'rgb(200, 50, 132)',
                             'rgb(100, 159, 64)',
-                            'rgb(100, 205, 86)',
-                            'rgb(175, 192, 192)',
-                            'rgb(154, 162, 235)',
-                            'rgb(153, 52, 255)'
                         ]
                     }]
                 },
                 options: {
                     legend: {
-                        position: 'right' // Move legend to the right
-                    }
+                        position: 'right'
+                    },
+                    aspectRatio: 1,
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
+
+        } else {
+            var incomeCanvas = document.getElementById('incomeChart');
+            incomeCanvas.parentNode.innerHTML = "There are currently no income categories.";
         }
     }
+
 
     document.addEventListener("DOMContentLoaded", function () {
         createChart();

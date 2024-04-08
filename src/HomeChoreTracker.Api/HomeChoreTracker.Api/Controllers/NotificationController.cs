@@ -81,6 +81,35 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
+        [HttpGet("all/skip{skip}/take{take}")]
+        [Authorize]
+        public async Task<IActionResult> GetNotifications(int skip = 0, int take = 10)
+        {
+            try
+            {
+                int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+                var response = await _notificationRepository.GetNotifications(id);
+                List<Notification> result = response.OrderByDescending(notification => notification.Time).ToList();
+                List<NotificationResponse> notifications = new List<NotificationResponse>();
+                foreach (var notification in result)
+                {
+                    NotificationResponse notificationResponse = new NotificationResponse
+                    {
+                        Title = notification.Title,
+                        IsRead = notification.IsRead,
+                        Time = notification.Time,
+                    };
+                    notifications.Add(notificationResponse);
+                }
+                var list = notifications.Skip(skip).Take(take).ToList();
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpPut]
         [Authorize]

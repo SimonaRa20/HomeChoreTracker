@@ -159,8 +159,7 @@
         var expenseCategories = @Html.Raw(Json.Serialize(Model.ExpenseCategories));
         var incomeCategories = @Html.Raw(Json.Serialize(Model.IncomeCategories));
 
-        // Expense pie chart
-        if (expenseCategories) {
+        if (expenseCategories && Object.keys(expenseCategories).length > 0) {
             var expenseLabels = Object.keys(expenseCategories);
             var expenseData = Object.values(expenseCategories);
 
@@ -190,18 +189,20 @@
                 },
                 options: {
                     legend: {
-                        position: 'right' // Move legend to the right
+                        position: 'right'
                     },
                     aspectRatio: 1,
-                    responsive: true, // Make the chart responsive
-                    maintainAspectRatio: false // Don't maintain aspect ratio
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
 
+        } else {
+            var expenseCanvas = document.getElementById('expenseChart');
+            expenseCanvas.parentNode.innerHTML = "There are currently no expense categories.";
         }
 
-        // Income pie chart
-        if (incomeCategories) {
+        if (incomeCategories && Object.keys(incomeCategories).length > 0) {
             var incomeLabels = Object.keys(incomeCategories);
             var incomeData = Object.values(incomeCategories);
 
@@ -227,14 +228,17 @@
                 },
                 options: {
                     legend: {
-                        position: 'right' // Move legend to the right
+                        position: 'right'
                     },
                     aspectRatio: 1,
-                    responsive: true, // Make the chart responsive
-                    maintainAspectRatio: false // Don't maintain aspect ratio
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
 
+        } else {
+            var incomeCanvas = document.getElementById('incomeChart');
+            incomeCanvas.parentNode.innerHTML = "There are currently no income categories.";
         }
     }
 

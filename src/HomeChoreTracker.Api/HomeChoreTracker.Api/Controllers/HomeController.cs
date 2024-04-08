@@ -161,7 +161,7 @@ namespace HomeChoreTracker.Api.Controllers
 
         [HttpGet("{id}/skip{skip}/take{take}")]
         [Authorize]
-        public async Task<IActionResult> GetPointsHistoryBase(int id, int skip = 0, int take = 5)
+        public async Task<IActionResult> GetPointsHistoryBase(int id, int skip = 0, int take = 10)
         {
             try
             {

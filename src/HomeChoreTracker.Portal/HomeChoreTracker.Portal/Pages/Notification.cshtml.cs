@@ -1,3 +1,4 @@
+using HomeChoreTracker.Portal.Models.Gamification;
 using HomeChoreTracker.Portal.Models.Notification;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,6 +14,15 @@ namespace HomeChoreTracker.Portal.Pages
 
         public List<NotificationResponse> Notifications { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public int CurrentPage { get; set; } = 1;
+        public int Count { get; set; }
+        public int PageSize { get; set; } = 10;
+        public int TotalPages { get; set; }
+
+        public bool ShowPrevious => CurrentPage > 1;
+        public bool ShowNext => CurrentPage < TotalPages;
+
         public NotificationModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
@@ -26,15 +36,26 @@ namespace HomeChoreTracker.Portal.Pages
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var apiUrl = _config["ApiUrl"] + "/Notification/all";
+                int pageSize = PageSize;
+                int skip = (CurrentPage - 1) * pageSize;
+                var apiUrl = $"{_config["ApiUrl"]}/Notification/all/skip{skip}/take{pageSize}";
 
                 var response = await httpClient.GetAsync(apiUrl);
-
                 if (response.IsSuccessStatusCode)
                 {
                     Notifications = await response.Content.ReadFromJsonAsync<List<NotificationResponse>>();
+
+                    var apiUrlAll = _config["ApiUrl"] + $"/Notification/all";
+                    var totalCountResponse = await httpClient.GetAsync(apiUrlAll);
+                    if (totalCountResponse.IsSuccessStatusCode)
+                    {
+                        List<NotificationResponse> list = await totalCountResponse.Content.ReadFromJsonAsync<List<NotificationResponse>>();
+                        Count = list.Count;
+                        TotalPages = (int)Math.Ceiling((double)Count / pageSize);
+                    }
                     return Page();
                 }
+               
                 else
                 {
                     // Handle error scenario
