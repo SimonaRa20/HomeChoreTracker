@@ -2,6 +2,7 @@ using HomeChoreTracker.Portal.Models.Gamification;
 using HomeChoreTracker.Portal.Models.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net;
 using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Home
@@ -16,7 +17,7 @@ namespace HomeChoreTracker.Portal.Pages.Home
         public LevelRequest LevelResponse { get; set; }
         public Dictionary<string, int> ThisWeekPointsHistory { get; set; }
         public Dictionary<string, int> PreviousWeekPointsHistory { get; set; }
-
+        public bool Unauthorized { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -58,6 +59,11 @@ namespace HomeChoreTracker.Portal.Pages.Home
                         PreviousWeekPointsHistory = await responsePreviousWeek.Content.ReadFromJsonAsync<Dictionary<string, int>>();
                     }
 
+                    return Page();
+                }
+                else if (response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    Unauthorized = true;
                     return Page();
                 }
                 else

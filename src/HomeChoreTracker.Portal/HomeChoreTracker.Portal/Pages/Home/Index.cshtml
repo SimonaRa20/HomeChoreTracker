@@ -1,108 +1,139 @@
 ﻿@page "{id}"
 @model HomeChoreTracker.Portal.Pages.Home.IndexModel
 @{
-    Layout = "~/Pages/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Home";
+	Layout = "~/Pages/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Home";
 }
 
 @section HeadContent
 {
-    <title>@ViewData["Title"] - Home Chore Tracker</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet" asp-append-version="true">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
-    <!-- Add the following lines to include required Bootstrap and jQuery files -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<title>@ViewData["Title"] - Home Chore Tracker</title>
+	<link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		  rel="stylesheet" asp-append-version="true">
+	<link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+	<!-- Add the following lines to include required Bootstrap and jQuery files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+@if (!User.Identity.IsAuthenticated)
+{
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-secondary btn-sm mb-2" href="/Home/@Model.Id"><i class="fa fa-home mr-2" aria-hidden="true"></i>Home</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./PointsHistory" asp-route-id="@Model.Id"><i class="fa fa-history mr-2" aria-hidden="true"></i>Points History</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./Finance" asp-route-id="@Model.Id"><i class="fa fa-money-bill mr-2" aria-hidden="true"></i>Home Finances</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./HomeMembers" asp-route-id="@Model.Id"><i class="fa fa-users mr-2" aria-hidden="true"></i>Home Members</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./Invite" asp-route-id="@Model.Id"><i class="fa fa-user-plus mr-2" aria-hidden="true"></i>Add new home member</a>
+
+			@if (Model.Unauthorized)
+			{
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card mb-4 py-3 border-left-primary">
+							<div class="collapse show">
+								<div class="card-body">
+									<p>You don't have permission to view this content.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+			else
+			{
+				<div class="card mb-4 py-3 border-left-primary mt-2">
+					<div class="collapse show">
+						<div class="card-body">
+							<div class="row no-gutters align-items-center mb-4">
+								<div class="col mr-2">
+									<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+										How much points left to upgrade plant (@Model.LevelResponse.EarnedPoints / @Model.LevelResponse.MaxPoints)
+									</div>
+									<div class="row no-gutters align-items-center">
+										@{
+											var earnedPoints = (double)Model.LevelResponse.EarnedPoints;
+											var maxPoints = (double)Model.LevelResponse.MaxPoints;
+											var percentage = Math.Min(earnedPoints / maxPoints * 100, 100);
+										}
+										<div class="col-auto">
+											<div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@percentage.ToString("0.00")%</div>
+										</div>
+										<div class="col">
+
+											<div class="progress progress-sm mr-2">
+												<div class="progress-bar bg-primary" role="progressbar"
+													 style="width: @percentage%" aria-valuenow="@Model.LevelResponse.EarnedPoints" aria-valuemin="0"
+													 aria-valuemax="@Model.LevelResponse.MaxPoints"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="text-center mt-4">
+								<img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.LevelResponse.GamificationLevel.Image)" alt="Level Image" class="card-img-top" style="object-fit: cover; height: auto; max-height: 200px; width: auto; max-width: 100%;" />
+							</div>
+							<div class="text-center mt-4 ml-4">
+								@if (percentage >= 100)
+								{
+									<form method="post">
+										<input type="hidden" id="editHomeId" name="homeId" value="@Model.Id" />
+										<button type="submit" class="btn btn-primary mr-4">Upgrade your plant</button>
+									</form>
+								}
+								else
+								{
+									<button type="button" class="btn btn-secondary mr-4" disabled>Upgrade your plant</button>
+								}
+
+							</div>
+							<div class="row mt-4">
+								<div class="col-lg-6">
+									<div class="text-center">
+										<h5>This week</h5>
+										<div style="overflow-y:auto;">
+											<canvas id="weeklyChart" class="chart-canvas"></canvas>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="text-center">
+										<h5>Previous week</h5>
+										<div style="overflow-y:auto;">
+											<canvas id="previousWeekChart" class="chart-canvas"></canvas>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 
-<div class="row">
-    <div class="col-lg-12">
-        <a class="btn btn-secondary btn-sm mb-2" href="/Home/@Model.Id"><i class="fa fa-home mr-2" aria-hidden="true"></i>Home</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./PointsHistory" asp-route-id="@Model.Id"><i class="fa fa-history mr-2" aria-hidden="true"></i>Points History</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./Finance" asp-route-id="@Model.Id"><i class="fa fa-money-bill mr-2" aria-hidden="true"></i>Home Finances</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./HomeMembers" asp-route-id="@Model.Id"><i class="fa fa-users mr-2" aria-hidden="true"></i>Home Members</a>
-        <a class="btn btn-light btn-sm mb-2" asp-page="./Invite" asp-route-id="@Model.Id"><i class="fa fa-user-plus mr-2" aria-hidden="true"></i>Add new home member</a>
-        <div class="card mb-4 py-3 border-left-primary mt-2">
-
-            <div class="collapse show">
-                <div class="card-body">
-
-                    <div class="row no-gutters align-items-center mb-4">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                How much points left to upgrade plant (@Model.LevelResponse.EarnedPoints / @Model.LevelResponse.MaxPoints)
-                            </div>
-                            <div class="row no-gutters align-items-center">
-                                @{
-                                    var earnedPoints = (double)Model.LevelResponse.EarnedPoints;
-                                    var maxPoints = (double)Model.LevelResponse.MaxPoints;
-                                    var percentage = Math.Min(earnedPoints / maxPoints * 100, 100);
-                                }
-                                <div class="col-auto">
-                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@percentage.ToString("0.00")%</div>
-                                </div>
-                                <div class="col">
-                                   
-                                    <div class="progress progress-sm mr-2">
-                                        <div class="progress-bar bg-primary" role="progressbar"
-                                             style="width: @percentage%" aria-valuenow="@Model.LevelResponse.EarnedPoints" aria-valuemin="0"
-                                             aria-valuemax="@Model.LevelResponse.MaxPoints"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.LevelResponse.GamificationLevel.Image)" alt="Level Image" class="card-img-top" style="object-fit: cover; height: auto; max-height: 200px; width: auto; max-width: 100%;" />
-                    </div>
-                    <div class="text-center mt-4 ml-4">
-                        @if (percentage >= 100)
-                        {
-                            <form method="post">
-                                <input type="hidden" id="editHomeId" name="homeId" value="@Model.Id" />
-                                <button type="submit" class="btn btn-primary mr-4">Upgrade your plant</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-secondary mr-4" disabled>Upgrade your plant</button>
-                        }
-                        
-                    </div>
-
-                    <div class="row mt-4">
-                        <div class="col-lg-6">
-                            <div class="text-center">
-                                <h5>This week</h5>
-                                <div style="overflow-y:auto;">
-                                    <canvas id="weeklyChart" class="chart-canvas"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="text-center">
-                                <h5>Previous week</h5>
-                                <div style="overflow-y:auto;">
-                                    <canvas id="previousWeekChart" class="chart-canvas"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                </div>
-               
-            </div>
-
-           
-        </div>
-    </div>
-</div>
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -111,92 +142,91 @@
 <script src="js/demo/chart-bar-demo.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 <script>
-    function createBarChart() {
-        var weeklyPoints = @Html.Raw(Json.Serialize(Model.ThisWeekPointsHistory));
+	function createBarChart() {
+		var weeklyPoints = @Html.Raw(Json.Serialize(Model.ThisWeekPointsHistory));
 
-        if (weeklyPoints && Object.keys(weeklyPoints).length > 0) {
-            var users = Object.keys(weeklyPoints);
-            var points = Object.values(weeklyPoints);
+		if (weeklyPoints && Object.keys(weeklyPoints).length > 0) {
+			var users = Object.keys(weeklyPoints);
+			var points = Object.values(weeklyPoints);
 
-            var ctx = document.getElementById('weeklyChart');
-            if (ctx) {
-                var chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: users,
-                        datasets: [{
-                            label: 'Points Earned',
-                            data: points,
-                            backgroundColor: 'rgba(0, 123, 255, 1)', // Blue color with transparency
-                            borderColor: 'rgba(0, 123, 255, 1)', // Solid blue color
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    precision: 0 // Display only whole numbers
-                                }
-                            }
-                        }
-                    }
-                });
-            } else {
-                console.error("Canvas element 'weeklyChart' not found.");
-            }
-        } else {
-            console.error("Weekly points data is null, undefined, or empty.");
-        }
-    }
+			var ctx = document.getElementById('weeklyChart');
+			if (ctx) {
+				var chart = new Chart(ctx, {
+					type: 'bar',
+					data: {
+						labels: users,
+						datasets: [{
+							label: 'Points Earned',
+							data: points,
+							backgroundColor: 'rgba(0, 123, 255, 1)',
+							borderColor: 'rgba(0, 123, 255, 1)',
+							borderWidth: 1
+						}]
+					},
+					options: {
+						scales: {
+							y: {
+								beginAtZero: true,
+								ticks: {
+									stepSize: 1,
+									precision: 0
+								}
+							}
+						}
+					}
+				});
+			} else {
+				console.error("Canvas element 'weeklyChart' not found.");
+			}
+		} else {
+			console.error("Weekly points data is null, undefined, or empty.");
+		}
+	}
 
-    function createPreviousWeekBarChart() {
-        var previousWeekPoints = @Html.Raw(Json.Serialize(Model.PreviousWeekPointsHistory));
+	function createPreviousWeekBarChart() {
+		var previousWeekPoints = @Html.Raw(Json.Serialize(Model.PreviousWeekPointsHistory));
 
-        if (previousWeekPoints && Object.keys(previousWeekPoints).length > 0) {
-            var users = Object.keys(previousWeekPoints);
-            var points = Object.values(previousWeekPoints);
+		if (previousWeekPoints && Object.keys(previousWeekPoints).length > 0) {
+			var users = Object.keys(previousWeekPoints);
+			var points = Object.values(previousWeekPoints);
 
-            var ctx = document.getElementById('previousWeekChart');
-            if (ctx) {
-                var chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: users,
-                        datasets: [{
-                            label: 'Points Earned',
-                            data: points,
-                            backgroundColor: 'rgba(255, 193, 7, 1)', // Orange color with transparency
-                            borderColor: 'rgba(255, 193, 7, 1)', // Solid orange color
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    precision: 0 // Display only whole numbers
-                                }
-                            }
-                        }
-                    }
-                });
-            } else {
-                console.error("Canvas element 'previousWeekChart' not found.");
-            }
-        } else {
-            console.error("Previous week points data is null, undefined, or empty.");
-        }
-    }
+			var ctx = document.getElementById('previousWeekChart');
+			if (ctx) {
+				var chart = new Chart(ctx, {
+					type: 'bar',
+					data: {
+						labels: users,
+						datasets: [{
+							label: 'Points Earned',
+							data: points,
+							backgroundColor: 'rgba(255, 193, 7, 1)',
+							borderColor: 'rgba(255, 193, 7, 1)',
+							borderWidth: 1
+						}]
+					},
+					options: {
+						scales: {
+							y: {
+								beginAtZero: true,
+								ticks: {
+									stepSize: 1,
+									precision: 0
+								}
+							}
+						}
+					}
+				});
+			} else {
+				console.error("Canvas element 'previousWeekChart' not found.");
+			}
+		} else {
+			console.error("Previous week points data is null, undefined, or empty.");
+		}
+	}
 
-    document.addEventListener("DOMContentLoaded", function () {
-        createBarChart(); // Create chart for this week
-        createPreviousWeekBarChart(); // Create chart for previous week
-    });
-
+	document.addEventListener("DOMContentLoaded", function () {
+		createBarChart();
+		createPreviousWeekBarChart();
+	});
 
 </script>

@@ -3,6 +3,7 @@ using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Home
@@ -23,8 +24,9 @@ namespace HomeChoreTracker.Portal.Pages.Home
 		public bool ShowPrevious => CurrentPage > 1;
 		public bool ShowNext => CurrentPage < TotalPages;
 		public int Id { get; set; }
+        public bool Unauthorized { get; set; }
 
-		public PointsHistoryModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public PointsHistoryModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
 		{
 			_httpClientFactory = httpClientFactory;
 			_config = configuration;
@@ -59,7 +61,12 @@ namespace HomeChoreTracker.Portal.Pages.Home
 
                     return Page();
                 }
-				else
+                else if (response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    Unauthorized = true;
+                    return Page();
+                }
+                else
 				{
 					return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
 				}

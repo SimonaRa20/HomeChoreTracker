@@ -33,14 +33,16 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly IGamificationRepository _gamificationRepository;
         private readonly IUserRepository _userRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IHomeRepository _homeRepository;
 
-		public FinanceController(IIncomeRepository incomeRepository, IExpenseRepository expenseRepository, IGamificationRepository gamificationRepository, IUserRepository userRepository, INotificationRepository notificationRepository)
+		public FinanceController(IIncomeRepository incomeRepository, IExpenseRepository expenseRepository, IHomeRepository homeRepository, IGamificationRepository gamificationRepository, IUserRepository userRepository, INotificationRepository notificationRepository)
 		{
 			_incomeRepository = incomeRepository;
 			_expenseRepository = expenseRepository;
             _gamificationRepository = gamificationRepository;
             _userRepository = userRepository;
             _notificationRepository = notificationRepository;
+            _homeRepository = homeRepository;
 		}
 
 		[HttpGet("totalIncome")]
@@ -52,11 +54,18 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(totalIncome);
 		}
 
-        [HttpGet("totalIncome/{id}")]
+        [HttpGet("totalIncome/{homeId}")]
         [Authorize]
-        public async Task<IActionResult> GetCurrentMonthTotalIncome(int id)
+        public async Task<IActionResult> GetCurrentMonthTotalIncome(int homeId)
         {
-            decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalHomeIncome(id);
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            bool isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+            if (!isMember)
+            {
+                return Forbid();
+            }
+            decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalHomeIncome(homeId);
             return Ok(totalIncome);
         }
 
@@ -231,6 +240,13 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetCurrentMonthTotalExpense(int id)
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            bool isMember = await _homeRepository.OrHomeMember(id, userId);
+
+            if (!isMember)
+            {
+                return Forbid();
+            }
             decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalHomeExpense(id);
             return Ok(totalExpense);
         }
@@ -737,6 +753,13 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetCurrentMonthTotalBalance(int id)
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            bool isMember = await _homeRepository.OrHomeMember(id, userId);
+
+            if (!isMember)
+            {
+                return Forbid();
+            }
             decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalHomeIncome(id);
             decimal totalExpense = await _expenseRepository.GetCurrentMonthTotalHomeExpense(id);
             decimal totalBalance = totalIncome - totalExpense;
@@ -776,6 +799,13 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetMonthlySummary(int id)
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            bool isMember = await _homeRepository.OrHomeMember(id, userId);
+
+            if (!isMember)
+            {
+                return Forbid();
+            }
             DateTime currentDate = DateTime.UtcNow;
             DateTime startDate = currentDate.AddMonths(-12).Date;
             List<MonthlySummary> monthlySummaries = new List<MonthlySummary>();
@@ -823,6 +853,13 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetExpenseCategories(int id)
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            bool isMember = await _homeRepository.OrHomeMember(id, userId);
+
+            if (!isMember)
+            {
+                return Forbid();
+            }
             var categories = await _expenseRepository.GetExpenseCategories();
             var categoryCounts = new Dictionary<string, int>();
 
@@ -842,6 +879,13 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetIncomeCategories(int id)
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            bool isMember = await _homeRepository.OrHomeMember(id, userId);
+
+            if (!isMember)
+            {
+                return Forbid();
+            }
             var categories = await _incomeRepository.GetIncomeCategories();
             var categoryCounts = new Dictionary<string, int>();
 

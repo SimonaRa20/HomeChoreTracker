@@ -20,7 +20,7 @@
 {
 	Response.Redirect("/Auth/Login");
 }
-else
+else if (User.IsInRole("User"))
 {
 	<div class="row">
 		<div class="col-lg-12">
@@ -32,29 +32,41 @@ else
 			<a class="btn btn-secondary btn-sm mb-2" asp-page="./Invite" asp-route-id="@Model.Id"><i class="fa fa-user-plus mr-2" aria-hidden="true"></i>Add new home member</a>
 
 			<div class="card mb-4 py-3 border-left-info">
-
 				<div class="card-body">
-					<form method="post" asp-page-handler="GenerateInvitation">
-						<div class="form-group">
-							<label for="InviteeEmail">Invitee Email</label>
-							<input type="email" class="form-control" id="InviteeEmail" name="InviteUserRequest.InviteeEmail" asp-for="InviteUserRequest.InviteeEmail">
-							<span asp-validation-for="InviteUserRequest.InviteeEmail" class="text-danger"></span>
-						</div>
-						<div class="text-danger">
-							@if (!ModelState.IsValid)
-							{
-								<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
-									@foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-									{
-										<li>@error.ErrorMessage</li>
-									}
-								</ul>
-							}
-						</div>
-						<button type="submit" class="btn btn-info">Send Invitation</button>
-					</form>
+					@if (Model.Unauthorized)
+					{
+						<p>You don't have permission to view this content.</p>
+					}
+					else
+					{
+						<form method="post" asp-page-handler="GenerateInvitation">
+							<div class="form-group">
+								<label for="InviteeEmail">Invitee Email</label>
+								<input type="email" class="form-control" id="InviteeEmail" name="InviteUserRequest.InviteeEmail" asp-for="InviteUserRequest.InviteeEmail">
+								<span asp-validation-for="InviteUserRequest.InviteeEmail" class="text-danger"></span>
+							</div>
+							<div class="text-danger">
+								@if (!ModelState.IsValid)
+								{
+									<ul style="list-style-type:none; padding-left: 0; margin-left: 0;">
+										@foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+										{
+											<li>@error.ErrorMessage</li>
+										}
+									</ul>
+								}
+							</div>
+							<button type="submit" class="btn btn-info">Send Invitation</button>
+						</form>
+					}
 				</div>
 			</div>
 		</div>
+	</div>
+}
+else
+{
+	<div>
+		<p>You don't have permission to view this content.</p>
 	</div>
 }

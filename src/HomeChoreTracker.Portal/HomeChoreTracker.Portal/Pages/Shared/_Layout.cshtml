@@ -104,13 +104,11 @@
                             <i class="fa fa-bars"></i>
                         </button>
 
-                        <!-- ... Other code ... -->
-                        <!-- Navbar -->
                         <ul class="navbar-nav ml-auto">
-
-
-
-                            @await Component.InvokeAsync("NotificationList")
+                            @if (User.IsInRole("User"))
+                            {
+                                @await Component.InvokeAsync("NotificationList")
+                            }
                             <li class="nav-item dropdown no-arrow">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
@@ -127,9 +125,6 @@
                                 </div>
                             </li>
                         </ul>
-
-                        <!-- ... Other code ... -->
-
                     </nav>
 
                     <div class="container-fluid">

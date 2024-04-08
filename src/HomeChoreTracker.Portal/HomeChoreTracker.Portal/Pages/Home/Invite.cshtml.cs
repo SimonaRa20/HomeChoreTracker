@@ -1,6 +1,8 @@
 using HomeChoreTracker.Portal.Models.Home;
+using HomeChoreTracker.Portal.Models.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net;
 using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Home
@@ -15,25 +17,50 @@ namespace HomeChoreTracker.Portal.Pages.Home
 
 		[BindProperty]
 		public InviteUserRequest InviteUserRequest { get; set; }
+        public bool Unauthorized { get; set; }
 
-		public InviteModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public InviteModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
 		{
 			_httpClientFactory = httpClientFactory;
 			_config = configuration;
 		}
 
-		public void OnGet(int id)
-		{
+		public async Task<IActionResult> OnGetAsync(int id)
+        {
 			Id = id;
-		}
+
+            var token = User.FindFirstValue("Token");
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_config["ApiUrl"]}/Home/CheckOrHomeMember/{id}";
+
+                var response = await httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Page();
+                }
+                else if (response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    Unauthorized = true;
+                    return Page();
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {response.ReasonPhrase}");
+                    return Page();
+                }
+            }
+        }
 
 
 		public async Task<IActionResult> OnPostGenerateInvitationAsync()
 		{
 			if (!ModelState.IsValid)
 			{
-				OnGet(Id);
-				return Page();
+				return await OnGetAsync(Id);
 			}
 
 			try
@@ -61,9 +88,8 @@ namespace HomeChoreTracker.Portal.Pages.Home
 			}
 			catch (Exception ex)
 			{
-				OnGet(Id);
 				ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-				return Page();
+				return await OnGetAsync(Id);
 			}
 		}
 	}

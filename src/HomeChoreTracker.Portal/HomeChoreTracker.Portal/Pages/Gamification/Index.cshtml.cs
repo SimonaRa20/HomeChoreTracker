@@ -42,7 +42,7 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
                 }
                 else
                 {
-                    return BadRequest($"Failed to retrieve data: {response.ReasonPhrase}");
+                    return Page();
                 }
             }
         }

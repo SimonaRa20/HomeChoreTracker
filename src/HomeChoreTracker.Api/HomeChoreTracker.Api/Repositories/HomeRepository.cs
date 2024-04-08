@@ -52,8 +52,6 @@ namespace HomeChoreTracker.Api.Repositories
             }
             else
             {
-                // Handle the scenario where the GamificationLevel with ID 1 doesn't exist
-                // For example, log an error or throw an exception
                 throw new Exception("Default GamificationLevel not found");
             }
         }

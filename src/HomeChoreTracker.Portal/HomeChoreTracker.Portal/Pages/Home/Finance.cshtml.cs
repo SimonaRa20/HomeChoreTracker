@@ -2,6 +2,7 @@ using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Finance;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net;
 using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Home
@@ -16,7 +17,7 @@ namespace HomeChoreTracker.Portal.Pages.Home
         public List<MonthlySummary> MonthlySummaries { get; set; }
         public Dictionary<string, int> ExpenseCategories { get; set; }
         public Dictionary<string, int> IncomeCategories { get; set; }
-
+        public bool Unauthorized { get; set; }
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
@@ -83,9 +84,20 @@ namespace HomeChoreTracker.Portal.Pages.Home
         private async Task<T> GetApiResponse<T>(HttpClient httpClient, string apiUrl)
         {
             var response = await httpClient.GetAsync(apiUrl);
-            response.EnsureSuccessStatusCode(); 
-
-            return await response.Content.ReadFromJsonAsync<T>();
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<T>();
+            }
+            else if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                Unauthorized = true;
+                return default;
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();
+                return default;
+            }
         }
     }
 }

@@ -67,18 +67,26 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok(homes);
         }
 
-        [HttpGet("Level/{id}")]
+        [HttpGet("Level/{homeId}")]
         [Authorize(Roles = Role.User)]
-        public async Task<IActionResult> GetHomePlant(int id)
+        public async Task<IActionResult> GetHomePlant(int homeId)
         {
-            Home home = await _homeRepository.GetHome(id);
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            Home home = await _homeRepository.GetHome(homeId);
 
             if (home == null)
             {
                 return NotFound("This home not found.");
             }
 
-            List<PointsHistory> pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
+            bool isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+            if(!isMember)
+            {
+                return Forbid();
+            }
+
+            List<PointsHistory> pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(homeId);
 
             int sum = 0;
 
@@ -112,15 +120,23 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok(levelRequest);
         }
 
-        [HttpPut("Level/{id}")]
+        [HttpPut("Level/{homeId}")]
         [Authorize(Roles = Role.User)]
-        public async Task<IActionResult> UpdateHomePlant(int id)
+        public async Task<IActionResult> UpdateHomePlant(int homeId)
         {
-            Home home = await _homeRepository.GetHome(id);
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+            Home home = await _homeRepository.GetHome(homeId);
 
             if (home == null)
             {
                 return NotFound("This home not found.");
+            }
+
+            bool isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+            if (!isMember)
+            {
+                return Forbid();
             }
 
             GamificationLevel gamificationNowLevel = await _gamificationRepository.GetGamificationLevel(home.GamificationLevelId);
@@ -128,13 +144,13 @@ namespace HomeChoreTracker.Api.Controllers
             PointsHistory pointsHistory = new PointsHistory
             {
                 EarnedPoints = -(int)gamificationNextLevel.PointsRequired,
-                HomeId = id,
+                HomeId = homeId,
                 Text = $"Upgrade home plant from {gamificationNowLevel.LevelId} level to {gamificationNextLevel.LevelId} level",
                 EarnedDate = DateTime.Now
             };
             await _gamificationRepository.AddPointsHistory(pointsHistory);
 
-            var members = await _homeRepository.GetHomeMembers(id);
+            var members = await _homeRepository.GetHomeMembers(homeId);
 
             foreach (var member in members)
             {
@@ -159,13 +175,23 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok("Upgrade home level");
         }
 
-        [HttpGet("{id}/skip{skip}/take{take}")]
+        [HttpGet("{homeId}/skip{skip}/take{take}")]
         [Authorize]
-        public async Task<IActionResult> GetPointsHistoryBase(int id, int skip = 0, int take = 10)
+        public async Task<IActionResult> GetPointsHistoryBase(int homeId, int skip = 0, int take = 10)
         {
             try
             {
-                var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
+                int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+                bool isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+                if (!isMember)
+                {
+                    return Forbid();
+                }
+
+                var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(homeId);
+
                 List<PointsHistory> points = pointsHistory.OrderBy(h => h.EarnedDate).Skip(skip).Take(take).ToList();
                 List<PointsResponse> response = new List<PointsResponse>();
 
@@ -189,13 +215,22 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{homeId}")]
         [Authorize]
-        public async Task<IActionResult> GetPointsHistoryBase(int id)
+        public async Task<IActionResult> GetPointsHistoryBase(int homeId)
         {
             try
             {
-                var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(id);
+                int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+                bool isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+                if (!isMember)
+                {
+                    return Forbid();
+                }
+
+
+                var pointsHistory = await _gamificationRepository.GetPointsHistoryByHomeId(homeId);
                 List<PointsHistory> points = pointsHistory.OrderBy(h => h.EarnedDate).ToList();
                 List<PointsResponse> response = new List<PointsResponse>();
 
@@ -212,6 +247,28 @@ namespace HomeChoreTracker.Api.Controllers
                 }
 
                 return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred while fetching points history: {ex.Message}");
+            }
+        }
+
+        [HttpGet("CheckOrHomeMember/{homeId}")]
+        [Authorize]
+        public async Task<IActionResult> CheckOrHomeMember(int homeId)
+        {
+            try
+            {
+                int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+                bool isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+                if (!isMember)
+                {
+                    return Forbid();
+                }
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -356,7 +413,6 @@ namespace HomeChoreTracker.Api.Controllers
         public async Task<IActionResult> GetHomeMembers(int homeId)
         {
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-
             var isMember = await _homeRepository.OrHomeMember(homeId, userId);
 
             if (!isMember)
