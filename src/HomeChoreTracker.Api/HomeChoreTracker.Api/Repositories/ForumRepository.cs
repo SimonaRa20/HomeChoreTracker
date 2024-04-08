@@ -47,17 +47,19 @@ namespace HomeChoreTracker.Api.Repositories
 
 		public async Task<List<AdviceResponse>> GetAll(int userId)
 		{
-			List<UserHomes> userHomes = await _dbContext.UserHomes
+			List<int> homesList = await _dbContext.UserHomes
 				.Where(x => x.UserId == userId)
+				.Select(x => x.HomeId)
 				.ToListAsync();
 
-			List<int> otherUserIds = userHomes
-				.Select(uh => uh.UserId)
+			List<int> userList = await _dbContext.UserHomes
+				.Where(x => homesList.Contains(x.HomeId))
+				.Select(x => x.UserId)
 				.Distinct()
-				.ToList();
+				.ToListAsync();
 
 			var advices = await _dbContext.Advices
-				.Where(e => e.UserId == userId || otherUserIds.Contains(e.UserId) || e.IsPublic)
+				.Where(e => e.IsPublic || homesList.Contains(e.UserId) || userList.Contains(e.UserId))
 				.ToListAsync();
 
 			var adviceResponses = advices.Select(advice => new AdviceResponse
@@ -69,7 +71,10 @@ namespace HomeChoreTracker.Api.Repositories
 				Description = advice.Description,
 				IsPublic = advice.IsPublic,
 				UserId = advice.UserId,
-				UserName = advice.UserId == userId ? _dbContext.Users.Where(x => x.Id == userId).FirstOrDefault()?.UserName : _dbContext.Users.Where(x => x.Id == advice.UserId).FirstOrDefault()?.UserName
+				UserName = _dbContext.Users
+					.Where(x => x.Id == advice.UserId)
+					.Select(x => x.UserName)
+					.FirstOrDefault()
 			}).ToList();
 
 			return adviceResponses;

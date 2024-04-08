@@ -49,7 +49,7 @@ namespace HomeChoreTracker.Api.Controllers
             if (!hasBadge)
             {
                 BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(userId);
-                wallet.CreateFirstExpense = true;
+                wallet.CreateFirstAdvice = true;
                 await _gamificationRepository.UpdateBadgeWallet(wallet);
 
                 Notification notification = new Notification
