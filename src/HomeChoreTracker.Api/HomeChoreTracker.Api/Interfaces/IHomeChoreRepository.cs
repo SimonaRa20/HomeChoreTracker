@@ -29,7 +29,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task DeleteNotAssignedTasks(int id);
         Task<bool> VoteArtical(int taskId, int userId, int voteValue);
         Task<int> GetTotalVotes(int taskId);
-        Task<List<TaskAssignment>> GetDoneTaskAssigment(int id);
+        Task<List<TaskAssignment>> GetDoneTasks(DateTime date);
+		Task<List<TaskAssignment>> GetDoneTaskAssigment(int id);
         Task<List<TaskAssignment>> GetDoneTaskAssigments(int userId);
     }
 }

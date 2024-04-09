@@ -213,7 +213,12 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.TaskAssignments.Where(x => x.HomeId.Equals(id)).ToListAsync();
         }
 
-        public async Task<bool> CheckOrHomeChoreWasAssigned(int id)
+		public async Task<List<TaskAssignment>> GetDoneTasks(DateTime date)
+		{
+			return await _dbContext.TaskAssignments.Where(x => x.EndDate < date && !x.IsDone).ToListAsync();
+		}
+
+		public async Task<bool> CheckOrHomeChoreWasAssigned(int id)
         {
             List<TaskAssignment> tasks = await _dbContext.TaskAssignments.Where(x => x.TaskId.Equals(id)).ToListAsync();
             bool flag = false;
