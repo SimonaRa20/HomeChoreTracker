@@ -32,5 +32,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<List<TaskAssignment>> GetDoneTasks(DateTime date);
 		Task<List<TaskAssignment>> GetDoneTaskAssigment(int id);
         Task<List<TaskAssignment>> GetDoneTaskAssigments(int userId);
-    }
+        Task<List<TaskAssignment>> GetThisDayAssignedTasks(int userId, DateTime time);
+		Task<List<TaskAssignment>> GetNextDayAssignedTasks(int userId, DateTime time);
+
+	}
 }

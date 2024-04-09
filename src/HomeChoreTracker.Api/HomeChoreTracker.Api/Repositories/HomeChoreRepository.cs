@@ -169,8 +169,23 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.TaskAssignments.Where(x => x.HomeMemberId.Equals(userId)).ToListAsync();
         }
 
+		public async Task<List<TaskAssignment>> GetThisDayAssignedTasks(int userId, DateTime time)
+		{
+			return await _dbContext.TaskAssignments
+				.Where(x => x.HomeMemberId == userId && x.StartDate.Date == time)
+				.ToListAsync();
+		}
 
-        public async Task<int> GetTotalPointsAssigned(int memberId)
+		public async Task<List<TaskAssignment>> GetNextDayAssignedTasks(int userId, DateTime time)
+		{
+			DateTime nextDay = time.Date.AddDays(1);
+
+			return await _dbContext.TaskAssignments
+				.Where(x => x.HomeMemberId == userId && x.StartDate.Date == nextDay)
+				.ToListAsync();
+		}
+
+		public async Task<int> GetTotalPointsAssigned(int memberId)
         {
             var assignments = await _dbContext.TaskAssignments
                 .Where(assignment => assignment.HomeMemberId == memberId)
