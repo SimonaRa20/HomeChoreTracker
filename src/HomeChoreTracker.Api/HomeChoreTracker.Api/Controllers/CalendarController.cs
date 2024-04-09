@@ -216,7 +216,7 @@ public class CalendarController : Controller
 
         while (true)
         {
-            suitableIntervals = GetSuitableIntervalsForDay(user, currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals);
+            suitableIntervals = GetSuitableIntervalsForDay(currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals);
 
             if (suitableIntervals.Any())
             {
@@ -293,7 +293,7 @@ public class CalendarController : Controller
 
         while (true)
         {
-            suitableIntervals = GetSuitableIntervalsForDay(user, currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals);
+            suitableIntervals = GetSuitableIntervalsForDay(currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals);
 
             if (suitableIntervals.Any())
             {
@@ -306,98 +306,95 @@ public class CalendarController : Controller
         return suitableIntervals;
     }
 
-    private List<(DateTime start, DateTime end)> GetSuitableIntervalsForDay(User user, DateTime date, TimeSpan startDayTime, TimeSpan endDayTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals)
-    {
-        List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
+	private List<(DateTime start, DateTime end)> GetSuitableIntervalsForDay(DateTime date, TimeSpan startDayTime, TimeSpan endDayTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals)
+	{
+		List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
 
-        DateTime dayStart = date.Date.Add(startDayTime);
-        DateTime dayEnd = date.Date.Add(endDayTime);
+		DateTime dayStart = date.Date.Add(startDayTime);
+		DateTime dayEnd = date.Date.Add(endDayTime);
 
-        suitableIntervals.Add((dayStart, dayEnd));
+		suitableIntervals.Add((dayStart, dayEnd));
 
-        if (events != null)
-        {
-            foreach (var e in events)
-            {
-                List<(DateTime start, DateTime end)> updatedIntervals = new List<(DateTime start, DateTime end)>();
+		if (events != null)
+		{
+			foreach (var e in events)
+			{
+				List<(DateTime start, DateTime end)> updatedIntervals = new List<(DateTime start, DateTime end)>();
 
-                foreach (var interval in suitableIntervals)
-                {
-                    if (interval.end > e.StartDate && interval.start < e.EndDate)
-                    {
-                        if (interval.start < e.StartDate)
-                            updatedIntervals.Add((interval.start, e.StartDate));
-                        if (interval.end > e.EndDate)
-                            updatedIntervals.Add((e.EndDate, interval.end));
-                    }
-                    else
-                    {
-                        updatedIntervals.Add(interval);
-                    }
-                }
+				foreach (var interval in suitableIntervals)
+				{
+					if (interval.end > e.StartDate && interval.start < e.EndDate)
+					{
+						if (interval.start < e.StartDate)
+							updatedIntervals.Add((interval.start, e.StartDate));
+						if (interval.end > e.EndDate)
+							updatedIntervals.Add((e.EndDate, interval.end));
+					}
+					else
+					{
+						updatedIntervals.Add(interval);
+					}
+				}
 
-                suitableIntervals = updatedIntervals;
-            }
-        }
-        busyIntervals = busyIntervals.OrderBy(x => x.StartTime).ToList();
+				suitableIntervals = updatedIntervals;
+			}
+		}
 
-        foreach (BusyInterval busyInterval in busyIntervals)
-        {
-            foreach (var interval in suitableIntervals.ToList())
-            {
-                if (interval.end.TimeOfDay > busyInterval.StartTime && interval.start.TimeOfDay < busyInterval.EndTime)
-                {
-                    suitableIntervals.Remove(interval);
-                    if (interval.start.TimeOfDay < busyInterval.StartTime)
-                        suitableIntervals.Add((interval.start, interval.start.Add(busyInterval.StartTime - interval.start.TimeOfDay)));
-                    if (interval.end.TimeOfDay > busyInterval.EndTime)
-                        suitableIntervals.Add((interval.start.Add(busyInterval.EndTime - interval.start.TimeOfDay), interval.end));
-                }
-            }
-        }
+		busyIntervals = busyIntervals.OrderBy(x => x.StartTime).ToList();
 
-        suitableIntervals = suitableIntervals
-            .Where(i => (i.end - i.start).TotalMinutes >= GetMinutesFromTimeLong(choreTime))
-            .ToList();
+		foreach (BusyInterval busyInterval in busyIntervals)
+		{
+			List<(DateTime start, DateTime end)> updatedIntervals = new List<(DateTime start, DateTime end)>();
 
-        foreach (var assignedTask in assignedTasks)
-        {
-            foreach (var interval in suitableIntervals.ToList())
-            {
-                if (interval.end.TimeOfDay > assignedTask.StartDate.TimeOfDay && interval.start.TimeOfDay < assignedTask.EndDate.TimeOfDay)
-                {
-                    suitableIntervals.Remove(interval);
-                    if (interval.start.TimeOfDay < assignedTask.StartDate.TimeOfDay)
-                        suitableIntervals.Add((interval.start, interval.start.Add(assignedTask.StartDate.TimeOfDay - interval.start.TimeOfDay)));
-                    if (interval.end.TimeOfDay > assignedTask.StartDate.TimeOfDay)
-                        suitableIntervals.Add((interval.start.Add(assignedTask.EndDate.TimeOfDay - interval.start.TimeOfDay), interval.end));
-                }
-            }
-            suitableIntervals.RemoveAll(interval =>
-            assignedTask.StartDate < interval.end &&
-            assignedTask.EndDate > interval.start);
-        }
-        return suitableIntervals;
-    }
+			foreach (var interval in suitableIntervals)
+			{
+				if (interval.end.TimeOfDay > busyInterval.StartTime && interval.start.TimeOfDay < busyInterval.EndTime)
+				{
+					if (interval.start.TimeOfDay < busyInterval.StartTime)
+						updatedIntervals.Add((interval.start, interval.start.Date.Add(busyInterval.StartTime)));
+					if (interval.end.TimeOfDay > busyInterval.EndTime)
+						updatedIntervals.Add((interval.start.Date.Add(busyInterval.EndTime), interval.end));
+				}
+				else
+				{
+					updatedIntervals.Add(interval);
+				}
+			}
+
+			suitableIntervals = updatedIntervals;
+		}
+
+		suitableIntervals = suitableIntervals
+			.Where(i => (i.end - i.start).TotalMinutes >= GetMinutesFromTimeLong(choreTime))
+			.ToList();
+
+		foreach (var assignedTask in assignedTasks)
+		{
+			List<(DateTime start, DateTime end)> updatedIntervals = new List<(DateTime start, DateTime end)>();
+
+			foreach (var interval in suitableIntervals)
+			{
+				if (!(assignedTask.EndDate <= interval.start || assignedTask.StartDate >= interval.end))
+				{
+					if (assignedTask.StartDate > interval.start)
+						updatedIntervals.Add((interval.start, assignedTask.StartDate));
+					if (assignedTask.EndDate < interval.end)
+						updatedIntervals.Add((assignedTask.EndDate, interval.end));
+				}
+				else
+				{
+					updatedIntervals.Add(interval);
+				}
+			}
+
+			suitableIntervals = updatedIntervals;
+		}
+
+		return suitableIntervals;
+	}
 
 
-    private IEnumerable<(DateTime start, DateTime end)> GetFreeIntervals(DateTime referenceDate, DateTime eventStart, DateTime eventEnd, int startHour, int endHour)
-    {
-        if (eventStart.Date == referenceDate.Date)
-        {
-            if (eventStart.Hour > startHour)
-                yield return (referenceDate.Date.AddHours(startHour), eventStart);
-
-            if (eventEnd.Hour < endHour)
-                yield return (eventEnd, referenceDate.Date.AddHours(endHour));
-        }
-        else
-        {
-            yield return (referenceDate.Date.AddHours(startHour), referenceDate.Date.AddHours(endHour));
-        }
-    }
-
-    private int GetMinutesFromTimeLong(TimeLong timeLong)
+	private int GetMinutesFromTimeLong(TimeLong timeLong)
     {
         switch (timeLong)
         {
