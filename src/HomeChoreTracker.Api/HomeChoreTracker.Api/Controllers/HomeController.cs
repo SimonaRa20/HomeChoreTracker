@@ -67,7 +67,17 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok(homes);
         }
 
-        [HttpGet("Level/{homeId}")]
+		[HttpGet("Level")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> GetMaxLevel()
+		{
+			GamificationLevel level = await _gamificationRepository.GetMaxLevel();
+
+			return Ok(level.LevelId);
+		}
+
+
+		[HttpGet("Level/{homeId}")]
         [Authorize(Roles = Role.User)]
         public async Task<IActionResult> GetHomePlant(int homeId)
         {

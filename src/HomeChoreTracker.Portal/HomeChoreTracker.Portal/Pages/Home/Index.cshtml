@@ -80,8 +80,8 @@ else if (User.IsInRole("User"))
 								<img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.LevelResponse.GamificationLevel.Image)" alt="Level Image" class="card-img-top" style="object-fit: cover; height: auto; max-height: 200px; width: auto; max-width: 100%;" />
 							</div>
 							<div class="text-center mt-4 ml-4">
-								@if (percentage >= 100)
-								{
+								@if (percentage >= 100 && Model.LevelResponse.GamificationLevelId < Model.Level)
+											{
 									<form method="post">
 										<input type="hidden" id="editHomeId" name="homeId" value="@Model.Id" />
 										<button type="submit" class="btn btn-primary mr-4">Upgrade your plant</button>

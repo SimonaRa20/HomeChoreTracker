@@ -39,5 +39,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<bool> UserHasDoneTwentyFiveTaskPerWeekBadge(int userId);
         Task<int> GetUserBadgesCountByUserId(int userId);
         Task<int> GetUserPointsByUserId(int userId);
-    }
+        Task<GamificationLevel> GetMaxLevel();
+
+	}
 }
