@@ -21,11 +21,8 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<ShoppingItem> ShoppingItems { get; set; }
         public DbSet<HomeChoreTask> HomeChoreTasks { get; set; }
         public DbSet<PointsHistory> PointsHistory { get; set; }
-        public DbSet<TaskApproval> TaskApprovals { get; set; }
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
-        public DbSet<TaskSchedule> TaskSchedules { get; set; }
         public DbSet<Event> Events { get; set; }
-        public DbSet<Schedule> Schedules { get; set; }
         public DbSet<TaskVote> TaskVotes { get; set; }
         public DbSet<Advice> Advices { get; set; }
         public DbSet<BusyInterval> BusyIntervals { get; set; }

@@ -63,9 +63,11 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 var hashedPassword = HashPassword(user.Password);
-                user.Password = hashedPassword;
-
-                User userDto = _mapper.Map<User>(user);
+           
+                User userDto = new User();
+                userDto.UserName = user.UserName;
+                userDto.Email = user.Email;
+                userDto.Password = hashedPassword;
                 userDto.Role = Role.User;
                 userDto.StartDayTime = new TimeSpan(8, 0, 0);
                 userDto.EndDayTime = new TimeSpan(22, 0, 0);
@@ -153,8 +155,8 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
-                string fromMail = _config["EmailConfigServer:Email"];
-                string fromPassword = _config["EmailConfigServer:Password"];
+                string fromMail = "homechoretracker@gmail.com";
+                string fromPassword = "fbkigruisnpntbww";
 
                 MailMessage message = new MailMessage();
                 message.From = new MailAddress(fromMail);
@@ -163,9 +165,9 @@ namespace HomeChoreTracker.Api.Controllers
                 message.Body = $"<html><body>Click the following link to reset your password: <a href=\"{resetLink}\">{resetLink}</a></body></html>";
                 message.IsBodyHtml = true;
 
-                var smtpClient = new SmtpClient(_config["EmailConfigServer:Server"])
+                var smtpClient = new SmtpClient("smtp.gmail.com")
                 {
-                    Port = int.Parse(_config["EmailConfigServer:Port"]),
+                    Port = 587,
                     Credentials = new NetworkCredential(fromMail, fromPassword),
                     EnableSsl = true,
                     UseDefaultCredentials = false,
@@ -231,7 +233,7 @@ namespace HomeChoreTracker.Api.Controllers
         private string GeneratePasswordResetToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes("hdtp26741yyeett212rrrr1111de32132128bhwi");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.Id.ToString()) }),

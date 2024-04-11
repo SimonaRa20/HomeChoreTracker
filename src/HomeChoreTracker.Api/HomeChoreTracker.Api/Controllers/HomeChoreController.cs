@@ -483,17 +483,6 @@ namespace HomeChoreTracker.Api.Controllers
                 DateTime startDate = (DateTime)homeChore.StartDate;
                 DateTime endDate = (DateTime)homeChore.EndDate;
                 int id = homeChore.Id;
-                
-                TaskSchedule taskSchedule = new TaskSchedule
-                {
-                    TaskId = id,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                };
-
-                await _homeChoreRepository.SetHomeChoreDates(taskSchedule);
-                await _homeChoreRepository.Save();
-
 
                 if (homeChore.Unit == RepeatUnit.Day)
                 {
