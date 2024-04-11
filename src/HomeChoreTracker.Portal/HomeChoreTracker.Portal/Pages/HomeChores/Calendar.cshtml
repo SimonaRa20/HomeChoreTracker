@@ -165,6 +165,17 @@ else
 		</div>
 	</div>
 </div>
+@{
+	var userColors = new string[] { "#FAEDCB", "#C9E4DE", "#C6DEF1", "#DBCDF0", "#F2C6DE", "#F8F3E8", "#E6F8F6", "#F8DBB8", "#CDE8E6", "F6C7B3", "5B96A9" };
+	var assignedUsers = Model.HomeChoreResponse.Select(c => c.HomeMemberId).Distinct().Where(id => id != null).ToList();
+	Dictionary<string, string> userColorMap = new Dictionary<string, string>();
+
+	for (int i = 0; i < assignedUsers.Count; i++)
+	{
+		string userKey = assignedUsers[i].ToString();
+		userColorMap.Add(userKey, userColors[i % userColors.Length]);
+	}
+}
 
 <script>
 	$(function () {
@@ -185,8 +196,8 @@ else
 						type: '@chore.Task.ChoreType',
 						time: '@chore.Task.Time',
 						assigned: '@chore.HomeMemberId',
-						color: '@(chore.HomeMemberId == null ? "#4e73df" : "#1cc88a")',
-						textColor: 'white',
+						color: '@(chore.HomeMemberId == null ? "#4e73df" : userColorMap.GetValueOrDefault(chore.HomeMemberId.ToString(), "#4e73df"))',
+						textColor: '@(chore.HomeMemberId == null ? "white" : "black")',
 						isDone: '@chore.IsDone',
 						votes: '@chore.TotalVotes'
 					},

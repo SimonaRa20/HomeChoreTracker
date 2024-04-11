@@ -31,6 +31,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
 		public async Task<IActionResult> OnGetAsync(int id)
 		{
+            Id = id;
 			var token = User.FindFirstValue("Token");
 			using (var httpClient = _httpClientFactory.CreateClient())
 			{
