@@ -124,7 +124,7 @@ namespace HomeChoreTracker.Api.Controllers
                 var accessToken = GenerateAccessToken(user);
 
                 var userLoginResponse = LoginResponse(user, accessToken);
-                return Created("", userLoginResponse);
+                return Ok(userLoginResponse);
             }
 
             return NotFound("Invalid email or password. Please try again.");

@@ -5,7 +5,9 @@ VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeChoreTracker.Api", "HomeChoreTracker.Api\HomeChoreTracker.Api.csproj", "{4068231E-7019-40C5-BFC5-D3147C0E272D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeChoreTracker.Api.Tests", "HomeChoreTracker.Api.Tests\HomeChoreTracker.Api.Tests.csproj", "{1A6D4AFC-46A1-466F-97A4-F3EAC04B7322}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeChoreTracker.Api.Tests", "HomeChoreTracker.Api.Tests\HomeChoreTracker.Api.Tests.csproj", "{1A6D4AFC-46A1-466F-97A4-F3EAC04B7322}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeChoreTracker.Api.IntegrationTests", "HomeChoreTracker.Api.IntegrationTests\HomeChoreTracker.Api.IntegrationTests.csproj", "{67E78506-7E9C-4C42-9D4F-148568B0240A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{1A6D4AFC-46A1-466F-97A4-F3EAC04B7322}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A6D4AFC-46A1-466F-97A4-F3EAC04B7322}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A6D4AFC-46A1-466F-97A4-F3EAC04B7322}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67E78506-7E9C-4C42-9D4F-148568B0240A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67E78506-7E9C-4C42-9D4F-148568B0240A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67E78506-7E9C-4C42-9D4F-148568B0240A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67E78506-7E9C-4C42-9D4F-148568B0240A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
