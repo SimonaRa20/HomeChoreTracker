@@ -1,4 +1,6 @@
+using AutoFixture;
 using AutoMapper;
+using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Auth;
 using HomeChoreTracker.Api.Contracts.User;
 using HomeChoreTracker.Api.Controllers;
@@ -22,153 +24,212 @@ namespace HomeChoreTracker.Api.Tests
 {
 	public class AuthControllerTests
 	{
-		private readonly AuthController _authController;
+		private readonly Fixture _fixture;
 		private readonly Mock<IAuthRepository> _authRepositoryMock;
-		private readonly Mock<IConfiguration> _config;
 		private readonly Mock<IMapper> _mapperMock;
+		private readonly AuthController _authController;
 
 		public AuthControllerTests()
 		{
-			_mapperMock = new Mock<IMapper>();
-			_config = new Mock<IConfiguration>();
+			_fixture = new Fixture();
 			_authRepositoryMock = new Mock<IAuthRepository>();
-			_authController = new AuthController(_config.Object, _authRepositoryMock.Object, _mapperMock.Object);
+			_mapperMock = new Mock<IMapper>();
+			_authController = new AuthController(null, _authRepositoryMock.Object, _mapperMock.Object);
 		}
 
 		[Fact]
-		public async Task Register_ValidUser_ReturnsCreatedResult()
+		public async Task Register_Returns_CreatedResult_When_ValidInput()
 		{
 			// Arrange
-			var userRequest = new UserRegisterRequest
-			{
-				UserName = "test",
-				Email = "test@example.com",
-				Password = "password"
-			};
-			_authRepositoryMock.Setup(repo => repo.GetUserByEmail(It.IsAny<string>())).ReturnsAsync((User)null);
-			_authRepositoryMock.Setup(repo => repo.AddUser(It.IsAny<User>())).Returns(Task.CompletedTask);
-			_authRepositoryMock.Setup(repo => repo.Save()).Returns(Task.CompletedTask);
+			var userRegisterRequest = _fixture.Create<UserRegisterRequest>();
+			userRegisterRequest.Email = "test@gmail.com";
+			userRegisterRequest.Password = "short123456";
 
 			// Act
-			var result = await _authController.Register(userRequest) as CreatedResult;
+			var result = await _authController.Register(userRegisterRequest);
 
 			// Assert
-			Assert.NotNull(result);
-			Assert.Equal((int)HttpStatusCode.Created, result.StatusCode);
+			var createdResult = Assert.IsType<CreatedResult>(result);
+			Assert.Equal((int)HttpStatusCode.Created, createdResult.StatusCode);
+
+			var responseData = Assert.IsAssignableFrom<UserRegisterResponse>(createdResult.Value);
+			Assert.Equal(responseData.Id, responseData.Id);
+			Assert.Equal(responseData.UserName, responseData.UserName);
+			Assert.Equal(responseData.Email, responseData.Email);
+		}
+
+
+		[Fact]
+		public async Task Register_Returns_UnprocessableEntityResult_When_InvalidEmail()
+		{
+			// Arrange
+			var userRegisterRequest = _fixture.Create<UserRegisterRequest>();
+			userRegisterRequest.Email = "invalidemail"; // Set invalid email
+
+			// Act
+			var result = await _authController.Register(userRegisterRequest);
+
+			// Assert
+			var objectResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal((int)HttpStatusCode.UnprocessableEntity, objectResult.StatusCode);
+			Assert.Equal("Invalid email format.", objectResult.Value);
 		}
 
 		[Fact]
-		public async Task Register_ExistingUser_ReturnsUnprocessableEntityResult()
+		public async Task Register_Returns_UnprocessableEntityResult_When_PasswordIsTooShort()
 		{
 			// Arrange
-			var userRequest = new UserRegisterRequest
+			var userRegisterRequest = _fixture.Create<UserRegisterRequest>();
+			userRegisterRequest.Email = "test@gmail.com";
+			userRegisterRequest.Password = "short"; // Set short password
+
+			// Act
+			var result = await _authController.Register(userRegisterRequest);
+
+			// Assert
+			var objectResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal((int)HttpStatusCode.UnprocessableEntity, objectResult.StatusCode);
+			Assert.Equal("Password should be a minimum of 8 characters.", objectResult.Value);
+		}
+
+		[Fact]
+		public async Task Register_Returns_UnprocessableEntityResult_When_UserAlreadyExists()
+		{
+			// Arrange
+			var userRegisterRequest = _fixture.Create<UserRegisterRequest>();
+			userRegisterRequest.Email = "text@gmail.com";
+			var existingUser = new User
 			{
-				Email = "test@example.com",
-				Password = "password"
+				Id = _fixture.Create<int>(),
+				UserName = _fixture.Create<string>(),
+				Email = userRegisterRequest.Email,
+				Password = _fixture.Create<string>(),
+				Role = Role.User,
+				StartDayTime = new TimeSpan(8, 0, 0),
+				EndDayTime = new TimeSpan(22, 0, 0),
+				BadgeWallet = new BadgeWallet
+				{
+					DoneFirstTask = false,
+					DoneFirstCleaningTask = false,
+					DoneFirstLaundryTask = false,
+					DoneFirstKitchenTask = false,
+					DoneFirstBathroomTask = false,
+					DoneFirstBedroomTask = false,
+					DoneFirstOutdoorsTask = false,
+					DoneFirstOrganizeTask = false,
+					EarnedPerDayFiftyPoints = false,
+					EarnedPerDayHundredPoints = false,
+					DoneFiveTaskPerWeek = false,
+					DoneTenTaskPerWeek = false,
+					DoneTwentyFiveTaskPerWeek = false,
+					CreatedTaskWasUsedOtherHome = false,
+					CreateFirstPurchase = false,
+					CreateFirstAdvice = false,
+					CreateFirstIncome = false,
+					CreateFirstExpense = false
+				}
 			};
-			var existingUser = new User { Email = "test@example.com" };
 			_authRepositoryMock.Setup(repo => repo.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(existingUser);
 
 			// Act
-			var result = await _authController.Register(userRequest) as ObjectResult;
+			var result = await _authController.Register(userRegisterRequest);
 
 			// Assert
-			Assert.NotNull(result);
-			Assert.Equal((int)HttpStatusCode.UnprocessableEntity, result.StatusCode);
+			var objectResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal((int)HttpStatusCode.UnprocessableEntity, objectResult.StatusCode);
+			Assert.Equal("User with the same email already exists.", objectResult.Value);
 		}
 
 		[Fact]
-		public async Task Login_ValidCredentials_ReturnsOkResult()
+		public async Task RestoreForgotPassword_Returns_BadRequest_When_Invalid_Token()
 		{
 			// Arrange
-			var userRequest = new UserRegisterRequest
+			var restoreData = _fixture.Create<UserRestorePasswordRequest>();
+			restoreData.Token = "invalid_token";
+
+			// Act
+			var result = await _authController.RestoreForgotPassword(restoreData);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal("Invalid token.", badRequestResult.Value);
+		}
+
+		[Fact]
+		public async Task Login_Returns_CreatedResult_When_ValidCredentials()
+		{
+			// Arrange
+			var userLoginRequest = _fixture.Create<UserLoginRequest>();
+			userLoginRequest.Email = "test@gmail.com";
+			
+			var existingUser = new User
 			{
-				UserName = "test",
-				Email = "test@example.com",
-				Password = "password"
+				Id = _fixture.Create<int>(),
+				UserName = _fixture.Create<string>(),
+				Email = userLoginRequest.Email,
+				Password = HashPassword("testtest"),
+				Role = Role.User,
+				StartDayTime = new TimeSpan(8, 0, 0),
+				EndDayTime = new TimeSpan(22, 0, 0),
+				BadgeWallet = new BadgeWallet
+				{
+					DoneFirstTask = false,
+					DoneFirstCleaningTask = false,
+					DoneFirstLaundryTask = false,
+					DoneFirstKitchenTask = false,
+					DoneFirstBathroomTask = false,
+					DoneFirstBedroomTask = false,
+					DoneFirstOutdoorsTask = false,
+					DoneFirstOrganizeTask = false,
+					EarnedPerDayFiftyPoints = false,
+					EarnedPerDayHundredPoints = false,
+					DoneFiveTaskPerWeek = false,
+					DoneTenTaskPerWeek = false,
+					DoneTwentyFiveTaskPerWeek = false,
+					CreatedTaskWasUsedOtherHome = false,
+					CreateFirstPurchase = false,
+					CreateFirstAdvice = false,
+					CreateFirstIncome = false,
+					CreateFirstExpense = false
+				}
 			};
+			_authRepositoryMock.Setup(repo => repo.GetUserByEmail(existingUser.Email)).ReturnsAsync(existingUser);
+			userLoginRequest.Password = "testtest";
 
-			// Simulate user registration
-			_authRepositoryMock.Setup(repo => repo.GetUserByEmail(userRequest.Email)).ReturnsAsync((User)null);
-			_authRepositoryMock.Setup(repo => repo.AddUser(It.IsAny<User>())).Returns(Task.CompletedTask);
-			_authRepositoryMock.Setup(repo => repo.Save()).Returns(Task.CompletedTask);
+			// Act
+			var result = await _authController.LoginAsync(userLoginRequest);
 
-			// Register the user
-			var resultRegister = await _authController.Register(userRequest) as CreatedResult;
+			// Assert
+			var createdResult = Assert.IsType<CreatedResult>(result);
+			Assert.Equal(201, createdResult.StatusCode);
+		}
 
-			// Now set up the mock repository to return the registered user
-			var registeredUser = new User
-			{
-				Email = userRequest.Email,
-				Password = "password" // Assuming this is the hashed password
-			};
+		private string HashPassword(string? password)
+		{
 			var saltValue = "dsdjiajeefiajofijaoifjoaijfoiajgorjag";
 			byte[] salt = Encoding.ASCII.GetBytes(saltValue);
 			string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-				password: registeredUser.Password,
+				password: password,
 				salt: salt,
 				prf: KeyDerivationPrf.HMACSHA512,
 				iterationCount: 10000,
 				numBytesRequested: 256 / 8));
-
-			var userLoginRequest = new UserLoginRequest
-			{
-				Email = userRequest.Email,
-				Password = hashedPassword,
-			};
-			_authController.ControllerContext = new ControllerContext
-			{
-				HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
-			};
-
-			// Act
-			var result = await _authController.LoginAsync(userLoginRequest) as OkObjectResult;
-
-			// Assert
-			Assert.NotNull(result);
-			Assert.Equal((int)System.Net.HttpStatusCode.OK, result.StatusCode);
-		}
-
-
-
-		[Fact]
-		public async Task Login_InValidCredentials_ReturnsNotFoundResult()
-		{
-			// Arrange
-			var userLoginRequest = new UserLoginRequest
-			{
-				Email = "test@example.com",
-				Password = "password"
-			};
-			var user = new User { Email = "test@example.com", Password = "hashed_password" };
-			_authRepositoryMock.Setup(repo => repo.GetUserByEmail(userLoginRequest.Email)).ReturnsAsync(user);
-			_authController.ControllerContext = new ControllerContext
-			{
-				HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
-			};
-
-			// Act
-			var result = await _authController.LoginAsync(userLoginRequest) as NotFoundObjectResult;
-
-			// Assert
-			Assert.NotNull(result);
-			Assert.Equal((int)System.Net.HttpStatusCode.NotFound, result.StatusCode);
+			return hashedPassword;
 		}
 
 		[Fact]
-		public async Task RestorePassword_ExistingUser_ReturnsOkResult()
+		public async Task Login_Returns_NotFound_When_InvalidCredentials()
 		{
 			// Arrange
-			var userEmail = "test@example.com";
-			var user = new User { Email = userEmail };
-			_authRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
+			var userLoginRequest = _fixture.Create<UserLoginRequest>();
+			_authRepositoryMock.Setup(repo => repo.GetUserByEmail(userLoginRequest.Email)).ReturnsAsync((User)null);
 
 			// Act
-			var result = await _authController.RestorePassword(userEmail) as OkObjectResult;
+			var result = await _authController.LoginAsync(userLoginRequest);
 
 			// Assert
-			Assert.NotNull(result);
-			Assert.Equal((int)System.Net.HttpStatusCode.OK, result.StatusCode);
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal("Invalid email or password. Please try again.", notFoundResult.Value);
 		}
 	}
 }

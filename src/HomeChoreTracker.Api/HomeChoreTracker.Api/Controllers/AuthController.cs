@@ -276,7 +276,7 @@ namespace HomeChoreTracker.Api.Controllers
         private string GenerateAccessToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes("hdtp26741yyeett212rrrr1111de32132128bhwi");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] 
@@ -286,9 +286,9 @@ namespace HomeChoreTracker.Api.Controllers
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _config["Jwt:Issuer"],
-                Audience = _config["Jwt:Audience"]
-            };
+                Issuer = "Simona",
+                Audience = "TrustedClient"
+			};
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
