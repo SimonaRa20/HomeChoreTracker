@@ -9,5 +9,7 @@ namespace HomeChoreTracker.Api.Contracts.Purchase
         public QuantityType QuantityType { get; set; }
         public ProductType ProductType { get; set; }
         public bool IsCompleted { get; set; }
+        public int? HomeChoreTaskId { get; set; }
+        public int? Time { get; set; }
     }
 }

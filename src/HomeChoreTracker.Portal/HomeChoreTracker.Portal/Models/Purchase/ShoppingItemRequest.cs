@@ -8,6 +8,8 @@ namespace HomeChoreTracker.Portal.Models.Purchase
         public decimal Quantity { get; set; }
         public QuantityType QuantityType { get; set; }
         public ProductType ProductType { get; set; }
-        public bool IsCompleted { get; set; }
+		public int? HomeChoreTaskId { get; set; }
+		public int? Time { get; set; }
+		public bool IsCompleted { get; set; }
     }
 }

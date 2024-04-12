@@ -6,6 +6,7 @@ using HomeChoreTracker.Api.Models;
 using HomeChoreTracker.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Utilities;
 using System.Linq;
 using System.Security.Claims;
 
@@ -56,6 +57,8 @@ namespace HomeChoreTracker.Api.Controllers
                         IsCompleted = false,
                         PurchaseId = purchase.Id,
                         HomeId = purchase.HomeId,
+                        HomeChoreTaskId = item.HomeChoreTaskId,
+                        Time = item.Time
                     });
                 }
 
@@ -182,7 +185,9 @@ namespace HomeChoreTracker.Api.Controllers
 							Quantity = update.Quantity,
 							QuantityType = update.QuantityType,
 							ProductType = update.ProductType,
-							IsCompleted = false
+							IsCompleted = false,
+                            HomeChoreTaskId = update.HomeChoreTaskId,
+                            Time = update.Time,
 						});
 					}
 					else
@@ -194,6 +199,8 @@ namespace HomeChoreTracker.Api.Controllers
 							existingItem.Quantity = update.Quantity;
 							existingItem.QuantityType = update.QuantityType;
 							existingItem.ProductType = update.ProductType;
+                            existingItem.HomeChoreTaskId = update.HomeChoreTaskId;
+                            existingItem.Time = update.Time;
 						}
 						else
 						{

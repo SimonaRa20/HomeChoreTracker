@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
+using HomeChoreTracker.Portal.Models.HomeChore;
 
 namespace HomeChoreTracker.Portal.Pages.Purchase
 {
@@ -17,13 +18,34 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
         [BindProperty]
         public PurchaseRequest PurchaseRequest { get; set; }
 
-        [BindProperty]
+		public List<HomeChoreResponse> HomeChoreResponse { get; set; }
+
+		[BindProperty]
         public int Id { get; set; }
 
-        public void OnGet(int id)
-        {
+        public async Task<IActionResult> OnGetAsync(int id)
+		{
             Id = id;
-        }
+			var token = User.FindFirstValue("Token");
+			using (var httpClient = _httpClientFactory.CreateClient())
+			{
+				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+				var apiHomeChoreUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
+				var responseHomeChore = await httpClient.GetAsync(apiHomeChoreUrl);
+
+				if (responseHomeChore.IsSuccessStatusCode)
+				{
+					HomeChoreResponse = await responseHomeChore.Content.ReadFromJsonAsync<List<HomeChoreResponse>>();
+					return Page();
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {responseHomeChore.ReasonPhrase}");
+					return Page();
+				}
+			}
+		}
 
         public AddPurchaseModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {

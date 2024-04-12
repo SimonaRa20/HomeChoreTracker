@@ -1,4 +1,5 @@
 using HomeChoreTracker.Portal.Models.Home;
+using HomeChoreTracker.Portal.Models.HomeChore;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using HomeChoreTracker.Portal.Models.Purchase;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,8 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
         private readonly IConfiguration _config;
 
         public List<Models.Purchase.Purchase> Purchases { get; set; }
-
-        [BindProperty]
+		public List<HomeChoreResponse> Tasks { get; set; }
+		[BindProperty]
         public int PurchaseId { get; set; }
 
         public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
@@ -42,8 +43,16 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
                 if (response.IsSuccessStatusCode)
                 {
                     Purchases = await response.Content.ReadFromJsonAsync<List<Models.Purchase.Purchase>>();
-                    return Page();
-                }
+					var apiHomeChoreUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
+					var responseHomeChore = await httpClient.GetAsync(apiHomeChoreUrl);
+
+					if (responseHomeChore.IsSuccessStatusCode)
+					{
+                        Tasks = await responseHomeChore.Content.ReadFromJsonAsync<List<HomeChoreResponse>>();
+						
+					}
+					return Page();
+				}
                 else
                 {
                     ModelState.AddModelError(string.Empty, $"Failed to retrieve data: {response.ReasonPhrase}");
@@ -109,7 +118,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 		}
 
 
-		public async Task<IActionResult> OnPostUpdateShoppingPurchaseAsync()
+		public async Task<IActionResult> OnPostUpdateShoppingPurchaseAsync(int homeId)
 		{
 			var token = User.FindFirstValue("Token");
 			var itemsToUpdateJson = HttpContext.Request.Form["itemsToUpdate"];
@@ -130,7 +139,7 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
 					if (response.IsSuccessStatusCode)
 					{
-						return RedirectToPage("/Purchase/Index", new { id = PurchaseId });
+						return RedirectToPage("/Purchase/Index", new { id = homeId });
 					}
 					else
 					{

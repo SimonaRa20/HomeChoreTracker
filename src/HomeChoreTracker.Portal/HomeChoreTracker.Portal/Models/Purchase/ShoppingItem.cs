@@ -12,5 +12,7 @@ namespace HomeChoreTracker.Portal.Models.Purchase
         public bool IsCompleted { get; set; }
         public int PurchaseId { get; set; }
         public int HomeId { get; set; }
-    }
+		public int? HomeChoreTaskId { get; set; }
+		public int? Time { get; set; }
+	}
 }

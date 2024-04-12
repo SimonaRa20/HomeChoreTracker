@@ -11,6 +11,10 @@ namespace HomeChoreTracker.Api.Models
         public ProductType ProductType { get; set; }
         public bool IsCompleted { get; set; }
         public int PurchaseId { get; set; }
+
+        public int? HomeChoreTaskId { get; set; }
+        public int? Time { get; set; }
+
         public int HomeId { get; set; }
     }
 }

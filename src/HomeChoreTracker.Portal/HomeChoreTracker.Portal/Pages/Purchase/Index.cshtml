@@ -146,6 +146,7 @@ else if (User.IsInRole("User"))
 	<form id="updateShoppingPurchaseForm" method="post" asp-page-handler="UpdateShoppingPurchase">
 		<input type="hidden" id="purchaseIdInput" name="purchaseId" />
 		<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
+		<input type="hidden" name="homeId" value="@Model.PurchaseId" />
 	</form>
 }
 else
@@ -172,6 +173,7 @@ else
 			url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,
 			type: 'GET',
 			success: function (data) {
+				console.log(data)
 				$('#purchaseIdInput').val(purchaseId);
 				$('#purchaseEditModalLabel').text("Update Purchase Items");
 				var purchaseDate = new Date(data.purchaseDate);
@@ -197,6 +199,16 @@ else
 					content += "<select class='form-control' id='quantityType_" + item.id + "'>" + getQuantityTypeOptions(item.quantityType) + "</select>";
 					content += "<label for='productType_" + item.id + "'>Product Type:</label>";
 					content += "<select class='form-control' id='productType_" + item.id + "'>" + getProductTypeOptions(item.productType) + "</select>";
+
+					// Add Time selection
+					content += "<label for='time_" + item.id + "'>Time:</label>";
+					content += "<input type='number' class='form-control' id='time_" + item.id + "' value='" + (item.time ? item.time : '') + "'>";
+
+
+					// Add Task selection
+					content += "<label for='task_" + item.id + "'>Task:</label>";
+					content += "<select class='form-control' id='task_" + item.id + "'>" + getTaskOptions(item.homeChoreTaskId) + "</select>";
+
 					content += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + item.id + "'>Remove</button>";
 					content += "</li>";
 				});
@@ -220,6 +232,21 @@ else
 		}
 		return options;
 	}
+
+	function getTaskOptions(selectedTask) {
+		console.log(selectedTask)
+		var options = "<option value='' " + (selectedTask === null ? "selected" : "") + ">Select Task</option>";
+		var tasks = @Html.Raw(Json.Serialize(Model.Tasks));
+
+		console.log(tasks)
+
+		for (var i = 0; i < tasks.length; i++) {
+			options += "<option value='" + tasks[i].id + "' " + (tasks[i].id === selectedTask ? "selected" : "") + ">" + tasks[i].name + "</option>";
+		}
+		return options;
+	}
+
+
 
 	function getProductTypeOptions(selectedType) {
 		var options = "";
@@ -313,8 +340,11 @@ else
 				var quantity = $(this).find('input[type="number"]').val();
 				var quantityType = $(this).find('select[id^="quantityType_"]').val();
 				var productType = $(this).find('select[id^="productType_"]').val();
-
-				itemsToUpdate.push({ id: itemId, title: title, quantity: quantity, quantityType: quantityType, productType: productType });
+				var time = $(this).find('input[id^="time_"]').val();
+				console.log(time)
+				var task = $(this).find('select[id^="task_"]').val();
+				itemsToUpdate.push({ id: itemId, title: title, quantity: quantity, quantityType: quantityType, productType: productType, time: time, homeChoreTaskId: task });
+				console.log(itemsToUpdate)
 			});
 
 			$('#purchaseId').val(currentPurchaseId);
