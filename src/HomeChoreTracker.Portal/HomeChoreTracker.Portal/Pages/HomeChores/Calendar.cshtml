@@ -69,7 +69,7 @@ else if (User.IsInRole("User"))
 				}
 				else
 				{
-					<a class='btn btn-sm' id='btnSystemAssign' data-toggle="modal" data-target="#SystemAssignModal-@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Assign tasks randomly</a>
+					<a class='btn btn-sm mb-4' id='btnSystemAssign' data-toggle="modal" data-target="#SystemAssignModal-@Model.Id"><i class="fa fa-clone mr-2" aria-hidden="true"></i>Assign tasks randomly</a>
 					<div class="modal" tabindex="-1" role="dialog" id="SystemAssignModal-@Model.Id">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
@@ -92,6 +92,43 @@ else if (User.IsInRole("User"))
 							</div>
 						</div>
 					</div>
+
+					<div class="container-fluid">
+						<div class="row justify-content-center">
+								<div style="margin-top: 8px; margin-bottom: 8px;">
+									<form method="get" id="filterForm" class="form-inline">
+										<div class="form-group mr-2">
+											<label for="userId" class="mr-2">Filter by User:</label>
+										<select class="form-select form-select-sm" id="userId" name="userId">
+												<option value="">All</option>
+												@foreach (var member in Model.HomeMembers)
+												{
+													<option value="@member.HomeMemberId" selected="@(member.HomeMemberId == Model.HomeMemberId)">@member.UserName</option>
+												}
+											</select>
+										</div>
+
+										<div class="form-group mr-2">
+											<label for="choreType" class="mr-2">Filter by Chore Type:</label>
+										<select class="form-select form-select-sm" id="choreType" name="choreType">
+												<option value="" selected="@(Model.HomeChoreType == "")">All</option>
+												<option value="Cleaning" selected="@(Model.HomeChoreType == "Cleaning")">Cleaning</option>
+												<option value="Laundry" selected="@(Model.HomeChoreType == "Laundry")">Laundry</option>
+												<option value="Kitchen" selected="@(Model.HomeChoreType == "Kitchen")">Kitchen</option>
+												<option value="Bathroom" selected="@(Model.HomeChoreType == "Bathroom")">Bathroom</option>
+												<option value="Bedroom" selected="@(Model.HomeChoreType == "Bedroom")">Bedroom</option>
+												<option value="Outdoors" selected="@(Model.HomeChoreType == "Outdoors")">Outdoors</option>
+												<option value="Organize" selected="@(Model.HomeChoreType == "Organize")">Organize</option>
+											</select>
+										</div>
+
+									<button type="submit" class="btn btn-outline-info btn-sm">Apply Filters</button>
+									</form>
+								</div>
+							</div>
+					</div>
+
+
 					<div id="calendar" style="margin-left:4px"></div>
 				}
 			</div>
@@ -130,7 +167,7 @@ else
 				<p>Assigned member: <span id="task-assigned"></span></p>
 				<div id="vote-to-selection">
 					<p>Total votes: <span id="task-totalVotes"></span> (if half of the household members agree, assigned user receive a penalty of -10 points)</p>
-					<p class="mb-1">Vote if the task was well done</p>
+					<p class="mb-1">Vote if the task was not done well</p>
 					<form method="post" asp-page-handler="Vote" class="d-inline">
 						<button type="submit" class="btn btn-success mx-1">Vote</button>
 						<input type="hidden" id="homeId" name="homeId" value="@Model.Id" />
@@ -178,6 +215,7 @@ else
 }
 
 <script>
+
 	$(function () {
 		$('#calendar').fullCalendar({
 			defaultView: 'month',

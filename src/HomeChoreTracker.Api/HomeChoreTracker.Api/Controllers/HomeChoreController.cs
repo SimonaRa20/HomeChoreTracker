@@ -613,7 +613,7 @@ namespace HomeChoreTracker.Api.Controllers
 
         [HttpGet("Chore/Calendar/{id}")]
         [Authorize]
-        public async Task<IActionResult> GetHomeChoresToCalendar(int id)
+        public async Task<IActionResult> GetHomeChoresToCalendar(int id, int? selectedUserId = null, string choreType = null)
         {
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 			bool isMember = await _homeRepository.OrHomeMember(id, userId);
@@ -652,7 +652,17 @@ namespace HomeChoreTracker.Api.Controllers
                 taskAssignments.Add(assignmentResponse);
             }
 
-            return Ok(taskAssignments);
+			if (selectedUserId != null)
+			{
+				taskAssignments = taskAssignments.Where(chore => chore.HomeMemberId == selectedUserId).ToList();
+			}
+
+			if (!string.IsNullOrEmpty(choreType))
+			{
+				taskAssignments = taskAssignments.Where(chore => chore.Task.ChoreType.ToString() == choreType).ToList();
+			}
+
+			return Ok(taskAssignments);
         }
 
         [HttpPut("{id}")]
