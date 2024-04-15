@@ -76,10 +76,8 @@ else if (User.IsInRole("User"))
                                 <div class="form-group" id="TimeGroup0" style="display:none">
                                     <label for="Time0">Time</label>
                                     <input type="number" class="form-control mb-2" id="Time0" name="PurchaseRequest.Items[0].Time" asp-for="PurchaseRequest.Items[0].Time">
+                                    <span id="TimeError0" class="text-danger"></span>
                                 </div>
-
-
-
 								<button type="button" class="btn btn-danger btn-sm" onclick="removeShoppingItem(this)">Remove</button>
 							</div>
 						</div>
@@ -162,6 +160,7 @@ else
                 '<div class="form-group" id="TimeGroup' + itemCount + '" style="display:none">' +
                 '<label for="Time' + itemCount + '">Time</label>' +
                 '<input type="number" class="form-control mb-2" id="Time' + itemCount + '" name="Items[' + itemCount + '].Time" placeholder="Time" asp-for="PurchaseRequest.Items[' + itemCount + '].Time">' +
+                '<span id="TimeError' + itemCount + '" class="text-danger"></span>' +
                 '</div>' +
                 '<button type="button" class="btn btn-danger btn-sm" onclick="removeShoppingItem(this)">Remove</button>' +
                 '</div>';
@@ -174,39 +173,12 @@ else
     }
 
     function toggleTimeInput(itemCount) {
-        console.log(itemCount)
         var taskId = document.getElementById('TaskId' + itemCount);
-        console.log(taskId)
-        var timeGroup = document.getElementById('TimeGroup' + itemCount); // Remove the extra single quote here
-        console.log(timeGroup)
+        var timeGroup = document.getElementById('TimeGroup' + itemCount);
         if (taskId.value !== '') {
             timeGroup.style.display = 'block';
         } else {
             timeGroup.style.display = 'none';
-        }
-    }
-
-
-    function validateShoppingItem(itemCount) {
-        var title = document.getElementById('Title' + itemCount);
-        var quantity = document.getElementById('Quantity' + itemCount);
-        var titleError = document.getElementById('TitleError' + itemCount);
-        var quantityError = document.getElementById('QuantityError' + itemCount);
-
-        if (title && quantity && titleError && quantityError) {
-            if (title.value.trim() === '') {
-                titleError.textContent = 'Title is required';
-            } else {
-                titleError.textContent = '';
-            }
-
-            if (quantity.value.trim() === '' || parseFloat(quantity.value) < 0.01) {
-                quantityError.textContent = 'Quantity must be greater than or equal to 0.01';
-            } else {
-                quantityError.textContent = '';
-            }
-        } else {
-            console.log('One or more elements not found for item:', itemCount);
         }
     }
 
@@ -220,6 +192,17 @@ else
             var titleError = document.getElementById('TitleError' + i);
             var quantityError = document.getElementById('QuantityError' + i);
             var time = document.getElementById('Time' + i);
+
+            var timeError = document.getElementById('TimeError' + i);
+            var timeGroup = document.getElementById('TimeGroup' + i);
+
+            if (timeGroup.style.display === 'block') {
+                if (time.value.trim() === '' || parseInt(time.value) < 0) {
+                    timeError.textContent = 'Time is required and must be greater than 0.';
+                } else {
+                    timeError.textContent = '';
+                }
+            }
 
             if (title && quantity && titleError && quantityError) {
                 if (title.value.trim() === '') {

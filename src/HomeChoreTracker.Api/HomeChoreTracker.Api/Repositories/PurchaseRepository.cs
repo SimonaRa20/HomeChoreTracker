@@ -48,9 +48,15 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.ShoppingItems.FindAsync(id);
         }
 
-        public async Task UpdateShoppingItem(ShoppingItem shoppingItem)
+		public async Task<ShoppingItem> GetShoppingItemByTaskId(int taskId)
+		{
+			return await _dbContext.ShoppingItems.Where(x=>x.HomeChoreTaskId.Equals(taskId) && x.Time > 0 && x.IsCompleted).FirstOrDefaultAsync();
+		}
+
+		public async Task UpdateShoppingItem(ShoppingItem shoppingItem)
         {
             _dbContext.Entry(shoppingItem).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdatePurchase(Purchase purchase)

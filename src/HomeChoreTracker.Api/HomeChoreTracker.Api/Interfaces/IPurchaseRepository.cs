@@ -9,7 +9,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<Purchase> GetPurchaseById(int id);
         Task<ShoppingItem> GetShoppingItemById(int itemId);
         Task UpdateShoppingItem(ShoppingItem shoppingItem);
-        Task UpdatePurchase(Purchase purchase);
+        Task<ShoppingItem> GetShoppingItemByTaskId(int taskId);
+		Task UpdatePurchase(Purchase purchase);
         Task DeletePurchase(Purchase purchase);
 		Task Save();
     }

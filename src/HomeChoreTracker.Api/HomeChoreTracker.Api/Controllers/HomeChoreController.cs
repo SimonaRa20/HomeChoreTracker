@@ -27,9 +27,10 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly IUserRepository _userRepository;
         private readonly INotificationRepository _notificationRepository;
         private readonly IGamificationRepository _gamificationRepository;
+        private readonly IPurchaseRepository _purchaseRepository;
         private readonly IMapper _mapper;
 
-        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IGamificationRepository gamificationRepository, IMapper mapper, IUserRepository userRepository, INotificationRepository notificationRepository, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
+        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IPurchaseRepository purchaseRepository, IGamificationRepository gamificationRepository, IMapper mapper, IUserRepository userRepository, INotificationRepository notificationRepository, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
         {
             _homeChoreRepository = homeChoreRepository;
             _mapper = mapper;
@@ -38,6 +39,7 @@ namespace HomeChoreTracker.Api.Controllers
             _notificationRepository = notificationRepository;
             _userRepository = userRepository;
             _gamificationRepository = gamificationRepository;
+            _purchaseRepository = purchaseRepository;
         }
 
         [HttpPost("{homeId}")]
@@ -440,7 +442,31 @@ namespace HomeChoreTracker.Api.Controllers
                 
                 await _homeChoreRepository.UpdateTaskAssignment(homeChore);
 
-                if (homeChore == null)
+				ShoppingItem shoppingItem = await _purchaseRepository.GetShoppingItemByTaskId(homeChore.TaskId);
+				if (shoppingItem != null)
+				{
+					if (shoppingItem.Time == 1)
+					{
+						var members = await _userRepository.GetHomeMembers(task.HomeId);
+						foreach (var member in members)
+						{
+							Notification notification = new Notification
+							{
+								Title = $"Product '{shoppingItem.Title}' is run out, add to purchase, need for '{task.Name}' task",
+								IsRead = false,
+								Time = DateTime.Now,
+								UserId = (int)member.Id,
+								User = member,
+							};
+							await _notificationRepository.CreateNotification(notification);
+						}
+					}
+
+					shoppingItem.Time = shoppingItem.Time - 1;
+					await _purchaseRepository.UpdateShoppingItem(shoppingItem);
+				}
+
+				if (homeChore == null)
                 {
                     return NotFound("No home chore found");
                 }

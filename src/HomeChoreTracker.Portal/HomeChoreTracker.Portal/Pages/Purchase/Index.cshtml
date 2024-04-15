@@ -173,7 +173,6 @@ else
 			url: '/Purchase/Index?handler=PurchaseDetail&purchaseId=' + purchaseId,
 			type: 'GET',
 			success: function (data) {
-				console.log(data)
 				$('#purchaseIdInput').val(purchaseId);
 				$('#purchaseEditModalLabel').text("Update Purchase Items");
 				var purchaseDate = new Date(data.purchaseDate);
@@ -200,15 +199,17 @@ else
 					content += "<label for='productType_" + item.id + "'>Product Type:</label>";
 					content += "<select class='form-control' id='productType_" + item.id + "'>" + getProductTypeOptions(item.productType) + "</select>";
 
-					// Add Time selection
-					content += "<label for='time_" + item.id + "'>Time:</label>";
-					content += "<input type='number' class='form-control' id='time_" + item.id + "' value='" + (item.time ? item.time : '') + "'>";
-
-
-					// Add Task selection
+					console.log(item)
 					content += "<label for='task_" + item.id + "'>Task:</label>";
 					content += "<select class='form-control' id='task_" + item.id + "'>" + getTaskOptions(item.homeChoreTaskId) + "</select>";
+					content += "<div id='timeGroup_" + item.id + "'>";
+					content += "<label for='time_" + item.id + "'>Time:</label>";
+					content += "<input type='number' class='form-control' id='time_" + item.id + "' value='" + item.time + "'>";
 
+					content += "<div class='error-message-time' style='color: red'></div>"
+					content += "</div>";
+
+					
 					content += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + item.id + "'>Remove</button>";
 					content += "</li>";
 				});
@@ -234,19 +235,14 @@ else
 	}
 
 	function getTaskOptions(selectedTask) {
-		console.log(selectedTask)
 		var options = "<option value='' " + (selectedTask === null ? "selected" : "") + ">Select Task</option>";
 		var tasks = @Html.Raw(Json.Serialize(Model.Tasks));
-
-		console.log(tasks)
 
 		for (var i = 0; i < tasks.length; i++) {
 			options += "<option value='" + tasks[i].id + "' " + (tasks[i].id === selectedTask ? "selected" : "") + ">" + tasks[i].name + "</option>";
 		}
 		return options;
 	}
-
-
 
 	function getProductTypeOptions(selectedType) {
 		var options = "";
@@ -325,10 +321,31 @@ else
 		newItemHtml += "<option value='38'>Appliances</option>";
 		newItemHtml += "<option value='39'>Furniture</option>";
 		newItemHtml += "</select>";
+
+		newItemHtml += "<label for='task_" + newItemId + "'>Task:</label>";
+		newItemHtml += "<select class='form-control' id='task_" + newItemId + "'>" + getTaskOptions(null) + "</select>";
+		newItemHtml += "<div id='timeGroup_" + newItemId + "' style='display: none;'>";
+		newItemHtml += "<label for='time_" + newItemId + "'>Time:</label>";
+		newItemHtml += "<input type='number' class='form-control' id='time_" + newItemId + "' value=''>";
+		newItemHtml += "<div class='error-message-time' style='color: red'></div>"
+		newItemHtml += "</div>";
+
 		newItemHtml += "<button type='button' class='btn btn-danger btn-sm remove-item' data-id='" + newItemId + "'>Remove</button>";
 		newItemHtml += "</li>";
 
 		$('#itemsList').append(newItemHtml);
+	});
+
+	$(document).on('change', 'select[id^="task_"]', function () {
+		var newItemId = $(this).attr('id').split('_')[1];
+		var selectedTask = $(this).val();
+		var timeGroup = $('#timeGroup_' + newItemId);
+
+		if (selectedTask !== '') {
+			timeGroup.show();
+		} else {
+			timeGroup.hide();
+		}
 	});
 
 	$(document).ready(function () {
@@ -341,8 +358,14 @@ else
 				var quantityType = $(this).find('select[id^="quantityType_"]').val();
 				var productType = $(this).find('select[id^="productType_"]').val();
 				var time = $(this).find('input[id^="time_"]').val();
-				console.log(time)
 				var task = $(this).find('select[id^="task_"]').val();
+
+				if (task !== '' && (time === '' || parseInt(time) <= 0)) {
+					$(this).find('.error-message-time').text('Time is required and must be more than 0');
+					isValid = false;
+				} else {
+					$(this).find('.error-message-time').text('');
+				}
 				itemsToUpdate.push({ id: itemId, title: title, quantity: quantity, quantityType: quantityType, productType: productType, time: time, homeChoreTaskId: task });
 				console.log(itemsToUpdate)
 			});
@@ -456,17 +479,67 @@ else
 			case 8:
 				return "CannedGoods";
 			case 9:
-				return "FrozenFoods";
-			case 10:
 				return "Snacks";
+			case 10:
+				return "Beverages";
 			case 11:
 				return "Condiments";
 			case 12:
-				return "Sauces";
+				return "FrozenFoods";
 			case 13:
 				return "Spices";
 			case 14:
-				return "Others";
+				return "Herbs";
+				case 15:
+				return "BabyFood";
+				case 16:
+				return "CleaningSupplies";
+				case 17:
+				return "LaundrySupplies";
+				case 18:
+				return "PersonalCareProducts";
+				case 19:
+				return "PaperProducts";
+				case 20:
+				return "PetSupplies";
+				case 21:
+				return "GardeningSupplies";
+				case 22:
+				return "Tools";
+				case 23:
+				return "Batteries";
+				case 24:
+				return "LightBulbs";
+				case 25:
+				return "Stationery";
+				case 26:
+				return "HomeDecor";
+			case 27:
+				return "StorageContainers";
+				case 28:
+				return "Electronics";
+				case 29:
+				return "OfficeSupplies";
+				case 30:
+				return "MedicalSupplies";
+				case 31:
+				return "Books";
+				case 32:
+				return "Toys";
+				case 33:
+				return "Clothing";
+				case 34:
+				return "Shoes";
+				case 35:
+				return "Accessories";
+				case 36:
+				return "Kitchenware";
+				case 37:
+				return "Cookware";
+				case 38:
+				return "Appliances";
+				case 39:
+				return "Furniture";
 			default:
 				return "Unknown";
 		}

@@ -126,10 +126,10 @@ namespace HomeChoreTracker.Api.Controllers
                     }
 
                     shoppingItem.IsCompleted = item.IsCompleted;
+                    shoppingItem.WasBought = DateTime.Now;
                     _purchaseRepository.UpdateShoppingItem(shoppingItem);
                 }
 
-                await _purchaseRepository.Save();
 
                 var firstShoppingItem = await _purchaseRepository.GetShoppingItemById(itemsToUpdate[0].Id);
                 var purchaseId = firstShoppingItem?.PurchaseId;
@@ -139,12 +139,12 @@ namespace HomeChoreTracker.Api.Controllers
                     if (purchase != null && purchase.Items.All(item => item.IsCompleted))
                     {
                         purchase.IsCompleted = true;
-                        _purchaseRepository.UpdatePurchase(purchase);
+                        await _purchaseRepository.UpdatePurchase(purchase);
                     }
                     else
                     {
                         purchase.IsCompleted = false;
-                        _purchaseRepository.UpdatePurchase(purchase);
+						await _purchaseRepository.UpdatePurchase(purchase);
                     }    
                 }
 

@@ -23,6 +23,7 @@ namespace HomeChoreTracker.Api.Services
                 var _userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
                 var _notificationRepository = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
                 var _homeChoreRepository = scope.ServiceProvider.GetRequiredService<IHomeChoreRepository>();
+				var _purchaseRepository = scope.ServiceProvider.GetRequiredService<IPurchaseRepository>();
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -164,6 +165,31 @@ namespace HomeChoreTracker.Api.Services
 							var homeChore = await _homeChoreRepository.Get(task.TaskId);
 							var user = await _userRepository.GetUserById((int)task.HomeMemberId);
 							task.IsDone = true;
+
+							ShoppingItem shoppingItem = await _purchaseRepository.GetShoppingItemByTaskId(task.TaskId);
+							if(shoppingItem != null)
+							{
+								if (shoppingItem.Time == 1)
+								{
+									var members = await _userRepository.GetHomeMembers(task.HomeId);
+									foreach (var member in members)
+									{
+										Notification notification = new Notification
+										{
+											Title = $"Product '{shoppingItem.Title}' is run out, add to purchase, need for '{homeChore.Name}' task.",
+											IsRead = false,
+											Time = DateTime.Now,
+											UserId = (int)member.Id,
+											User = member,
+										};
+										await _notificationRepository.CreateNotification(notification);
+									}
+								}
+
+								shoppingItem.Time = shoppingItem.Time - 1;
+								await _purchaseRepository.UpdateShoppingItem(shoppingItem);
+							}
+
 							var pointHistory = await _gamificationRepository.GetPointsHistoryByTaskId(task.Id);
 							BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
 							if (pointHistory == null)

@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using DocumentFormat.OpenXml.Presentation;
+using HomeChoreTracker.Api.Constants;
 
 namespace HomeChoreTracker.Api.Models
 {
@@ -11,6 +12,7 @@ namespace HomeChoreTracker.Api.Models
         public ProductType ProductType { get; set; }
         public bool IsCompleted { get; set; }
         public int PurchaseId { get; set; }
+        public DateTime WasBought { get; set; }
 
         public int? HomeChoreTaskId { get; set; }
         public int? Time { get; set; }
