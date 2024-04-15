@@ -127,6 +127,8 @@ namespace HomeChoreTracker.Portal.Pages.Forum
         public async Task<IActionResult> OnPostEditAsync(int id)
         {
             ClearFieldErrors(key => key == "Title");
+            ClearFieldErrors(key => key == "Search");
+            ClearFieldErrors(key => key == "TypeFilter");
             ClearFieldErrors(key => key == "Description");
             if (!ModelState.IsValid)
             {

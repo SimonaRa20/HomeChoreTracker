@@ -41,6 +41,7 @@
                 <button type="button" class="btn btn-danger" onclick="filterAdvices('bedroom')">Bedroom</button>
                 <button type="button" class="btn btn-secondary" onclick="filterAdvices('outdoors')">Outdoors</button>
                 <button type="button" class="btn btn-dark" onclick="filterAdvices('organize')">Organize</button>
+                <button type="button" class="btn btn" style="background-color: #9B3922; color: white" onclick="filterAdvices('other')">Other</button>
             </div>
         </div>
     </div>
@@ -121,9 +122,6 @@
                                 </div>
                             </div>
                         }
-
-                   
-
                     }
                     else
                     {
@@ -163,6 +161,7 @@
                                 <option value="4">Bedroom</option>
                                 <option value="5">Outdoors</option>
                                 <option value="6">Organize</option>
+                                <option value="7">Other</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -319,6 +318,8 @@ else
                     return "#858796";
                 case "organize":
                     return "#5a5c69";
+                case "other":
+                    return "#9B3922";
                 default:
                     return "black";
             }

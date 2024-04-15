@@ -8,6 +8,7 @@
         Bathroom,
         Bedroom,
         Outdoors,
-        Organize
+        Organize,
+        Other
     }
 }
