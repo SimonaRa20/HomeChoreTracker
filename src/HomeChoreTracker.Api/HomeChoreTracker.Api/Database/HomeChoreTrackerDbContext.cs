@@ -72,7 +72,17 @@ namespace HomeChoreTracker.Api.Database
                .WithOne(e => e.User)
                .HasForeignKey(e => e.UserId);
 
-            modelBuilder.Entity<User>()
+			modelBuilder.Entity<User>()
+			   .HasMany(u => u.Advices)
+			   .WithOne(e => e.User)
+			   .HasForeignKey(e => e.UserId);
+
+			modelBuilder.Entity<User>()
+			   .HasMany(u => u.PointsHistories)
+			   .WithOne(e => e.User)
+			   .HasForeignKey(e => e.HomeMemberId);
+
+			modelBuilder.Entity<User>()
                 .HasMany(u => u.UserHomes)
                 .WithOne(uh => uh.User)
                 .HasForeignKey(uh => uh.UserId);

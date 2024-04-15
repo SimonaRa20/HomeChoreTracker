@@ -11,6 +11,8 @@
         public TimeSpan StartDayTime { get; set; }
         public TimeSpan EndDayTime { get; set; }
 
+        public List<Advice> Advices { get; set; }
+        public List<PointsHistory> PointsHistories { get; set; }
         public List<UserHomes>? UserHomes { get; set; }
         public List<FinancialRecord>? FinancialRecords { get; set; }
         public List<Event>? CalendarEvents { get; set; }
