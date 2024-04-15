@@ -79,54 +79,80 @@ else if (User.IsInRole("User"))
 										<span aria-hidden="true">&times;</span>
 									</button>
 								</div>
-								<div class="modal-body">
-									<p>Are you sure you want to let system to assigned home chore?</p>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-									<form method="post" asp-page-handler="SystemAssign" asp-route-taskId="@Model.Id">
+								<form method="post" asp-page-handler="SystemAssign" asp-route-taskId="@Model.Id">
+									<div class="modal-body">
+										<p>Are you sure you want to let the system assign home chores?</p>
+										<p>When we divide the home chores, do you want us to take into account (add checks if you want):</p>
+
+										<div class="form-check ml-2">
+											<input type="checkbox" class="form-check-input" id="googleCheck" name="googleCheck" />
+											<label class="form-check-label" for="googleCheck">Google events time</label>
+										</div>
+
+										<div class="form-check ml-2">
+											<input type="checkbox" class="form-check-input" id="busyIntervalCheck" name="busyIntervalCheck" />
+											<label class="form-check-label" for="busyIntervalCheck">Busy intervals time</label>
+										</div>
+
+										<div class="form-check ml-2">
+											<input type="checkbox" class="form-check-input" id="assignedHomeChoresCheck" name="assignedHomeChoresCheck" />
+											<label class="form-check-label" for="assignedHomeChoresCheck">Assigned home chores time</label>
+										</div>
+									</div>
+
+									@if (!string.IsNullOrEmpty(TempData["ErrorSystemMessage"] as string))
+									{
+										<div class="alert alert-danger" role="alert">
+											@TempData["ErrorSystemMessage"]
+										</div>
+									}
+
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
 										<input type="hidden" id="editHomeId" name="homeId" value="@Model.Id" />
 										<button type="submit" class="btn btn-primary">Assign</button>
-									</form>
-								</div>
+
+									</div>
+								</form>
 							</div>
 						</div>
 					</div>
 
 					<div class="container-fluid">
 						<div class="row justify-content-center">
-								<div style="margin-top: 8px; margin-bottom: 8px;">
-									<form method="get" id="filterForm" class="form-inline">
-										<div class="form-group mr-2">
-											<label for="userId" class="mr-2">Filter by User:</label>
+							<div style="margin-top: 8px; margin-bottom: 8px;">
+								<form method="get" id="filterForm" class="form-inline">
+									<div class="form-group mr-2">
+										<label for="userId" class="mr-2">Filter by User:</label>
 										<select class="form-select form-select-sm" id="userId" name="userId">
-												<option value="">All</option>
-												@foreach (var member in Model.HomeMembers)
-												{
-													<option value="@member.HomeMemberId" selected="@(member.HomeMemberId == Model.HomeMemberId)">@member.UserName</option>
-												}
-											</select>
-										</div>
+											<option value="">All</option>
+											@foreach (var member in Model.HomeMembers)
+											{
+												<option value="@member.HomeMemberId" selected="@(member.HomeMemberId == Model.HomeMemberId)">@member.UserName</option>
+											}
+										</select>
+									</div>
 
-										<div class="form-group mr-2">
-											<label for="choreType" class="mr-2">Filter by Chore Type:</label>
+									<div class="form-group mr-2">
+										<label for="choreType" class="mr-2">Filter by Chore Type:</label>
 										<select class="form-select form-select-sm" id="choreType" name="choreType">
-												<option value="" selected="@(Model.HomeChoreType == "")">All</option>
-												<option value="Cleaning" selected="@(Model.HomeChoreType == "Cleaning")">Cleaning</option>
-												<option value="Laundry" selected="@(Model.HomeChoreType == "Laundry")">Laundry</option>
-												<option value="Kitchen" selected="@(Model.HomeChoreType == "Kitchen")">Kitchen</option>
-												<option value="Bathroom" selected="@(Model.HomeChoreType == "Bathroom")">Bathroom</option>
-												<option value="Bedroom" selected="@(Model.HomeChoreType == "Bedroom")">Bedroom</option>
-												<option value="Outdoors" selected="@(Model.HomeChoreType == "Outdoors")">Outdoors</option>
-												<option value="Organize" selected="@(Model.HomeChoreType == "Organize")">Organize</option>
+											<option value="" selected="@(Model.HomeChoreType == "")">All</option>
+											<option value="Cleaning" selected="@(Model.HomeChoreType == "Cleaning")">Cleaning</option>
+											<option value="Laundry" selected="@(Model.HomeChoreType == "Laundry")">Laundry</option>
+											<option value="Kitchen" selected="@(Model.HomeChoreType == "Kitchen")">Kitchen</option>
+											<option value="Bathroom" selected="@(Model.HomeChoreType == "Bathroom")">Bathroom</option>
+											<option value="Bedroom" selected="@(Model.HomeChoreType == "Bedroom")">Bedroom</option>
+											<option value="Outdoors" selected="@(Model.HomeChoreType == "Outdoors")">Outdoors</option>
+											<option value="Organize" selected="@(Model.HomeChoreType == "Organize")">Organize</option>
 											<option value="Other" selected="@(Model.HomeChoreType == "Other")">Other</option>
-											</select>
-										</div>
+										</select>
+									</div>
 
 									<button type="submit" class="btn btn-outline-info btn-sm">Apply Filters</button>
-									</form>
-								</div>
+								</form>
 							</div>
+						</div>
 					</div>
 
 
@@ -196,6 +222,13 @@ else
 								}
 							</select>
 						</div>
+						@if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+						{
+							<div class="alert alert-danger" role="alert">
+								@TempData["ErrorMessage"]
+							</div>
+						}
+
 						<button type="submit" class="btn btn-primary">Save</button>
 					</form>
 				</div>
@@ -203,6 +236,8 @@ else
 		</div>
 	</div>
 </div>
+
+
 @{
 	var userColors = new string[] { "#FAEDCB", "#C9E4DE", "#C6DEF1", "#DBCDF0", "#F2C6DE", "#F8F3E8", "#E6F8F6", "#F8DBB8", "#CDE8E6", "F6C7B3", "5B96A9" };
 	var assignedUsers = Model.HomeChoreResponse.Select(c => c.HomeMemberId).Distinct().Where(id => id != null).ToList();
@@ -214,10 +249,21 @@ else
 		userColorMap.Add(userKey, userColors[i % userColors.Length]);
 	}
 }
-
 <script>
-
 	$(function () {
+		var errorMessage = '@TempData["ErrorMessage"]';
+		if (errorMessage !== "") {
+			// Show the modal here
+			$('#myModal').modal('show');
+		}
+
+		var errorSystemMessage = '@TempData["ErrorSystemMessage"]';
+		if (errorSystemMessage !== "") {
+			// Show the modal here
+			$('#SystemAssignModal - @Model.Id').modal('show');
+		}
+		
+
 		$('#calendar').fullCalendar({
 			defaultView: 'month',
 			firstDay: 1,
@@ -242,7 +288,7 @@ else
 					},
 		</text>
 	}
-				],
+					],
 			eventRender: function (event, element) {
 				var assignedMemberId = event.assigned;
 				var assignedMemberInitials = '';
@@ -305,6 +351,9 @@ else
 					$('#assign-to-selection').show();
 					$('#vote-to-selection').hide();
 				}
+
+
+				// Show the modal here
 				$('#myModal').modal('show');
 
 				var task = calEvent.task;
@@ -339,6 +388,55 @@ else
 				$('#task-id').val(calEvent.id);
 				$('#chosen-task-id').val(calEvent.id);
 			}
+
 		});
 	});
 </script>
+<style>
+	.form-check-input[type=checkbox] {
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		border: 2px solid #ccc;
+		outline: none;
+		cursor: pointer;
+		transition: background-color 0.3s;
+		position: relative;
+		vertical-align: middle;
+	}
+
+		.form-check-input[type=checkbox]::before {
+			content: "";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 20px;
+			height: 20px;
+			background-color: transparent;
+			border-radius: 50%;
+			transition: background-color 0.3s;
+		}
+
+		.form-check-input[type=checkbox]:checked::before {
+			background-color: #007bff;
+		}
+
+		.form-check-input[type=checkbox]:checked::after {
+			content: "\2713";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			color: #fff;
+			font-size: 16px;
+		}
+
+	.form-check-label {
+		margin-left: 5px;
+		vertical-align: middle;
+	}
+</style>

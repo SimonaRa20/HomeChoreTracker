@@ -133,16 +133,20 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
                 var response = await httpClient.PutAsJsonAsync(apiUrl, AssignedHomeMember);
 
+                
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
                 }
                 else
                 {
-                    var errorMessage = await response.Content.ReadAsStringAsync();
-                    ModelState.AddModelError(string.Empty, errorMessage);
-                    return Page();
-                }
+					var errorMessage = await response.Content.ReadAsStringAsync();
+					// Pass the error message to the modal
+					TempData["ErrorMessage"] = errorMessage;
+					ModelState.AddModelError("", errorMessage);
+					//return Page();
+					return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
+				}
 
             }
         }
@@ -185,7 +189,26 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var apiUrl = _config["ApiUrl"] + $"/Calendar/AssignTasksToMembers/{homeId}";
+
+                bool googleCheck = false;
+                if(Request.Form["googleCheck"] == "on")
+                {
+                    googleCheck = true;
+                }
+
+				bool busyIntervalCheck = false;
+				if (Request.Form["busyIntervalCheck"] == "on")
+				{
+					busyIntervalCheck = true;
+				}
+
+				bool assignedHomeChoresCheck = false;
+				if (Request.Form["assignedHomeChoresCheck"] == "on")
+				{
+					assignedHomeChoresCheck = true;
+				}
+
+				var apiUrl = _config["ApiUrl"] + $"/Calendar/AssignTasksToMembers/{homeId}?googleCheck={googleCheck}&busyIntervalCheck={busyIntervalCheck}&assignedHomeChoresCheck={assignedHomeChoresCheck}";
                 var emptyContent = new StringContent("");
                 var response = await httpClient.PostAsync(apiUrl, emptyContent);
 
@@ -195,10 +218,10 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 }
                 else
                 {
-                    var errorMessage = await response.Content.ReadAsStringAsync();
-                    ModelState.AddModelError(string.Empty, errorMessage);
-                    return Page();
-                }
+					var errorMessage = await response.Content.ReadAsStringAsync();
+					TempData["ErrorSystemMessage"] = errorMessage;
+					return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
+				}
             }
         }
     }
