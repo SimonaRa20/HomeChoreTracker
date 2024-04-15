@@ -12,5 +12,6 @@
         public string LevelType { get; set; }
         public string Time { get; set; }
         public bool IsDone { get; set; }
+        public string Product { get; set; }
     }
 }

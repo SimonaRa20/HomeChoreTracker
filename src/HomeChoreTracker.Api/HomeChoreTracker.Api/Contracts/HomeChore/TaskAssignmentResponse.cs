@@ -14,5 +14,6 @@ namespace HomeChoreTracker.Api.Contracts.HomeChore
         public bool IsDone { get; set; }
         public int TotalVotes { get; set; }
         public bool IsApproved { get; set; }
+        public string Product { get; set; }
     }
 }

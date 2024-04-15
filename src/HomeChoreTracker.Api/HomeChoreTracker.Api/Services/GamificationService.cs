@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Constants;
+﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using HomeChoreTracker.Api.Repositories;
@@ -166,28 +167,32 @@ namespace HomeChoreTracker.Api.Services
 							var user = await _userRepository.GetUserById((int)task.HomeMemberId);
 							task.IsDone = true;
 
-							ShoppingItem shoppingItem = await _purchaseRepository.GetShoppingItemByTaskId(task.TaskId);
-							if(shoppingItem != null)
-							{
-								if (shoppingItem.Time == 1)
-								{
-									var members = await _userRepository.GetHomeMembers(task.HomeId);
-									foreach (var member in members)
-									{
-										Notification notification = new Notification
-										{
-											Title = $"Product '{shoppingItem.Title}' is run out, add to purchase, need for '{homeChore.Name}' task.",
-											IsRead = false,
-											Time = DateTime.Now,
-											UserId = (int)member.Id,
-											User = member,
-										};
-										await _notificationRepository.CreateNotification(notification);
-									}
-								}
+                            List<ShoppingItem> shoppingItems = await _purchaseRepository.GetShoppingItemsByTaskId(task.TaskId);
 
-								shoppingItem.Time = shoppingItem.Time - 1;
-								await _purchaseRepository.UpdateShoppingItem(shoppingItem);
+                            if (shoppingItems != null)
+							{
+								foreach(var shoppingItem in shoppingItems)
+								{
+                                    if (shoppingItem.Time == 1)
+                                    {
+                                        var members = await _userRepository.GetHomeMembers(task.HomeId);
+                                        foreach (var member in members)
+                                        {
+                                            Notification notification = new Notification
+                                            {
+                                                Title = $"Product '{shoppingItem.Title}' is run out, add to purchase, need for '{homeChore.Name}' task.",
+                                                IsRead = false,
+                                                Time = DateTime.Now,
+                                                UserId = (int)member.Id,
+                                                User = member,
+                                            };
+                                            await _notificationRepository.CreateNotification(notification);
+                                        }
+                                    }
+
+                                    shoppingItem.Time = shoppingItem.Time - 1;
+                                    await _purchaseRepository.UpdateShoppingItem(shoppingItem);
+                                }
 							}
 
 							var pointHistory = await _gamificationRepository.GetPointsHistoryByTaskId(task.Id);

@@ -21,12 +21,14 @@ public class CalendarController : Controller
     private readonly ICalendarRepository _calendarRepository;
     private readonly IHomeChoreRepository _homeChoreRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IPurchaseRepository _purchaseRepository;
 
-    public CalendarController(ICalendarRepository calendarRepository, IHomeChoreRepository homeChoreRepository, IUserRepository userRepository)
+    public CalendarController(ICalendarRepository calendarRepository, IHomeChoreRepository homeChoreRepository, IUserRepository userRepository, IPurchaseRepository purchaseRepository)
     {
         _calendarRepository = calendarRepository;
         _homeChoreRepository = homeChoreRepository;
         _userRepository = userRepository;
+        _purchaseRepository = purchaseRepository;
     }
 
     [HttpPost]
@@ -99,6 +101,18 @@ public class CalendarController : Controller
         {
             HomeChoreTask homeChoreTask = await _homeChoreRepository.Get(taskAssignment.TaskId);
 
+            List<ShoppingItem> shoppingItems = await _purchaseRepository.GetShoppingItemsByTaskId(taskAssignment.TaskId);
+            string products = string.Empty;
+
+            if (shoppingItems.Count > 0)
+            {
+                foreach (var item in shoppingItems)
+                {
+                    products += string.Format(item.Title + ',');
+                }
+                products.Substring(0, products.Length - 1);
+            }
+
             TaskAssignmentResponse assignmentResponse = new TaskAssignmentResponse
             {
                 Id = taskAssignment.Id,
@@ -110,6 +124,7 @@ public class CalendarController : Controller
                 HomeId = taskAssignment.HomeId,
                 IsDone = taskAssignment.IsDone,
                 IsApproved = taskAssignment.IsApproved,
+                Product = products
             };
 
             taskAssignments.Add(assignmentResponse);
@@ -125,7 +140,7 @@ public class CalendarController : Controller
         TaskAssignment task = await _homeChoreRepository.GetTaskAssigment(id);
 
         HomeChoreTask homeChoreTask = await _homeChoreRepository.Get(task.TaskId);
-
+        ShoppingItem shoppingItem = await _purchaseRepository.GetShoppingItemByTaskId(task.TaskId);
         HomeChoreEventResponse homeChoreEventResponse = new HomeChoreEventResponse
         {
             Id = task.Id,
@@ -137,7 +152,8 @@ public class CalendarController : Controller
             Points = homeChoreTask.Points,
             LevelType = homeChoreTask.LevelType.ToString(),
             Time = homeChoreTask.Time.ToString(),
-            IsDone = task.IsDone
+            IsDone = task.IsDone,
+            Product = shoppingItem != null ? shoppingItem.Title : string.Empty
         };
 
         return Ok(homeChoreEventResponse);

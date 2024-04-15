@@ -661,6 +661,18 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 HomeChoreTask homeChoreTask = await _homeChoreRepository.Get(taskAssignment.TaskId);
 
+                List<ShoppingItem> shoppingItems = await _purchaseRepository.GetShoppingItemsByTaskId(taskAssignment.TaskId);
+                string products = string.Empty;
+
+                if(shoppingItems.Count > 0)
+                {
+                    foreach (var item in shoppingItems)
+                    {
+                        products += string.Format(item.Title + ',');
+                    }
+                    products.Substring(0, products.Length - 1);
+                }
+                
                 TaskAssignmentResponse assignmentResponse = new TaskAssignmentResponse
                 {
                     Id = taskAssignment.Id,
@@ -673,6 +685,7 @@ namespace HomeChoreTracker.Api.Controllers
                     IsDone = taskAssignment.IsDone,
                     TotalVotes = await _homeChoreRepository.GetTotalVotes(taskAssignment.Id),
                     IsApproved = taskAssignment.IsApproved,
+                    Product = products
                 };
 
                 taskAssignments.Add(assignmentResponse);

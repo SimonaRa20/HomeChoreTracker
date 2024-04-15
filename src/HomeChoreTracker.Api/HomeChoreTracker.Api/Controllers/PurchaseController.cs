@@ -127,7 +127,7 @@ namespace HomeChoreTracker.Api.Controllers
 
                     shoppingItem.IsCompleted = item.IsCompleted;
                     shoppingItem.WasBought = DateTime.Now;
-                    _purchaseRepository.UpdateShoppingItem(shoppingItem);
+                    await _purchaseRepository.UpdateShoppingItem(shoppingItem);
                 }
 
 

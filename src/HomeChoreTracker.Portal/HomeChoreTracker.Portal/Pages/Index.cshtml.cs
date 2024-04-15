@@ -2,6 +2,7 @@ using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Calendar;
 using HomeChoreTracker.Portal.Models.HomeChore;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
+using HomeChoreTracker.Portal.Models.Purchase;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -77,6 +78,7 @@ namespace HomeChoreTracker.Portal.Pages
                             description = chore.Task.Description,
                             type = chore.Task.ChoreType.ToString(),
                             time = chore.Task.Time.ToString(),
+                            product = chore.Product != string.Empty ? chore.Product : "-"
                         });
                     }
                     return Page();

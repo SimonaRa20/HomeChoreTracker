@@ -73,6 +73,7 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         time = chore.Task.Time.ToString(),
                         isDone = chore.IsDone,
                         votes = chore.TotalVotes,
+                        product = chore.Product,
                     });
 
                     var apiUrlMembers = $"{_config["ApiUrl"]}/Home/HomeMembers?homeId={Id}";

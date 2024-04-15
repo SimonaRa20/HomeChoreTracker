@@ -70,6 +70,7 @@ else if (User.IsInRole("User"))
                                     <p><strong>Level Type:</strong> <span id="modalLevelType"></span></p>
                                     <p><strong>How long have to take:</strong> <span id="modalTime"></span></p>
                                     <p><strong>Date:</strong> <span id="modalStartDate"></span> / <span id="modalEndDate"></span></p>
+                                    <p><strong>Product:</strong> <span id="modalProduct"></span></p>
                                     <div class="form-check">
                                         <input type="hidden" id="modalId" name="id" value="" />
                                         <div id="doneCheckbox">
@@ -171,6 +172,13 @@ else
                         $('#modalPoints').text(response.points);
                         $('#modalLevelType').text(response.levelType);
                         $('#modalChoreType').text(response.choreType);
+
+                        if(response.product === ''){
+                            $('#modalProduct').text("-");
+                        }else{
+                            $('#modalProduct').text(response.product);
+                        }
+                        
 
                         var startDate = moment(response.startDate).format('YYYY-MM-DD HH:mm');
                         var endDate = moment(response.endDate).format('YYYY-MM-DD HH:mm');
