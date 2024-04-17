@@ -18,7 +18,7 @@ namespace HomeChoreTracker.Api.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task AddHomeChoreBase(HomeChoreBase homeChoreBase, int homeId)
+        public async Task<HomeChoreTask> AddHomeChoreBase(HomeChoreBase homeChoreBase, int homeId)
         {
             HomeChoreTask homeChore = new HomeChoreTask
             {
@@ -40,6 +40,8 @@ namespace HomeChoreTracker.Api.Repositories
 
             await _dbContext.HomeChoreTasks.AddAsync(homeChore);
             await _dbContext.SaveChangesAsync();
+
+            return homeChore;
         }
 
         public async Task AddTaskAssignment(TaskAssignment taskAssignment)

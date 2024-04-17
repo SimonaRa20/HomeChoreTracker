@@ -17,8 +17,9 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task<int> GetUserIdByEmail(string inviteeEmail)
         {
-            return await _dbContext.Users.Where(x=>x.Email == inviteeEmail).Select(x => x.Id).FirstOrDefaultAsync();
+            return await _dbContext.Users.Where(x=>x.Email.Equals(inviteeEmail)).Select(x => x.Id).FirstOrDefaultAsync();
         }
+
         public async Task<User> GetUserById(int id)
         {
             return await _dbContext.Users
@@ -70,7 +71,6 @@ namespace HomeChoreTracker.Api.Repositories
         {
             return await _dbContext.BusyIntervals.FindAsync(id);
         }
-
 
         public async Task UpdateInterval(BusyInterval interval)
         {

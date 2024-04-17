@@ -6,7 +6,7 @@ namespace HomeChoreTracker.Api.Interfaces
     public interface IHomeChoreBaseRepository
     {
         Task<List<HomeChoreBase>> GetAll();
-        Task AddHomeChoreBase(HomeChoreBaseRequest homeChoreBase);
+        Task<HomeChoreBase> AddHomeChoreBase(HomeChoreBaseRequest homeChoreBase);
         Task<HomeChoreBase> GetChoreBase(int id);
         Task Save();
         Task Update(HomeChoreBase homeChoreBase);

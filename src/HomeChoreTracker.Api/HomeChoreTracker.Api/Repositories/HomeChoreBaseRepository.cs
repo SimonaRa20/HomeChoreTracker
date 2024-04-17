@@ -21,7 +21,6 @@ namespace HomeChoreTracker.Api.Repositories
             return await _dbContext.HomeChoresBases.ToListAsync();
         }
 
-
         public async Task<HomeChoreBase> GetChoreBase(int id)
         {
             return await _dbContext.HomeChoresBases.FirstOrDefaultAsync(x => x.Id == id);
@@ -32,7 +31,7 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task AddHomeChoreBase(HomeChoreBaseRequest homeChoreBase)
+        public async Task<HomeChoreBase> AddHomeChoreBase(HomeChoreBaseRequest homeChoreBase)
         {
             List<DayOfWeek> dayOfWeeks = new List<DayOfWeek>();
 
@@ -98,6 +97,7 @@ namespace HomeChoreTracker.Api.Repositories
 
             await _dbContext.HomeChoresBases.AddAsync(homeChore);
             await _dbContext.SaveChangesAsync();
+            return homeChore;
         }
 
         public async Task Update(HomeChoreBase homeChoreBase)
