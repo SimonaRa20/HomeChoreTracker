@@ -60,12 +60,9 @@ namespace HomeChoreTracker.Api.IntegrationTests.Shared
 			return await SendRequest<TResponse>(httpRequestMessage);
 		}
 
-
 		public async Task<Response<TResponse>> SendRequest<TResponse>(HttpRequestMessage httpRequestMessage)
 		{
 			var response = await _httpClient.SendAsync(httpRequestMessage);
-
-			string content = await response.Content.ReadAsStringAsync();
 
 			var responseResult = new Response<TResponse>
 			{
@@ -74,16 +71,33 @@ namespace HomeChoreTracker.Api.IntegrationTests.Shared
 				Data = default(TResponse)
 			};
 
-			if (string.IsNullOrEmpty(content))
+			if (!response.IsSuccessStatusCode)
 			{
+				responseResult.Message = $"Request failed with status code {response.StatusCode}.";
 				return responseResult;
 			}
-			var responseData = JsonConvert.DeserializeObject<TResponse>(content);
 
-			responseResult.Data = responseData;
+			if (response.Content.Headers.ContentType.MediaType == "application/pdf" || response.Content.Headers.ContentType.MediaType == "text/calendar")
+			{
+				// Handle PDF response
+				var pdfBytes = await response.Content.ReadAsByteArrayAsync();
+				responseResult.Data = (TResponse)(object)pdfBytes;
+			}
+			else
+			{
+				// Handle JSON response
+				string content = await response.Content.ReadAsStringAsync();
+				if (string.IsNullOrEmpty(content))
+				{
+					return responseResult;
+				}
+				var responseData = JsonConvert.DeserializeObject<TResponse>(content);
+				responseResult.Data = responseData;
+			}
 
 			return responseResult;
 		}
+
 
 		private HttpRequestMessage CreateHttpRequestMessage(HttpMethod httpMethod, Uri relativePath)
 		{

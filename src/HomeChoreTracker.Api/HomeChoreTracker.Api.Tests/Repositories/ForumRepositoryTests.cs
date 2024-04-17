@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentAssertions;
 using HomeChoreTracker.Api.Database;
+using HomeChoreTracker.Api.Models;
 using HomeChoreTracker.Api.Repositories;
 using HomeChoreTracker.Api.Tests.DatabaseFixture;
 using System;
@@ -29,10 +30,10 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 			context.Advices.Add(new Models.Advice
 			{
 				Id = 1,
-				Title = "mfioems",
+				Title = "Advice1",
 				Time = DateTime.Now,
 				Type = Constants.HomeChoreType.Laundry,
-				Description = "esfsfr",
+				Description = "Advice1 description",
 				IsPublic = false,
 				UserId = 1
 			});
@@ -41,6 +42,98 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 			var advice = await repository.GetAdviceById(1);
 
 			advice.Id.Should().Be(1);
+		}
+
+		[Fact]
+		public async Task AddAdvice_ShouldAddAdviceToDatabase()
+		{
+			// Arrange
+			using var context = new HomeChoreTrackerDbContext(_homeChoreTrackerDbFixture.Options);
+			var repository = new ForumRepository(context);
+			var adviceToAdd = new Advice
+			{
+				Id = 2,
+				Title = "Advice2",
+				Time = DateTime.Now,
+				Type = Constants.HomeChoreType.Laundry,
+				Description = "Advice2 description",
+				IsPublic = false,
+				UserId = 1
+			};
+
+			// Act
+			await repository.AddAdvice(adviceToAdd);
+
+			// Assert
+			var addedAdvice = await repository.GetAdviceById(adviceToAdd.Id);
+			Assert.NotNull(addedAdvice);
+		}
+
+		[Fact]
+		public async Task Delete_ShouldDeleteAdviceFromDatabase()
+		{
+			// Arrange
+			using var context = new HomeChoreTrackerDbContext(_homeChoreTrackerDbFixture.Options);
+			var repository = new ForumRepository(context);
+			var adviceToDelete = new Advice
+			{
+				Id = 3,
+				Title = "Advice3",
+				Time = DateTime.Now,
+				Type = Constants.HomeChoreType.Laundry,
+				Description = "Advice3 description",
+				IsPublic = false,
+				UserId = 1
+			};
+			await repository.AddAdvice(adviceToDelete);
+
+			// Act
+			await repository.Delete(adviceToDelete.Id);
+
+			// Assert
+			var deletedAdvice = await repository.GetAdviceById(adviceToDelete.Id);
+			Assert.Null(deletedAdvice);
+		}
+
+		[Fact]
+		public async Task Update_ShouldUpdateAdviceFromDatabase()
+		{
+			// Arrange
+			using var context = new HomeChoreTrackerDbContext(_homeChoreTrackerDbFixture.Options);
+			var repository = new ForumRepository(context);
+			var advice = new Advice
+			{
+				Id = 3,
+				Title = "Advice3",
+				Time = DateTime.Now,
+				Type = Constants.HomeChoreType.Laundry,
+				Description = "Advice3 description",
+				IsPublic = false,
+				UserId = 1
+			};
+
+			var checkAdvice = advice;
+
+			await repository.AddAdvice(advice);
+
+			var adviceUpdate = new Advice
+			{
+				Id = 3,
+				Title = "Advice5",
+				Time = DateTime.Now,
+				Type = Constants.HomeChoreType.Laundry,
+				Description = "Advice3 description",
+				IsPublic = false,
+				UserId = 1
+			};
+
+			// Act
+			await repository.UpdateAdvice(adviceUpdate);
+
+			// Assert
+			var updatedAdvice = await repository.GetAdviceById(adviceUpdate.Id);
+
+			Assert.NotEqual(checkAdvice.Title, updatedAdvice.Title);
 		}
 	}
 }

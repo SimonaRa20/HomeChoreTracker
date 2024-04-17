@@ -6,7 +6,7 @@ namespace HomeChoreTracker.Api.Interfaces
 {
     public interface IHomeRepository
     {
-        Task CreateHome(HomeRequest homeRequest, int userId);
+        Task<Home> CreateHome(HomeRequest homeRequest, int userId);
         Task<bool> CheckOrExistTitle(HomeRequest homeRequest);
         Task Update(Home home);
         Task<List<Home>> GetAll(int userId);

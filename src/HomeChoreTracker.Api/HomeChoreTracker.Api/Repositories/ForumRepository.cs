@@ -3,6 +3,7 @@ using HomeChoreTracker.Api.Contracts.Forum;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
+using iText.StyledXmlParser.Node;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeChoreTracker.Api.Repositories
@@ -87,8 +88,19 @@ namespace HomeChoreTracker.Api.Repositories
 
 		public async Task UpdateAdvice(Advice advice)
 		{
-			_dbContext.Advices.Update(advice);
+			// Find the existing advice entity being tracked
+			var existingAdvice = await _dbContext.Advices.FindAsync(advice.Id);
+
+			existingAdvice.Title = advice.Title;
+			existingAdvice.Time = advice.Time;
+			existingAdvice.Type = advice.Type;
+			existingAdvice.Description = advice.Description;
+			existingAdvice.IsPublic = advice.IsPublic;
+			existingAdvice.UserId = advice.UserId;
+
+			// Save the changes
 			await _dbContext.SaveChangesAsync();
 		}
+
 	}
 }

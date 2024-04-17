@@ -25,7 +25,7 @@ namespace HomeChoreTracker.Api.Repositories
             _gamificationRepository = gamificationRepository;
         }
 
-        public async Task CreateHome(HomeRequest homeRequest, int userId)
+        public async Task<Home> CreateHome(HomeRequest homeRequest, int userId)
         {
             GamificationLevel defaultGamificationLevel = await _gamificationRepository.GetGamificationLevel(1);
 
@@ -49,6 +49,8 @@ namespace HomeChoreTracker.Api.Repositories
 
                 _dbContext.UserHomes.Add(userHome);
                 await _dbContext.SaveChangesAsync();
+
+                return home;
             }
             else
             {

@@ -233,7 +233,6 @@ public class CalendarController : Controller
 		}
 	}
 
-
 	private List<(DateTime start, DateTime end)> FindHomersSuitableTimeIntervals(User user, DateTime startTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals, bool googleCheck, bool busyIntervalCheck, bool assignedHomeChoresCheck)
     {
         List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();

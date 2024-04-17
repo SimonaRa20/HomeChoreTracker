@@ -19,6 +19,23 @@ namespace HomeChoreTracker.Api.IntegrationTests
 		}
 
 		[Fact]
+		public async Task GetGameLevels_ValidCredentials_RetursGamificationLevelsResponse()
+		{
+			// Arrange
+			int id = 2;
+			string uri = baseUri;
+			var client = _factory.GetCustomHttpClient();
+			await client.LoginAsAdministrator();
+
+			// Act
+			var response = await client.Get<List<GamificationLevelResponse>>(uri);
+
+			// Assert
+			response.StatusCode.Should().Be(HttpStatusCode.OK);
+			response.Data.Count.Should().Be(5);
+		}
+
+		[Fact]
 		public async Task GetGameLevel_ValidCredentials_RetursGamificationLevelResponse()
 		{
 			// Arrange
@@ -36,5 +53,52 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			response.Data.PointsRequired.Should().Be(100);
 		}
 
+		[Fact]
+		public async Task GetBadgeWallet_ValidCredentials_RetursBadgeWalletResponse()
+		{
+			// Arrange
+			string uri = baseUri + "/BadgeWallet";
+			var client = _factory.GetCustomHttpClient();
+			await client.LoginAsUser();
+
+			// Act
+			var response = await client.Get<BadgeWalletResponse>(uri);
+
+			// Assert
+			response.StatusCode.Should().Be(HttpStatusCode.OK);
+			response.Data.Id.Should().Be(2);
+		}
+
+		[Fact]
+		public async Task GetRatingsByPoints_ValidCredentials_RetursRatingsByPointsResponse()
+		{
+			// Arrange
+			string uri = baseUri + "/RatingsByPoints";
+			var client = _factory.GetCustomHttpClient();
+			await client.LoginAsUser();
+
+			// Act
+			var response = await client.Get<List<RatingsResponse>>(uri);
+
+			// Assert
+			response.StatusCode.Should().Be(HttpStatusCode.OK);
+			response.Data.Count.Should().Be(4);
+		}
+
+		[Fact]
+		public async Task GetRatingsByBadges_ValidCredentials_RetursRatingsByBadgesResponse()
+		{
+			// Arrange
+			string uri = baseUri + "/RatingsByBadges";
+			var client = _factory.GetCustomHttpClient();
+			await client.LoginAsUser();
+
+			// Act
+			var response = await client.Get<List<RatingsResponse>>(uri);
+
+			// Assert
+			response.StatusCode.Should().Be(HttpStatusCode.OK);
+			response.Data.Count.Should().Be(4);
+		}
 	}
 }

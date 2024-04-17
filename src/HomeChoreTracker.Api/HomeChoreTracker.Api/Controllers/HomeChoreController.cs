@@ -158,7 +158,7 @@ namespace HomeChoreTracker.Api.Controllers
 
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<IActionResult> GetHomeChoresBase(int id)
+        public async Task<IActionResult> GetHomeChores(int id)
         {
             try
             {

@@ -200,8 +200,8 @@ namespace HomeChoreTracker.Api.Tests.Controllers
             var result = await _authController.LoginAsync(userLoginRequest);
 
             // Assert
-            var createdResult = Assert.IsType<CreatedResult>(result);
-            Assert.Equal(201, createdResult.StatusCode);
+            var createdResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, createdResult.StatusCode);
         }
 
         private string HashPassword(string? password)

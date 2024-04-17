@@ -52,8 +52,8 @@ namespace HomeChoreTracker.Api.Controllers
                 };
             }
 
-            await _homeRepository.CreateHome(homeRequest, userId);
-            return Ok($"Home created successfully");
+            var home = await _homeRepository.CreateHome(homeRequest, userId);
+            return Ok(home);
         }
 
         [HttpGet]
@@ -418,6 +418,7 @@ namespace HomeChoreTracker.Api.Controllers
                 return Ok("Invitation declined and removed.");
             }
         }
+
         [HttpGet("HomeMembers")]
         [Authorize(Roles = Role.User)]
         public async Task<IActionResult> GetHomeMembers(int homeId)

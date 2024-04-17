@@ -101,7 +101,6 @@ namespace HomeChoreTracker.Api.Controllers
                     addedCategory = category;
 				}
 
-
                 income = new FinancialRecord
                 {
                     Title = incomeRequest.Title,
