@@ -66,5 +66,42 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			// Assert
 			var okResult = Assert.IsType<BadRequestObjectResult>(result);
 		}
+
+		[Fact]
+		public async Task AssignTasksToMembers_Returns_BadRequestObjectResult_When_UnassignedTasksIsNull()
+		{
+			// Arrange
+			int homeId = 1;
+			bool googleCheck = true;
+			bool busyIntervalCheck = true;
+			bool assignedHomeChoresCheck = true;
+
+			var userRepositoryMock = new Mock<IUserRepository>();
+			var homeChoreRepositoryMock = new Mock<IHomeChoreRepository>();
+
+			var userId = 1;
+			var user = new User { Id = userId };
+			userRepositoryMock.Setup(repo => repo.GetHomeMembers(homeId)).ReturnsAsync(new List<User> { user });
+			userRepositoryMock.Setup(repo => repo.GetUserBusyIntervals(userId)).ReturnsAsync(new List<BusyInterval>());
+			homeChoreRepositoryMock.Setup(repo => repo.GetUnassignedTasks(homeId)).ReturnsAsync((List<TaskAssignment>)null);
+
+			_calendarController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+					{
+						new Claim(ClaimTypes.Name, userId.ToString())
+					}, "mock"))
+				}
+			};
+
+			// Act
+			var result = await _calendarController.AssignTasksToMembers(homeId, googleCheck, busyIntervalCheck, assignedHomeChoresCheck);
+
+			// Assert
+			var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal("There are no unassigned tasks available.", badRequestObjectResult.Value);
+		}
 	}
 }

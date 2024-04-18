@@ -141,7 +141,7 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 string resetToken = GeneratePasswordResetToken(user);
 
-                string resetLink = $"{_config["AppUrl"]}/Auth/RestorePassword?token={HttpUtility.UrlEncode(resetToken)}";
+                string resetLink = $"https://localhost:44336/Auth/RestorePassword?token={HttpUtility.UrlEncode(resetToken)}";
 
                 SendPasswordResetEmail(email, resetLink);
 

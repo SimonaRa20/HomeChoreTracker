@@ -291,9 +291,11 @@ namespace HomeChoreTracker.Api.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task Update(HomeChoreTask homeChoreTask)
+        public async Task<HomeChoreTask> Update(HomeChoreTask homeChoreTask)
         {
             _dbContext.Entry(homeChoreTask).State = EntityState.Modified;
+            await Save();
+            return homeChoreTask;
         }
 
         public async Task UpdateTaskAssignment(TaskAssignment assignment)

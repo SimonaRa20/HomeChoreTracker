@@ -328,7 +328,6 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 			var task = await repository.AddHomeChoreBase(homeChoreTask,1);
 			task.Name = "Updated Name";
 			await repository.Update(task);
-			await repository.Save();
 			var updatedTask = await repository.Get(task.Id);
 
 			// Assert
@@ -390,6 +389,5 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 			// Assert
 			Assert.Equal(20, totalPoints);
 		}
-
 	}
 }

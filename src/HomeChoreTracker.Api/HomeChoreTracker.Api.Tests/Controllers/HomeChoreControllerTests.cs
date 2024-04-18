@@ -3,6 +3,7 @@ using AutoMapper;
 using DocumentFormat.OpenXml.Spreadsheet;
 using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.HomeChore;
+using HomeChoreTracker.Api.Contracts.HomeChoreBase;
 using HomeChoreTracker.Api.Contracts.User;
 using HomeChoreTracker.Api.Controllers;
 using HomeChoreTracker.Api.Interfaces;
@@ -218,7 +219,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			bool isDone = true;
 			var homeChore = new TaskAssignment { Id = id, IsDone = isDone, HomeMemberId = 123 }; // Assuming HomeMemberId is set to a valid value
 			var task = new HomeChoreTask { Id = 456 };
-			var user = new User { Id = 123 };
+			var user = new User { Id = 123, BadgeWallet = new BadgeWallet() };
 			var wallet = new BadgeWallet
 			{
 				DoneFirstTask = false,
@@ -249,6 +250,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			_homeChoreRepositoryMock.Setup(repo => repo.GetTaskAssigment(id)).ReturnsAsync(homeChore);
 			_homeChoreRepositoryMock.Setup(repo => repo.Get(homeChore.TaskId)).ReturnsAsync(task);
 			_userRepositoryMock.Setup(repo => repo.GetUserById(homeChore.HomeMemberId.Value)).ReturnsAsync(user);
+			_gamificationRepositoryMock.Setup(repo => repo.GetUserBadgeWallet(user.Id)).ReturnsAsync(wallet); // Mocking the repository method to return the wallet object
 
 			// Act
 			var result = await _homeChoreController.GetHomeChore(id, isDone);
@@ -291,6 +293,283 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			// Assert
 			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
 			Assert.Equal("An error occurred while fetching home chore bases: Exception of type 'System.Exception' was thrown.", badRequestResult.Value);
+		}
+
+		[Fact]
+		public async Task UpdateHomeChore_ReturnsNotFound_When_HomeChoreNotFound()
+		{
+			// Arrange
+			int id = 1;
+			int userId = 123;
+			_homeChoreRepositoryMock.Setup(repo => repo.Get(id)).ReturnsAsync((HomeChoreTask)null);
+			_homeChoreController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+					{
+						new Claim(ClaimTypes.Name, userId.ToString())
+					}, "mock"))
+				}
+			};
+
+			// Act
+			var result = await _homeChoreController.UpdateHomeChore(id, new HomeChoreBaseRequest());
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal($"Home chore base with ID {id} not found", notFoundResult.Value);
+		}
+
+		[Fact]
+		public async Task UpdateHomeChore_ReturnsOk_When_HomeChoreUpdatedSuccessfully()
+		{
+			// Arrange
+			int id = 1;
+			int userId = 123;
+			var homeChore = new HomeChoreTask { Id = id, StartDate = DateTime.Now.AddDays(-6), EndDate = DateTime.Now };
+
+			var validRequest = new HomeChoreBaseRequest
+			{
+				Name = "Sample Name",
+				ChoreType = HomeChoreType.Laundry,
+				Description = "Sample Description",
+				Points = 10,
+				LevelType = LevelType.Medium,
+				Time = TimeLong.hour,
+				Interval = 1,
+				Unit = RepeatUnit.Day,
+				DaysOfWeek = new List<int> { 1, 2, 3 },
+				DayOfMonth = 15,
+				MonthlyRepeatType = MonthlyRepeatType.DayOfMonth,
+				StartDate = DateTime.Now.AddDays(-6),
+				EndDate = DateTime.Now
+			};
+
+			_homeChoreRepositoryMock.Setup(repo => repo.Get(id)).ReturnsAsync(homeChore);
+			_homeChoreRepositoryMock.Setup(repo => repo.Update(It.IsAny<HomeChoreTask>()));
+			_homeChoreController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+					{
+				new Claim(ClaimTypes.Name, userId.ToString())
+					}, "mock"))
+				}
+			};
+
+			// Act
+			var result = await _homeChoreController.UpdateHomeChore(id, validRequest);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal($"Home chore base with ID {id} updated successfully", okResult.Value);
+		}
+
+
+		[Fact]
+		public async Task UpdateHomeChoreOrganize_ReturnsOk_When_HomeChoreUpdatedSuccessfully()
+		{
+			// Arrange
+			int id = 1;
+			int userId = 123;
+			var homeChore = new HomeChoreTask { Id = id, StartDate = DateTime.Now.AddDays(-6), EndDate = DateTime.Now };
+
+			var validRequest = new HomeChoreBaseRequest
+			{
+				Name = "Sample Name",
+				ChoreType = HomeChoreType.Organize,
+				Description = "Sample Description",
+				Points = 10,
+				LevelType = LevelType.Medium,
+				Time = TimeLong.hour,
+				Interval = 1,
+				Unit = RepeatUnit.Week,
+				DaysOfWeek = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 },
+				DayOfMonth = 15,
+				MonthlyRepeatType = MonthlyRepeatType.DayOfMonth,
+				StartDate = DateTime.Now.AddDays(-6),
+				EndDate = DateTime.Now,
+			};
+
+			_homeChoreRepositoryMock.Setup(repo => repo.Get(id)).ReturnsAsync(homeChore);
+			_homeChoreRepositoryMock.Setup(repo => repo.Update(It.IsAny<HomeChoreTask>()));
+			_homeChoreController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+					{
+				new Claim(ClaimTypes.Name, userId.ToString())
+					}, "mock"))
+				}
+			};
+
+			// Act
+			var result = await _homeChoreController.UpdateHomeChore(id, validRequest);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal($"Home chore base with ID {id} updated successfully", okResult.Value);
+		}
+
+		[Fact]
+		public async Task UpdateHomeChoreMonth_ReturnsOk_When_HomeChoreUpdatedSuccessfully()
+		{
+			// Arrange
+			int id = 1;
+			int userId = 123;
+			var homeChore = new HomeChoreTask { Id = id, StartDate = DateTime.Now.AddDays(-6), EndDate = DateTime.Now };
+
+			var validRequest = new HomeChoreBaseRequest
+			{
+				Name = "Sample Name",
+				ChoreType = HomeChoreType.Organize,
+				Description = "Sample Description",
+				Points = 10,
+				LevelType = LevelType.Medium,
+				Time = TimeLong.hour,
+				Interval = 1,
+				Unit = RepeatUnit.Month,
+				DaysOfWeek = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 },
+				DayOfMonth = 15,
+				MonthlyRepeatType = MonthlyRepeatType.DayOfMonth,
+				StartDate = DateTime.Now.AddDays(-6),
+				EndDate = DateTime.Now,
+			};
+
+			_homeChoreRepositoryMock.Setup(repo => repo.Get(id)).ReturnsAsync(homeChore);
+			_homeChoreRepositoryMock.Setup(repo => repo.Update(It.IsAny<HomeChoreTask>()));
+			_homeChoreController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+					{
+				new Claim(ClaimTypes.Name, userId.ToString())
+					}, "mock"))
+				}
+			};
+
+			// Act
+			var result = await _homeChoreController.UpdateHomeChore(id, validRequest);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal($"Home chore base with ID {id} updated successfully", okResult.Value);
+		}
+
+		[Fact]
+		public async Task UpdateHomeChoreYear_ReturnsOk_When_HomeChoreUpdatedSuccessfully()
+		{
+			// Arrange
+			int id = 1;
+			int userId = 123;
+			var homeChore = new HomeChoreTask { Id = id, StartDate = DateTime.Now.AddDays(-6), EndDate = DateTime.Now };
+
+			var validRequest = new HomeChoreBaseRequest
+			{
+				Name = "Sample Name",
+				ChoreType = HomeChoreType.Organize,
+				Description = "Sample Description",
+				Points = 10,
+				LevelType = LevelType.Medium,
+				Time = TimeLong.hour,
+				Interval = 1,
+				Unit = RepeatUnit.Year,
+				DaysOfWeek = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 },
+				DayOfMonth = 15,
+				MonthlyRepeatType = MonthlyRepeatType.DayOfMonth,
+				StartDate = DateTime.Now.AddDays(-6),
+				EndDate = DateTime.Now,
+			};
+
+			_homeChoreRepositoryMock.Setup(repo => repo.Get(id)).ReturnsAsync(homeChore);
+			_homeChoreRepositoryMock.Setup(repo => repo.Update(It.IsAny<HomeChoreTask>()));
+			_homeChoreController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+					{
+				new Claim(ClaimTypes.Name, userId.ToString())
+					}, "mock"))
+				}
+			};
+
+			// Act
+			var result = await _homeChoreController.UpdateHomeChore(id, validRequest);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal($"Home chore base with ID {id} updated successfully", okResult.Value);
+		}
+		[Fact]
+		public async Task VoteArticle_ReturnsOkResult_When_VoteTaskIsSuccessful()
+		{
+			// Arrange
+			int taskId = 1;
+			int voteValue = 1;
+			int userId = 123;
+
+			var userClaims = new Claim[]
+			{
+				new Claim(ClaimTypes.Name, userId.ToString())
+			};
+			var userPrincipal = new ClaimsPrincipal(new ClaimsIdentity(userClaims, "mock"));
+
+			_homeChoreRepositoryMock.Setup(repo => repo.VoteArtical(taskId, userId, voteValue)).ReturnsAsync(true);
+			_homeChoreRepositoryMock.Setup(repo => repo.GetTaskAssigment(taskId)).ReturnsAsync(new TaskAssignment());
+			_homeChoreRepositoryMock.Setup(repo => repo.Get(It.IsAny<int>())).ReturnsAsync(new HomeChoreTask());
+			_userRepositoryMock.Setup(repo => repo.GetUserById(userId)).ReturnsAsync(new User());
+			_homeRepositoryMock.Setup(repo => repo.GetHomeMembers(It.IsAny<int>())).ReturnsAsync(new List<UserGetResponse>());
+
+			_homeChoreController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = userPrincipal
+				}
+			};
+
+			// Act
+			var result = await _homeChoreController.VoteArticle(taskId, voteValue);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.True((bool)okResult.Value);
+		}
+
+		[Fact]
+		public async Task VoteArticle_ReturnsBadRequestResult_When_ExceptionThrown()
+		{
+			// Arrange
+			int taskId = 1;
+			int voteValue = 1;
+			int userId = 123;
+
+			var userClaims = new Claim[]
+			{
+				new Claim(ClaimTypes.Name, userId.ToString())
+			};
+			var userPrincipal = new ClaimsPrincipal(new ClaimsIdentity(userClaims, "mock"));
+
+			_homeChoreRepositoryMock.Setup(repo => repo.VoteArtical(taskId, userId, voteValue)).ThrowsAsync(new Exception());
+
+			_homeChoreController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = userPrincipal
+				}
+			};
+
+			// Act
+			var result = await _homeChoreController.VoteArticle(taskId, voteValue);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
 		}
 	}
 }

@@ -901,7 +901,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 				HttpContext = new DefaultHttpContext { User = user }
 			};
 
-			_homeRepositoryMock.Setup(repo => repo.OrHomeMember(homeId, userId)).ReturnsAsync(true); // User is a member of the home
+			_homeRepositoryMock.Setup(repo => repo.OrHomeMember(homeId, userId)).ReturnsAsync(true);
 			_incomeRepositoryMock.Setup(repo => repo.GetTotalHomeIncomeForMonth(It.IsAny<DateTime>(), homeId))
 				.ReturnsAsync(1500.0m);
 			_expenseRepositoryMock.Setup(repo => repo.GetTotalHomeExpenseForMonth(It.IsAny<DateTime>(), homeId))
@@ -920,5 +920,59 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 				Assert.Equal(800.0m, summary.TotalExpense);
 			}
 		}
+
+		[Fact]
+		public async Task GetIncomeById_Returns_NotFound_When_Income_Not_Found()
+		{
+			// Arrange
+			var incomeId = 123;
+			_incomeRepositoryMock.Setup(repo => repo.GetIncomeById(incomeId)).ReturnsAsync((IncomeResponse)null);
+
+			// Act
+			var result = await _financeController.GetIncomeById(incomeId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal($"Income with ID {incomeId} not found", notFoundResult.Value);
+		}
+
+		[Fact]
+		public async Task GetExpenseById_Returns_NotFound_When_Expense_Not_Found()
+		{
+			// Arrange
+			var expenseId = 123;
+			_expenseRepositoryMock.Setup(repo => repo.GetExpenseById(expenseId)).ReturnsAsync((ExpenseResponse)null);
+
+			// Act
+			var result = await _financeController.GetExpenseById(expenseId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal($"Expense with ID {expenseId} not found", notFoundResult.Value);
+		}
+
+		[Fact]
+		public async Task GetCurrentMonthTotalBalance_Forbidden_When_User_Not_Home_Member()
+		{
+			// Arrange
+			int userId = 1;
+			int homeId = 123;
+			var claims = new[] { new Claim(ClaimTypes.Name, userId.ToString()) };
+			var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
+			_financeController.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext { User = user }
+			};
+
+			_homeRepositoryMock.Setup(repo => repo.OrHomeMember(homeId, userId)).ReturnsAsync(false);
+
+			// Act
+			var result = await _financeController.GetCurrentMonthTotalBalance(homeId);
+
+			// Assert
+			var forbiddenResult = Assert.IsType<ForbidResult>(result);
+			Assert.NotNull(forbiddenResult);
+		}
+
 	}
 }

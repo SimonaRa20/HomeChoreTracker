@@ -231,5 +231,50 @@ namespace HomeChoreTracker.Api.Tests.Controllers
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal("Invalid email or password. Please try again.", notFoundResult.Value);
         }
-    }
+
+		[Fact]
+		public async Task RestorePassword_Returns_Ok_When_UserExists()
+		{
+			// Arrange
+			var userEmail = "test@gmail.com";
+			var resetToken = "testResetToken";
+			var resetLink = "http://example.com/reset";
+
+			var user = new User
+			{
+				Id = 1,
+				UserName = "TestUser",
+				Email = userEmail,
+			};
+
+			var authRepositoryMock = new Mock<IAuthRepository>();
+			authRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
+
+			var authController = new AuthController(null, authRepositoryMock.Object, null);
+
+			// Act
+			var result = await authController.RestorePassword(userEmail);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal("Password reset link sent successfully.", okResult.Value);
+		}
+
+		[Fact]
+		public async Task RestorePassword_Returns_NotFound_When_UserDoesNotExist()
+		{
+			// Arrange
+			var email = "test@example.com";
+
+			var authRepositoryMock = new Mock<IAuthRepository>();
+			authRepositoryMock.Setup(repo => repo.GetUserByEmail(email)).ReturnsAsync((User)null);
+
+			// Act
+			var result = await _authController.RestorePassword(email);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal("Invalid email. Please try again.", notFoundResult.Value);
+		}
+	}
 }
