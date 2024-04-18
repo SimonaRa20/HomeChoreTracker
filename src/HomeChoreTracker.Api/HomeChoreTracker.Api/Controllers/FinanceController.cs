@@ -83,7 +83,6 @@ namespace HomeChoreTracker.Api.Controllers
 
                 FinancialCategory addedCategory = new FinancialCategory();
 
-
 				if (category == null)
                 {
 					FinancialCategory newfinancialCategory = new FinancialCategory
@@ -164,7 +163,6 @@ namespace HomeChoreTracker.Api.Controllers
 
 				FinancialCategory addedCategory = new FinancialCategory();
 
-
 				if (category == null)
 				{
 					FinancialCategory newfinancialCategory = new FinancialCategory
@@ -235,7 +233,7 @@ namespace HomeChoreTracker.Api.Controllers
 			if(type.Equals("income"))
 			{
                 await _incomeRepository.Delete(id);
-                return Ok($"Expense with ID {id} deleted successfully");
+                return Ok($"Income with ID {id} deleted successfully");
             }
 			else
 			{
@@ -243,7 +241,6 @@ namespace HomeChoreTracker.Api.Controllers
                 return Ok($"Expense with ID {id} deleted successfully");
             }
         }
-
 
         [HttpDelete("income/{id}")]
 		[Authorize]
@@ -1089,6 +1086,5 @@ namespace HomeChoreTracker.Api.Controllers
                 return File(pdfBytes, "application/pdf", "financial_report.pdf");
             }
         }
-
     }
 }

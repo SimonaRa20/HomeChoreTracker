@@ -18,6 +18,7 @@ namespace HomeChoreTracker.Api.Repositories
             _dbContext = dbContext;
         }
 
+
         public async Task<HomeChoreTask> AddHomeChoreBase(HomeChoreBase homeChoreBase, int homeId)
         {
             HomeChoreTask homeChore = new HomeChoreTask
@@ -267,7 +268,7 @@ namespace HomeChoreTracker.Api.Repositories
 
             foreach (var task in tasks)
             {
-                if (task.TaskId.Equals(id) && task.HomeMemberId == null)
+                if (task.TaskId.Equals(id) && task.HomeMemberId != null)
                 {
                     _dbContext.TaskAssignments.Remove(task);
                     await _dbContext.SaveChangesAsync();

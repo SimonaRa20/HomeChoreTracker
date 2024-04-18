@@ -98,16 +98,6 @@ namespace HomeChoreTracker.Api.Controllers
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
 			var adviceToUpdate = await _forumRepository.GetAdviceById(id);
 
-			if (adviceToUpdate == null)
-			{
-				return NotFound($"Advice with ID {id} not found");
-			}
-
-			if (adviceToUpdate.UserId != userId)
-			{
-				return Unauthorized("You do not have permission to update this advice");
-			}
-
 			adviceToUpdate.Title = adviceRequest.Title;
 			adviceToUpdate.Type = adviceRequest.Type;
 			adviceToUpdate.Description = adviceRequest.Description;
