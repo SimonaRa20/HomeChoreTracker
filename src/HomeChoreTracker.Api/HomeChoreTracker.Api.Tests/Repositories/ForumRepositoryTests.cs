@@ -77,7 +77,6 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 			var repository = new ForumRepository(context);
 			var adviceToDelete = new Advice
 			{
-				Id = 3,
 				Title = "Advice3",
 				Time = DateTime.Now,
 				Type = Constants.HomeChoreType.Laundry,
@@ -116,24 +115,15 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 
 			await repository.AddAdvice(advice);
 
-			var adviceUpdate = new Advice
-			{
-				Id = 3,
-				Title = "Advice5",
-				Time = DateTime.Now,
-				Type = Constants.HomeChoreType.Laundry,
-				Description = "Advice3 description",
-				IsPublic = false,
-				UserId = 1
-			};
+			advice.Title = "Mandarinas";
 
 			// Act
-			await repository.UpdateAdvice(adviceUpdate);
+			await repository.UpdateAdvice(advice);
 
 			// Assert
-			var updatedAdvice = await repository.GetAdviceById(adviceUpdate.Id);
+			var updatedAdvice = await repository.GetAdviceById(advice.Id);
 
-			Assert.NotEqual(checkAdvice.Title, updatedAdvice.Title);
+			Assert.Equal("Mandarinas", updatedAdvice.Title);
 		}
 	}
 }

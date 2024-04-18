@@ -77,14 +77,6 @@ namespace HomeChoreTracker.Api.Repositories
 
         public async Task<string> InviteUserToHome(int inviterUserId, int homeId, string inviteeEmail)
         {
-            var isAdmin = await _dbContext.UserHomes
-                .AnyAsync(uh => uh.UserId == inviterUserId && uh.HomeId == homeId);
-
-            if (!isAdmin)
-            {
-                throw new InvalidOperationException("Only HomeAdmin can invite users to the home.");
-            }
-
             var token = GenerateInvitationToken();
 
             var invitation = new HomeInvitation

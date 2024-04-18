@@ -104,7 +104,7 @@ namespace HomeChoreTracker.Api.Repositories
                     LevelType = homeChoreRequest.LevelType,
                     Interval = homeChoreRequest.Interval,
                     Unit = homeChoreRequest.Unit,
-                    DaysOfWeek = dayOfWeeks,
+					DaysOfWeek = dayOfWeeks,
                     DayOfMonth = homeChoreRequest.DayOfMonth,
                     MonthlyRepeatType = homeChoreRequest.MonthlyRepeatType,
                     UserId = userId,

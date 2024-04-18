@@ -664,7 +664,7 @@ namespace HomeChoreTracker.Api.Controllers
                 List<ShoppingItem> shoppingItems = await _purchaseRepository.GetShoppingItemsByTaskId(taskAssignment.TaskId);
                 string products = string.Empty;
 
-                if(shoppingItems.Count > 0)
+                if(shoppingItems != null && shoppingItems.Count > 0)
                 {
                     foreach (var item in shoppingItems)
                     {

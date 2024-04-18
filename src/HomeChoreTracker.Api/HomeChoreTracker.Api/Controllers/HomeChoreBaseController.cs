@@ -137,14 +137,11 @@ namespace HomeChoreTracker.Api.Controllers
                 {
                     foreach (int day in homeChoreBaseRequest.DaysOfWeek)
                     {
-                        if (day == 0)
-                        {
-                            if (day == 0)
-                            {
-                                dayOfWeeks.Add(DayOfWeek.Default);
-                            }
-                        }
-                        if (day == 1)
+						if (day == 0)
+						{
+							dayOfWeeks.Add(DayOfWeek.Default);
+						}
+						if (day == 1)
                         {
                             dayOfWeeks.Add(DayOfWeek.Monday);
                         }

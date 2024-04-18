@@ -27,20 +27,16 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 		private readonly Mock<ICalendarRepository> _calendarRepositoryMock;
 		private readonly Mock<IUserRepository> _userRepositoryMock;
 		private readonly Mock<IHomeChoreRepository> _homeChoreRepositoryMock;
-		private readonly Mock<IAuthRepository> _authRepositoryMock;
 		private readonly Mock<IPurchaseRepository> _purchaseRepositoryMock;
-		private readonly Mock<IMapper> _mapperMock;
 
 		public CalendarControllerTests()
 		{
 			_fixture = new Fixture();
 			_fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-			_authRepositoryMock = new Mock<IAuthRepository>();
 			_userRepositoryMock = new Mock<IUserRepository>();
 			_calendarRepositoryMock = new Mock<ICalendarRepository>();
 			_homeChoreRepositoryMock = new Mock<IHomeChoreRepository>();
 			_purchaseRepositoryMock = new Mock<IPurchaseRepository>();
-			_mapperMock = new Mock<IMapper>();
 			_calendarController = new CalendarController(_calendarRepositoryMock.Object, _homeChoreRepositoryMock.Object, _userRepositoryMock.Object,_purchaseRepositoryMock.Object);
 		}
 
