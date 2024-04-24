@@ -42,6 +42,12 @@
                             <span>Manage default home chores</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="~/Avatars">
+                            <i class="fa fa-user-circle" aria-hidden="true"></i>
+                            <span>Manage avatars</span>
+                        </a>
+                    </li>
                 }
 
                 @if (User.IsInRole("User"))
@@ -103,10 +109,14 @@
                                     <i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                    <a class="dropdown-item" asp-page="/Profile" method="get">
-                                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400" ></i>
-                                        Profile
-                                    </a>
+                                    @if(User.IsInRole("User"))
+                                    {
+                                        <a class="dropdown-item" asp-page="/Profile" method="get">
+                                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                            Profile
+                                        </a>
+                                    }
+                                    
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Logout

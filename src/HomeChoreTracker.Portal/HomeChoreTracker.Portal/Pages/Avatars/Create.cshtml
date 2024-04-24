@@ -1,0 +1,87 @@
+﻿@page
+@model HomeChoreTracker.Portal.Pages.Avatars.CreateModel
+@section HeadContent
+{
+    <title>@ViewData["Title"] - Home Chore Tracker</title>
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet" asp-append-version="true">
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+    <!-- Add the following lines to include required Bootstrap and jQuery files -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+<body>
+
+    @if (!User.Identity.IsAuthenticated)
+    {
+        Response.Redirect("/Auth/Login");
+    }
+    else if (User.IsInRole("Admin"))
+    {
+        <div class="row">
+            <div class="col-lg-12">
+                <a class="btn btn-light btn-sm mb-2" href="/Avatars"><i class="fa fa-user-circle mr-2" aria-hidden="true"></i>Avatars</a>
+                <a class="btn btn-secondary btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
+
+                <div class="card mb-4 py-3 border-left-primary">
+                    <div class="card-body">
+                        <form method="post" asp-action="Create" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="AvatarType">Avatar Type</label>
+                                <select class="form-control" id="AvatarType" name="CreateAvatar.AvatarType" asp-for="CreateAvatar.AvatarType" required>
+                                    @foreach (var avatarType in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.AvatarType)))
+                                    {
+                                        <option value="@((int)avatarType)">@avatarType</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CreateAvatar.AvatarType" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Image">Image</label>
+                                <input type="file" class="form-control-file" id="Image" name="Image" asp-for="CreateAvatar.Image" accept="image/*" />
+                                <span class="text-danger" id="image-error"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card mb-4 py-3 border-left-primary">
+
+                    <div class="collapse show">
+                        <div class="card-body">
+                            <p>You don't have permission to view this content.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K+1ClXaRhPU17yAPQnQA4Gn4kKgdCjP/vt3kS2uF78w=" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('form').submit(function () {
+            var isValid = true;
+            var image = $('#Image').val().trim();
+            if (image === '') {
+                $('#image-error').text('Image is required.');
+                isValid = false;
+            } else {
+                $('#image-error').text('');
+            }
+
+            return isValid;
+        });
+    });
+</script>

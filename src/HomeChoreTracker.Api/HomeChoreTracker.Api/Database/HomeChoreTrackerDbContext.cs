@@ -29,6 +29,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<GamificationLevel> GamificationLevels { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<BadgeWallet> BadgeWallets { get; set; }
+        public DbSet<Avatar> Avatars { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

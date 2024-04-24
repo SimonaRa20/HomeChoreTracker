@@ -94,6 +94,7 @@ namespace HomeChoreTracker.Api
             builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
             builder.Services.AddScoped<IGamificationRepository, GamificationRepository>();
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+            builder.Services.AddScoped<IAvatarRepository, AvatarRepository>();
             builder.Services.AddHostedService<GamificationService>();
             var app = builder.Build();
 
