@@ -96,7 +96,7 @@ namespace HomeChoreTracker.Api.Controllers
 		}
 
 		[HttpGet("GetUserAvatar")]
-		[Authorize(Roles = Role.User)]
+		[Authorize]
 		public async Task<IActionResult> GetUserAvatar()
 		{
 			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);

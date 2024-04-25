@@ -108,7 +108,6 @@ namespace HomeChoreTracker.Api.Repositories
 			{
 				UserId = userId,
 				AvatarId = avatar.Id,
-				PurchaseDate = DateTime.Now,
 				User = user,
 				Avatar = avatar
 			};

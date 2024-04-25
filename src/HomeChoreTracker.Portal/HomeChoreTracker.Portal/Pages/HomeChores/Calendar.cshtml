@@ -302,7 +302,6 @@ else
 					var homeMembersData = @Html.Raw(Json.Serialize(Model.HomeMembers));
 					var assignedMember = homeMembersData.find(member => member.homeMemberId == assignedMemberId);
 					if (assignedMember && assignedMember.image) {
-						// Display user image in a circle
 						assignedMemberInitials = `<img src="data:image/png;base64,${assignedMember.image}" class="rounded-circle align-middle" style="width: 32px; height: 32px;">`;
 					} else {
 						assignedMemberInitials = ` <i class="fas fa-user fa-lg mt-2 text-gray-400"  style="width: 32px; height: 32px;"></i>`;
