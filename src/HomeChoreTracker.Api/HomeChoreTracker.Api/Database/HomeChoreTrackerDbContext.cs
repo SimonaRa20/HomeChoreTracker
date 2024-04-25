@@ -30,6 +30,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<BadgeWallet> BadgeWallets { get; set; }
         public DbSet<Avatar> Avatars { get; set; }
+        public DbSet<AvatarPurchase> AvatarPurchases { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -108,6 +109,11 @@ namespace HomeChoreTracker.Api.Database
                 .HasOne(bw => bw.User)
                 .WithOne(u => u.BadgeWallet)
                 .HasForeignKey<BadgeWallet>(bw => bw.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.AvatarPurchase)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserId);
         }
     }
 }

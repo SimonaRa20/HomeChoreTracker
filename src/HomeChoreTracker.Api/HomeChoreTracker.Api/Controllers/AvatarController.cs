@@ -7,6 +7,7 @@ using HomeChoreTracker.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using System.Security.Claims;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -42,10 +43,118 @@ namespace HomeChoreTracker.Api.Controllers
 			return Ok(responses);
 		}
 
+		[HttpGet("GetAvatars")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> GetUserAvatars()
+		{
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			List<Avatar> avatars = await _avatarRepository.GetAll();
+			List<AvatarSelectionResponse> responses = new List<AvatarSelectionResponse>();
+			List<AvatarPurchase> purchases = await _avatarRepository.GetPurchaseAvatars(userId);
+			foreach (Avatar avatar in avatars)
+			{
+				if (avatar.AvatarType.Equals(AvatarType.Basic))
+				{
+					AvatarSelectionResponse avatarResponse = new AvatarSelectionResponse
+					{
+						Id = avatar.Id,
+						AvatarType = avatar.AvatarType,
+						Image = avatar.Image,
+						IsPurchased = true,
+					};
+					responses.Add(avatarResponse);
+				}
+				else
+				{
+					var purchase = purchases.Where(x => x.AvatarId.Equals(avatar.Id)).FirstOrDefault();
+					if (purchases.Count > 0 && purchase != null)
+					{
+						AvatarSelectionResponse avatarResponse = new AvatarSelectionResponse
+						{
+							Id = avatar.Id,
+							AvatarType = avatar.AvatarType,
+							Image = avatar.Image,
+							IsPurchased = true,
+						};
+						responses.Add(avatarResponse);
+					}
+					else
+					{
+						AvatarSelectionResponse avatarResponse = new AvatarSelectionResponse
+						{
+							Id = avatar.Id,
+							AvatarType = avatar.AvatarType,
+							Image = avatar.Image,
+							IsPurchased = false,
+						};
+						responses.Add(avatarResponse);
+					}
+				}
+			}
+
+			return Ok(responses);
+		}
+
+		[HttpGet("GetUserAvatar")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> GetUserAvatar()
+		{
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			var avatar = await _avatarRepository.GetUserAvatar(userId);
+
+			return Ok(avatar);
+		}
+
+		[HttpPut("Set/{id}")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> GetUserSetAvatar(int id)
+		{
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			var avatar = await _avatarRepository.GetAvatar(id);
+
+			await _avatarRepository.SetAvatar(userId, avatar);
+
+			return Ok("Successfully updated");
+		}
+
+		[HttpPut("Buy/{id}")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> GetUserBuyAvatar(int id)
+		{
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			var avatar = await _avatarRepository.GetAvatar(id);
+			await _avatarRepository.SetAvatar(userId, avatar);
+			await _avatarRepository.CountThePoints(userId, avatar);
+			return Ok(avatar);
+		}
+
+		[HttpGet("UserPoints")]
+		[Authorize]
+		public async Task<IActionResult> GetUserPoints()
+		{
+			try
+			{
+				int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+				var pointsHistory = await _avatarRepository.GetPointsHistoryByUserId(userId);
+
+				int points = 0;
+
+				foreach (var history in pointsHistory)
+				{
+					points += history.EarnedPoints;
+				}
+
+				return Ok(points);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"An error occurred while get points: {ex.Message}");
+			}
+		}
 
 		[HttpGet("{id}")]
 		[Authorize]
-		public async Task<IActionResult> GetAdvice(int id)
+		public async Task<IActionResult> GetAvatar(int id)
 		{
 			try
 			{
@@ -65,27 +174,27 @@ namespace HomeChoreTracker.Api.Controllers
 		}
 
 		[HttpPost]
-        [Authorize(Roles = Role.Admin)]
-        public async Task<IActionResult> AddAvatar(AvatarRequest avatarRequest)
-        {
-            if (avatarRequest.Image != null)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await avatarRequest.Image.CopyToAsync(memoryStream);
+		[Authorize(Roles = Role.Admin)]
+		public async Task<IActionResult> AddAvatar(AvatarRequest avatarRequest)
+		{
+			if (avatarRequest.Image != null)
+			{
+				using (var memoryStream = new MemoryStream())
+				{
+					await avatarRequest.Image.CopyToAsync(memoryStream);
 
-                    var avatar = new Avatar
-                    {
-                        AvatarType = Enum.Parse<AvatarType>(avatarRequest.AvatarType),
-                        Image = memoryStream.ToArray()
-                    };
+					var avatar = new Avatar
+					{
+						AvatarType = Enum.Parse<AvatarType>(avatarRequest.AvatarType),
+						Image = memoryStream.ToArray()
+					};
 
-                    await _avatarRepository.AddAvatar(avatar);
-                }
-            }
+					await _avatarRepository.AddAvatar(avatar);
+				}
+			}
 
-            return Ok("Avatar added successfully");
-        }
+			return Ok("Avatar added successfully");
+		}
 
 
 		[HttpPut("{id}")]
@@ -121,6 +230,5 @@ namespace HomeChoreTracker.Api.Controllers
 				return BadRequest($"An error occurred while updating the avatar: {ex.Message}");
 			}
 		}
-
 	}
 }

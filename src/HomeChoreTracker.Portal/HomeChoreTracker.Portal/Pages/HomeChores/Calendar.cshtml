@@ -19,17 +19,20 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
 	<style>
+
 		.circle {
 			display: inline-block;
+			justify-content: center;
+			align-items: center;
 			width: 32px;
 			height: 32px;
 			border-radius: 50%;
 			background-color: white;
 			color: black;
 			text-align: center;
-			line-height: 32px;
 			font-weight: bold;
 		}
+
 
 		.event-details {
 			display: inline-block;
@@ -297,12 +300,12 @@ else
 					assignedMemberInitials = '-';
 				} else {
 					var homeMembersData = @Html.Raw(Json.Serialize(Model.HomeMembers));
-					for (var i = 0; i < homeMembersData.length; i++) {
-						if (homeMembersData[i].homeMemberId == assignedMemberId) {
-							var userName = homeMembersData[i].userName;
-							assignedMemberInitials = userName.substring(0, 2).toUpperCase();
-							break;
-						}
+					var assignedMember = homeMembersData.find(member => member.homeMemberId == assignedMemberId);
+					if (assignedMember && assignedMember.image) {
+						// Display user image in a circle
+						assignedMemberInitials = `<img src="data:image/png;base64,${assignedMember.image}" class="rounded-circle align-middle" style="width: 32px; height: 32px;">`;
+					} else {
+						assignedMemberInitials = ` <i class="fas fa-user fa-lg mt-2 text-gray-400"  style="width: 32px; height: 32px;"></i>`;
 					}
 				}
 
@@ -318,8 +321,7 @@ else
 						'</div>' +
 						'</div>';
 					element.css('min-height', '16px');
-				}
-				else {
+				} else {
 					var eventText = '<div class="fc-content">' +
 						'<div class="circle">' + assignedMemberInitials + '</div>' +
 						'<div class="event-details">' +
@@ -334,6 +336,8 @@ else
 				element.find('.fc-title').remove();
 				element.append(eventText);
 			},
+
+
 			eventClick: function (calEvent, jsEvent, view) {
 				var userId = @Html.Raw(Json.Serialize(Model.UserId));
 				if (calEvent.isDone === 'True') {
@@ -439,4 +443,6 @@ else
 		margin-left: 5px;
 		vertical-align: middle;
 	}
+
+	
 </style>

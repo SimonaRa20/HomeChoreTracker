@@ -1,0 +1,12 @@
+﻿@model HomeChoreTracker.Portal.Models.Avatar.AvatarResponse
+
+@if (Model.Image == null)
+{
+	<i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
+}
+else
+{
+	<div style="overflow: hidden; width:40px; height:40px; overflow: hidden;">
+		<img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)" alt="Avatar Image" class="card-img-top w-100" style="object-fit: cover; height:100%" />
+	</div>
+}

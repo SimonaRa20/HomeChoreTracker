@@ -8,5 +8,11 @@ namespace HomeChoreTracker.Api.Interfaces
 		Task<List<Avatar>> GetAll();
 		Task<Avatar>GetAvatar(int id);
 		Task Update(Avatar avatar);
-	}
+		Task<List<PointsHistory>> GetPointsHistoryByUserId(int userId);
+		Task<List<AvatarPurchase>> GetPurchaseAvatars(int userId);
+		Task<Avatar> GetUserAvatar(int userId);
+		Task SetAvatar(int userId, Avatar avatar);
+		Task CountThePoints(int userId, Avatar avatar);
+
+    }
 }

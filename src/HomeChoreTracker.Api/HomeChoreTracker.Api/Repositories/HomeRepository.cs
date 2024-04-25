@@ -141,6 +141,7 @@ namespace HomeChoreTracker.Api.Repositories
                    HomeMemberId = uh.UserId,
                    UserName = uh.User.UserName,
                    Email = uh.User.Email,
+                   Image = uh.User.Avatar.Image,
                })
                .ToListAsync();
 

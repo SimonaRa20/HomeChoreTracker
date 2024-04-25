@@ -141,10 +141,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 else
                 {
 					var errorMessage = await response.Content.ReadAsStringAsync();
-					// Pass the error message to the modal
 					TempData["ErrorMessage"] = errorMessage;
 					ModelState.AddModelError("", errorMessage);
-					//return Page();
 					return RedirectToPage("/HomeChores/Calendar", new { id = homeId });
 				}
 

@@ -11,6 +11,9 @@
         public TimeSpan StartDayTime { get; set; }
         public TimeSpan EndDayTime { get; set; }
 
+        public int? AvatarId { get; set; }
+        public Avatar Avatar { get; set; }
+
         public List<Advice> Advices { get; set; }
         public List<PointsHistory> PointsHistories { get; set; }
         public List<UserHomes>? UserHomes { get; set; }
@@ -19,5 +22,6 @@
         public List<BusyInterval> BusyIntervals { get; set; }
         public List<Notification> Notifications { get; set; }
         public BadgeWallet BadgeWallet { get; set; }
+        public List<AvatarPurchase> AvatarPurchase { get; set; }
     }
 }
