@@ -31,6 +31,7 @@ namespace HomeChoreTracker.Api.Database
         public DbSet<BadgeWallet> BadgeWallets { get; set; }
         public DbSet<Avatar> Avatars { get; set; }
         public DbSet<AvatarPurchase> AvatarPurchases { get; set; }
+        public DbSet<Challenge> Challenges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
