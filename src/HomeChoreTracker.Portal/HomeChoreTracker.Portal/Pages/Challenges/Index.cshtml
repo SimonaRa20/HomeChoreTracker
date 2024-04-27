@@ -20,6 +20,7 @@ else if (User.IsInRole("User"))
 				<div class="card-body">
 					@if (Model.ChallengesResponse != null && Model.ChallengesResponse.Any())
 					{
+						<h4>Received challenges</h4>
 						<div class="table-responsive">
 							<table class="table table-bordered">
 							<thead>
@@ -112,6 +113,107 @@ else if (User.IsInRole("User"))
 								}
 							</tbody>
 						</table>
+						</div>
+					}
+					else
+					{
+						<p>No received challenges found.</p>
+					}
+				</div>
+			</div>
+
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="card-body">
+					@if (Model.CurrentChallengeResponses != null && Model.CurrentChallengeResponses.Any())
+					{
+						<h4>Current challenges</h4>
+						<div class="table-responsive">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+										<th>Invitee opponent</th>
+										<th>Invited opponent</th>
+										<th>Challenge home/user</th>
+										<th>Challenge type</th>
+										<th>Tasks/Points</th>
+										<th>Time</th>
+										<th>Invitee progress</th>
+										<th>Invited progress</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var challenge in Model.CurrentChallengeResponses)
+									{
+										<tr>
+											@if (challenge.OpponentType.Equals(HomeChoreTracker.Portal.Constants.OpponentType.User))
+											{
+												<td>@challenge.UserName</td>
+												<td>@challenge.OpponentUserName</td>
+											}
+											else
+											{
+												<td>@challenge.HomeTitle</td>
+												<td>@challenge.OpponentHomeTitle</td>
+											}
+
+											<td>@challenge.OpponentType</td>
+											<td>@challenge.ChallengeType</td>
+											<td>@challenge.ChallengeCount</td>
+											<td>@challenge.EndTime</td>
+											<td>
+												<div class="row no-gutters align-items-center mb-4">
+													<div class="col mr-2">
+														
+														<div class="row no-gutters align-items-center">
+															@{
+																var earnedPoints = (double)challenge.Count;
+																var maxPoints = (double)challenge.ChallengeCount;
+																var percentage = Math.Min(earnedPoints / maxPoints * 100, 100);
+															}
+															<div class="col">
+
+																<div class="progress progress-sm mr-2">
+																	<div class="progress-bar bg-primary" role="progressbar"
+																		 style="width: @percentage%" aria-valuenow="@challenge.Count" aria-valuemin="0"
+																		 aria-valuemax="@challenge.ChallengeCount"></div>
+																</div>
+															</div>
+														</div>
+														<div class="text-xs font-weight-bold text-primary text-uppercase mb-1 text-center">
+															@challenge.Count / @challenge.ChallengeCount %
+														</div>
+													</div>
+												</div>
+											</td>
+											<td>
+												<div class="row no-gutters align-items-center mb-4">
+													<div class="col mr-2">
+
+														<div class="row no-gutters align-items-center">
+															@{
+																var earned = (double)challenge.OpponentCount;
+																var max = (double)challenge.ChallengeCount;
+																var percent = Math.Min(earned / max * 100, 100);
+															}
+															<div class="col">
+
+																<div class="progress progress-sm mr-2">
+																	<div class="progress-bar bg-primary" role="progressbar"
+																		 style="width: @percent%" aria-valuenow="@challenge.OpponentCount" aria-valuemin="0"
+																		 aria-valuemax="@challenge.ChallengeCount"></div>
+																</div>
+															</div>
+														</div>
+														<div class="text-xs font-weight-bold text-primary text-uppercase mb-1 text-center">
+															@challenge.OpponentCount / @challenge.ChallengeCount %
+														</div>
+													</div>
+												</div>
+											</td>
+										</tr>
+									}
+								</tbody>
+							</table>
 						</div>
 					}
 					else

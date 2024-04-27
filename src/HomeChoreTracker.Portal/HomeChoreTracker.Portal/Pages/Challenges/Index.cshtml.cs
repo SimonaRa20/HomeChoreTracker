@@ -12,6 +12,7 @@ namespace HomeChoreTracker.Portal.Pages.Challenges
 		private readonly IConfiguration _config;
 
 		public List<ReceivedChallengeResponse> ChallengesResponse { get; set; }
+		public List<CurrentChallengeResponse> CurrentChallengeResponses { get; set; }
 
 		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
 		{
@@ -33,6 +34,12 @@ namespace HomeChoreTracker.Portal.Pages.Challenges
 				if (response.IsSuccessStatusCode)
 				{
 					ChallengesResponse = await response.Content.ReadFromJsonAsync<List<ReceivedChallengeResponse>>();
+					var apiUrlCurrent = $"{_config["ApiUrl"]}/Challenge/CurrentChallenges";
+					var currentresponse = await httpClient.GetAsync(apiUrlCurrent);
+					if(currentresponse.IsSuccessStatusCode)
+					{
+						CurrentChallengeResponses = await currentresponse.Content.ReadFromJsonAsync<List<CurrentChallengeResponse>>();
+					}
 					return Page();
 				}
 				else

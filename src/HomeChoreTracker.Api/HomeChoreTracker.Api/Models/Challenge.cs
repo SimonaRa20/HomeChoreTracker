@@ -12,6 +12,8 @@ namespace HomeChoreTracker.Api.Models
         public int? OpponentUserId { get; set; }
         public ChallengeType ChallengeType { get; set; }
         public int ChallengeCount { get; set; }
+        public int? Count { get; set; }
+        public int? OpponentCount { get; set; } 
         public int DaysTime { get; set; }
         public int HoursTime { get; set; }
         public int MinutesTime { get; set; }

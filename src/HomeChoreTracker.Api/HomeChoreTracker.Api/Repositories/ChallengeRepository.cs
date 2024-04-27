@@ -65,5 +65,13 @@ namespace HomeChoreTracker.Api.Repositories
 			_dbContext.Entry(challenge).State = EntityState.Modified;
 			await _dbContext.SaveChangesAsync();
 		}
-	}
+
+		public async Task<List<Challenge>> GetCurrentChallenges()
+        {
+            return await _dbContext.Challenges.Where(x => !x.Action.Equals(ChallengeInvitationType.None) &&
+			                                               x.ChallengeCount > x.Count || x.ChallengeCount > x.OpponentCount && 
+                                                           x.EndTime > DateTime.Now).ToListAsync();
+
+		}
+    }
 }

@@ -13,5 +13,6 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<List<Challenge>> GetReceivedChallenges();
         Task<Challenge> GetChallengeById(int challengeId);
         Task Update(Challenge challenge);
+        Task<List<Challenge>> GetCurrentChallenges();
 	}
 }

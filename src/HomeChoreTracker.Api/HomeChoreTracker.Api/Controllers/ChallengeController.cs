@@ -182,6 +182,8 @@ namespace HomeChoreTracker.Api.Controllers
 
                 var challenge = await _challengeRepository.GetChallengeById(challengeId);
 
+                challenge.Count = 0;
+                challenge.OpponentCount = 0;
                 challenge.Action = ChallengeInvitationType.Decline;
                 await _challengeRepository.Update(challenge);
                 return Ok("Successfully declined challenge");
@@ -202,6 +204,8 @@ namespace HomeChoreTracker.Api.Controllers
 
 				var challenge = await _challengeRepository.GetChallengeById(challengeId);
 
+				challenge.Count = 0;
+				challenge.OpponentCount = 0;
 				challenge.Action = ChallengeInvitationType.Accept;
                 challenge.StartTime = DateTime.Now;
                 challenge.EndTime = challenge.StartTime + new TimeSpan(challenge.DaysTime, challenge.HoursTime, challenge.MinutesTime, challenge.SecondsTime);
@@ -211,6 +215,70 @@ namespace HomeChoreTracker.Api.Controllers
 			catch (Exception ex)
 			{
 				return BadRequest($"An error occurred while update challenge: {ex.Message}");
+			}
+		}
+
+		[HttpGet("CurrentChallenges")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> GetCurrentChallenges()
+		{
+			try
+			{
+				int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+				List<Challenge> allChallenges = await _challengeRepository.GetCurrentChallenges();
+                //allChallenges = allChallenges.Where(x => x.ChallengeCount > x.Count || x.ChallengeCount > x.OpponentCount).ToList();
+                //allChallenges = allChallenges.Where(x=> x.EndTime > DateTime.Now).ToList();
+
+				List<CurrentChallengeResponse> currentChallengeResponses = new List<CurrentChallengeResponse>();
+
+				foreach (var challenge in allChallenges)
+				{
+					CurrentChallengeResponse receivedChallenge = new CurrentChallengeResponse();
+					if (OpponentType.User.Equals(challenge.OpponentType) && challenge.UserId != null && challenge.UserId.Equals(userId) || challenge.OpponentUserId.Equals(userId))
+					{
+						var user = await _challengeRepository.GetUser((int)challenge.UserId);
+						var opponentUser = await _challengeRepository.GetUser((int)challenge.OpponentUserId);
+						receivedChallenge.Id = challenge.Id;
+						receivedChallenge.OpponentType = challenge.OpponentType;
+						receivedChallenge.UserName = user.UserName;
+						receivedChallenge.OpponentUserName = opponentUser.UserName;
+						receivedChallenge.ChallengeType = challenge.ChallengeType;
+						receivedChallenge.ChallengeCount = challenge.ChallengeCount;
+                        receivedChallenge.Count = (int)challenge.Count;
+                        receivedChallenge.OpponentCount = (int)challenge.OpponentCount;
+						receivedChallenge.EndTime = (DateTime)challenge.EndTime;
+
+						currentChallengeResponses.Add(receivedChallenge);
+					}
+					else if (OpponentType.Home.Equals(challenge.OpponentType) && challenge.HomeId != null && challenge.OpponentHomeId != null)
+					{
+						var userHomes = await _challengeRepository.GetUserHomes(userId);
+						var isUserHome = userHomes.Select(x => x.Id).Contains((int)challenge.HomeId);
+						if (isUserHome)
+						{
+							var userHome = await _challengeRepository.GetHome((int)challenge.HomeId);
+							var opponentHome = await _challengeRepository.GetHome((int)challenge.OpponentHomeId);
+							receivedChallenge.Id = challenge.Id;
+							receivedChallenge.OpponentType = challenge.OpponentType;
+							receivedChallenge.HomeTitle = userHome.Title;
+							receivedChallenge.OpponentHomeTitle = opponentHome.Title;
+							receivedChallenge.ChallengeType = challenge.ChallengeType;
+							receivedChallenge.ChallengeCount = challenge.ChallengeCount;
+							receivedChallenge.Count = (int)challenge.Count;
+							receivedChallenge.OpponentCount = (int)challenge.OpponentCount;
+                            receivedChallenge.EndTime = (DateTime)challenge.EndTime;
+
+							currentChallengeResponses.Add(receivedChallenge);
+						}
+					}
+				}
+
+				return Ok(currentChallengeResponses);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"An error occurred while get avatar: {ex.Message}");
 			}
 		}
 	}
