@@ -1,3 +1,4 @@
+using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Avatar;
 using HomeChoreTracker.Portal.Models.Challenge;
 using HomeChoreTracker.Portal.Models.HomeChore;
@@ -79,8 +80,9 @@ namespace HomeChoreTracker.Portal.Pages.Challenges
                     {
                         httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                         var apiUrl = _config["ApiUrl"] + "/Challenge";
-
-                        var response = await httpClient.PostAsJsonAsync(apiUrl, CreateChallenge);
+						var type = Enum.Parse<OpponentType>(Request.Form["CreateAvatar.OpponentType"]);
+                        CreateChallenge.OpponentType = type;
+						var response = await httpClient.PostAsJsonAsync(apiUrl, CreateChallenge);
 
                         if (response.IsSuccessStatusCode)
                         {

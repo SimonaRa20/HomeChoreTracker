@@ -1,4 +1,5 @@
-﻿using HomeChoreTracker.Api.Database;
+﻿using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,21 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task<List<Home>> GetUserHomes(int userId)
         {
             return await _dbContext.UserHomes.Where(x => x.UserId == userId).Select(h => h.Home).ToListAsync();
+        }
+
+        public async Task<Home> GetHome(int homeId)
+        {
+            return await _dbContext.Homes.Where(x => x.Id == homeId).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUser(int userId)
+        {
+            return await _dbContext.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Challenge>> GetReceivedChallenges()
+        {
+            return await _dbContext.Challenges.Where(x => x.Action.Equals(ChallengeInvitationType.None)).ToListAsync();
         }
     }
 }

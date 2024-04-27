@@ -8,5 +8,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<List<User>> GetUsersOpponents(int userId);
         Task<List<Home>> GetOpponentsHomes(int userId);
         Task<List<Home>> GetUserHomes(int userId);
+        Task<Home> GetHome(int homeId);
+        Task<User> GetUser(int userId);
+        Task<List<Challenge>> GetReceivedChallenges();
     }
 }

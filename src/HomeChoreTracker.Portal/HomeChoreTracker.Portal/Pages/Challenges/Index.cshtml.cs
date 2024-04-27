@@ -1,12 +1,45 @@
+using HomeChoreTracker.Portal.Models.Avatar;
+using HomeChoreTracker.Portal.Models.Challenge;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Challenges
 {
     public class IndexModel : PageModel
     {
-        public void OnGet()
-        {
-        }
-    }
+		private readonly IHttpClientFactory _httpClientFactory;
+		private readonly IConfiguration _config;
+
+		public List<ReceivedChallengeResponse> ChallengesResponse { get; set; }
+
+		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		{
+			_httpClientFactory = httpClientFactory;
+			_config = configuration;
+		}
+
+		public async Task<IActionResult> OnGetAsync()
+		{
+			var token = User.FindFirstValue("Token");
+			using (var httpClient = _httpClientFactory.CreateClient())
+			{
+				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+				var apiUrl = $"{_config["ApiUrl"]}/Challenge/ReceivedChallenges";
+
+				var response = await httpClient.GetAsync(apiUrl);
+
+				if (response.IsSuccessStatusCode)
+				{
+					ChallengesResponse = await response.Content.ReadFromJsonAsync<List<ReceivedChallengeResponse>>();
+					return Page();
+				}
+				else
+				{
+					return Page();
+				}
+			}
+		}
+	}
 }

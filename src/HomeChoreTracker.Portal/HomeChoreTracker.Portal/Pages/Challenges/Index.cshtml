@@ -15,6 +15,55 @@ else if (User.IsInRole("User"))
 			<a class="btn btn-secondary btn-sm mb-2" href="~/Challenges"><i class="fas fa-user fa-sm fa-fw mr-2"></i>Current Challenges</a>
 			<a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-hourglass-start mr-2" aria-hidden="true"></i>Create challenge</a>
 			<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-user-astronaut mr-2" aria-hidden="true"></i>History</a>
+
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="card-body">
+					@if (Model.ChallengesResponse != null && Model.ChallengesResponse.Any())
+					{
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Invitee opponent</th>
+									<th>Invited opponent</th>
+									<th>Challenge home/user</th>
+									<th>Challenge type</th>
+									<th>Tasks/Points</th>
+									<th>Time</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var challenge in Model.ChallengesResponse)
+								{
+									<tr>
+										@if (challenge.OpponentType.Equals(HomeChoreTracker.Portal.Constants.OpponentType.User))
+										{
+											<td>@challenge.UserName</td>
+											<td>@challenge.OpponentUserName</td>
+										}
+										else
+										{
+											<td>@challenge.HomeTitle</td>
+											<td>@challenge.OpponentHomeTitle</td>
+										}
+										
+										<td>@challenge.OpponentType</td>
+										<td>@challenge.ChallengeType</td>
+										<td>@challenge.ChallengeCount</td>
+										<td>@challenge.Days d @challenge.Hours h @challenge.Minutes m @challenge.Seconds s</td>
+										<td>Action</td>
+
+									</tr>
+								}
+							</tbody>
+						</table>
+					}
+					else
+					{
+						<p>No challenges found.</p>
+					}
+				</div>
+			</div>
 		</div>
 	</div>
 }

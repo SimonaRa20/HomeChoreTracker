@@ -2,7 +2,7 @@
 {
     public enum OpponentType
     {
-        Team,
+		Home,
         User
     }
 }
