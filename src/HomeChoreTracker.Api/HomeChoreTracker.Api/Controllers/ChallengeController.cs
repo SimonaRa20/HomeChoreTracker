@@ -25,19 +25,30 @@ namespace HomeChoreTracker.Api.Controllers
         [Authorize(Roles = Role.User)]
         public async Task<IActionResult> AddChallenge(ChallengeRequest challengeRequest)
         {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
             var challenge = new Challenge
             {
                 OpponentType = challengeRequest.OpponentType,
-                HomeId = challengeRequest.HomeId,
-                UserId = challengeRequest.UserId,
-                OpponentHomeId = challengeRequest.OpponentHomeId,
-                OpponentUserId = challengeRequest.UserId,
                 ChallengeType = challengeRequest.ChallengeType,
                 ChallengeCount = challengeRequest.ChallengeCount,
-                Time = new TimeSpan(challengeRequest.Days, challengeRequest.Hours, challengeRequest.Minutes, challengeRequest.Seconds),
+                DaysTime = challengeRequest.Days,
+                HoursTime = challengeRequest.Hours,
+                MinutesTime = challengeRequest.Minutes,
+                SecondsTime = challengeRequest.Seconds,
                 Action = ChallengeInvitationType.None,
                 ResultType = ChallengeResultType.None,
             };
+
+            if (challengeRequest.OpponentType.Equals(OpponentType.User))
+            {
+                challenge.UserId = userId;
+                challenge.OpponentUserId = challengeRequest.UserId;
+            }
+            else
+            {
+                challenge.HomeId = challengeRequest.HomeId;
+                challenge.OpponentHomeId = challengeRequest.OpponentHomeId;
+            }
 
             await _challengeRepository.AddChallenge(challenge);
 

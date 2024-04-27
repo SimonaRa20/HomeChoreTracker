@@ -84,7 +84,7 @@ namespace HomeChoreTracker.Portal.Pages.Challenges
 
                         if (response.IsSuccessStatusCode)
                         {
-                            return RedirectToPage("/Challenge/Index");
+                            return RedirectToPage("/Challenges/Index");
                         }
                         else
                         {

@@ -27,7 +27,7 @@ else if (User.IsInRole("User"))
 			<a class="btn btn-light btn-sm mb-2" asp-page="./History"><i class="fa fa-user-astronaut mr-2" aria-hidden="true"></i>History</a>
             <div class="card mb-4 py-3 border-left-primary">
                 <div class="card-body">
-                    <form method="post" asp-action="Create">
+                    <form method="post" asp-action="Create" onsubmit="return validateForm()">
                         <div class="form-group">
                             <label for="OpponentType">Challenge Type</label>
                             <select class="form-control" id="OpponentType" name="CreateAvatar.OpponentType" asp-for="CreateChallenge.OpponentType" required>
@@ -82,22 +82,19 @@ else if (User.IsInRole("User"))
 
                         <div class="form-group">
                             <label for="ChallengeCount">Tasks/Points count</label>
-                            <input type="number" class="form-control" id="ChallengeCount" name="CreateChallenge.ChallengeCount" asp-for="CreateChallenge.ChallengeCount" step="1" min="1">
-                            <span asp-validation-for="CreateChallenge.ChallengeCount" class="text-danger"></span>
+                            <input type="number" class="form-control" id="ChallengeCount" name="CreateChallenge.ChallengeCount" asp-for="CreateChallenge.ChallengeCount" value="1" step="1" >
+                            <span class="text-danger" id="challengeCountError"></span>
                         </div>
 
                         <div class="form-group">
-                            <label for="ChallengeDuration">Challenge Duration</label>
+                            <label for="ChallengeDuration">Challenge Duration ( Days | Hours | Minutes | Seconds )</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="Days" name="CreateChallenge.Days" placeholder="Days" min="0" step="1">
-                                <input type="number" class="form-control" id="Hours" name="CreateChallenge.Hours" placeholder="Hours" min="0" step="1">
-                                <input type="number" class="form-control" id="Minutes" name="CreateChallenge.Minutes" placeholder="Minutes" min="0" step="1">
-                                <input type="number" class="form-control" id="Seconds" name="CreateChallenge.Seconds" placeholder="Seconds" min="0" step="1">
+                                <input type="number" class="form-control" id="Days" name="CreateChallenge.Days" placeholder="Days" value="0" min="0" step="1">
+                                <input type="number" class="form-control" id="Hours" name="CreateChallenge.Hours" placeholder="Hours" value="0" min="0" step="1">
+                                <input type="number" class="form-control" id="Minutes" name="CreateChallenge.Minutes" placeholder="Minutes" value="0" min="0" step="1">
+                                <input type="number" class="form-control" id="Seconds" name="CreateChallenge.Seconds" placeholder="Seconds" value="0" min="0" step="1">
                             </div>
-                            <span asp-validation-for="CreateChallenge.Days" class="text-danger"></span>
-                            <span asp-validation-for="CreateChallenge.Hours" class="text-danger"></span>
-                            <span asp-validation-for="CreateChallenge.Minutes" class="text-danger"></span>
-                            <span asp-validation-for="CreateChallenge.Seconds" class="text-danger"></span>
+                            <span class="text-danger" id="durationError"></span>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Create</button>
@@ -122,11 +119,37 @@ else
 	</div>
 }
 <script>
+    function validateForm() {
+        var isValid = true;
+
+        var challengeCount = $('#ChallengeCount').val().trim();
+        if (challengeCount === '' || parseInt(challengeCount) < 1) {
+            $('#challengeCountError').text('Count must be at least 1.');
+            isValid = false;
+        } else {
+            $('#challengeCountError').text('');
+        }
+
+        var days = parseInt($('#Days').val()) || 0;
+        var hours = parseInt($('#Hours').val()) || 0;
+        var minutes = parseInt($('#Minutes').val()) || 0;
+        var seconds = parseInt($('#Seconds').val()) || 0;
+
+        if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
+            $('#durationError').text('At least one duration field must be more than 0.');
+            isValid = false;
+        } else {
+            $('#durationError').text('');
+        }
+
+        return isValid;
+    }
+
     $(document).ready(function () {
         $('#OpponentType').change(function () {
             var selectedType = $(this).val();
             console.log(selectedType)
-            if (selectedType == 0) { // Assuming 'Team' is represented by value 1
+            if (selectedType == 0) {
                 $('#HomeOpponentGroup').show();
                 $('#HomeGroup').show();
                 $('#UserOpponentGroup').hide();
@@ -134,30 +157,6 @@ else
                 $('#UserOpponentGroup').show();
                 $('#HomeOpponentGroup').hide();
                 $('#HomeGroup').hide();
-            }
-        });
-
-        // Validate Challenge Count
-        $('#ChallengeCount').change(function () {
-            var count = $(this).val();
-            if (count < 1) {
-                $(this).next('.text-danger').text('Count must be at least 1.');
-            } else {
-                $(this).next('.text-danger').text('');
-            }
-        });
-
-        // Validate Challenge Duration (At least one of Days, Hours, Minutes, or Seconds must be more than 0)
-        $('#Days, #Hours, #Minutes, #Seconds').change(function () {
-            var days = parseInt($('#Days').val()) || 0;
-            var hours = parseInt($('#Hours').val()) || 0;
-            var minutes = parseInt($('#Minutes').val()) || 0;
-            var seconds = parseInt($('#Seconds').val()) || 0;
-
-            if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
-                $(this).next('.text-danger').text('At least one duration field must be more than 0.');
-            } else {
-                $(this).next('.text-danger').text('');
             }
         });
     });
