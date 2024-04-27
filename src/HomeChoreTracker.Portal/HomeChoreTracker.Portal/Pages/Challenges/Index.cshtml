@@ -20,7 +20,8 @@ else if (User.IsInRole("User"))
 				<div class="card-body">
 					@if (Model.ChallengesResponse != null && Model.ChallengesResponse.Any())
 					{
-						<table class="table">
+						<div class="table-responsive">
+							<table class="table table-bordered">
 							<thead>
 								<tr>
 									<th>Invitee opponent</th>
@@ -51,16 +52,71 @@ else if (User.IsInRole("User"))
 										<td>@challenge.ChallengeType</td>
 										<td>@challenge.ChallengeCount</td>
 										<td>@challenge.Days d @challenge.Hours h @challenge.Minutes m @challenge.Seconds s</td>
-										<td>Action</td>
+										<td>
+											<a class='btn btn-success text-white btn-sm' id='btnAccept' data-toggle="modal" data-target="#AcceptModal-@challenge.Id">Accept</a>
+											<div class="modal" tabindex="-1" role="dialog" id="AcceptModal-@challenge.Id">
+												<div class="modal-dialog" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title">Accept Confirmation</h5>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<p>Are you sure you want to accept this '@challenge.ChallengeType' challenge?</p>
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+																<form method="post" asp-page-handler="Accept" asp-route-challengeId="@challenge.Id">
+																<button type="submit" class="btn btn-success">Accept</button>
+															</form>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<a class='btn btn-danger text-white btn-sm' id='btnDecline' data-toggle="modal" data-target="#DeclineModal-@challenge.Id">Decline</a>
+											<div class="modal" tabindex="-1" role="dialog" id="DeclineModal-@challenge.Id">
+												<div class="modal-dialog" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title">Decline Confirmation</h5>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															@if (challenge.OpponentType.Equals(HomeChoreTracker.Portal.Constants.OpponentType.User))
+															{
+																<p>Are you sure you want to decline this '@challenge.UserName vs @challenge.OpponentUserName' challenge?</p>
+															}
+															else
+															{
+																<p>Are you sure you want to decline this '@challenge.HomeTitle vs @challenge.OpponentHomeTitle' challenge?</p>
+															}
+															
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+															<form method="post" asp-page-handler="Decline" asp-route-challengeId="@challenge.Id">
+																<button type="submit" class="btn btn-danger">Decline</button>
+															</form>
+														</div>
+													</div>
+												</div>
+											</div>
+										</td>
 
 									</tr>
 								}
 							</tbody>
 						</table>
+						</div>
 					}
 					else
 					{
-						<p>No challenges found.</p>
+						<p>No received challenges found.</p>
 					}
 				</div>
 			</div>

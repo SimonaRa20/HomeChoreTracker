@@ -11,5 +11,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<Home> GetHome(int homeId);
         Task<User> GetUser(int userId);
         Task<List<Challenge>> GetReceivedChallenges();
-    }
+        Task<Challenge> GetChallengeById(int challengeId);
+        Task Update(Challenge challenge);
+	}
 }

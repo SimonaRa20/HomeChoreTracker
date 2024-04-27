@@ -41,5 +41,47 @@ namespace HomeChoreTracker.Portal.Pages.Challenges
 				}
 			}
 		}
+
+		public async Task<IActionResult> OnPostAcceptAsync(int challengeId)
+		{
+			var token = User.FindFirstValue("Token");
+			using (var httpClient = _httpClientFactory.CreateClient())
+			{
+				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+				var apiUrl = $"{_config["ApiUrl"]}/Challenge/Accept/{challengeId}";
+				var response = await httpClient.PutAsync(apiUrl, null);
+
+				if (response.IsSuccessStatusCode)
+				{
+					return RedirectToPage();
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, $"Failed to update challenge: {response.StatusCode}");
+					return Page();
+				}
+			}
+		}
+
+		public async Task<IActionResult> OnPostDeclineAsync(int challengeId)
+		{
+			var token = User.FindFirstValue("Token");
+			using (var httpClient = _httpClientFactory.CreateClient())
+			{
+				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+				var apiUrl = $"{_config["ApiUrl"]}/Challenge/Decline/{challengeId}";
+				var response = await httpClient.PutAsync(apiUrl, null);
+
+				if (response.IsSuccessStatusCode)
+				{
+					return RedirectToPage();
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, $"Failed to update challenge: {response.StatusCode}");
+					return Page();
+				}
+			}
+		}
 	}
 }

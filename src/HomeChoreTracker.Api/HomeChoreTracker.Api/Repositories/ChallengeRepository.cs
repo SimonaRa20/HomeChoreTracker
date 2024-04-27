@@ -54,5 +54,16 @@ namespace HomeChoreTracker.Api.Repositories
         {
             return await _dbContext.Challenges.Where(x => x.Action.Equals(ChallengeInvitationType.None)).ToListAsync();
         }
-    }
+
+        public async Task<Challenge> GetChallengeById(int challengeId)
+        {
+            return await _dbContext.Challenges.Where(x => x.Id.Equals(challengeId)).FirstOrDefaultAsync();
+        }
+
+		public async Task Update(Challenge challenge)
+		{
+			_dbContext.Entry(challenge).State = EntityState.Modified;
+			await _dbContext.SaveChangesAsync();
+		}
+	}
 }

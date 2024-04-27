@@ -171,5 +171,47 @@ namespace HomeChoreTracker.Api.Controllers
                 return BadRequest($"An error occurred while get avatar: {ex.Message}");
             }
         }
-    }
+
+		[HttpPut("Decline/{challengeId}")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> DeclineChallenge(int challengeId)
+		{
+			try
+			{
+				int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+                var challenge = await _challengeRepository.GetChallengeById(challengeId);
+
+                challenge.Action = ChallengeInvitationType.Decline;
+                await _challengeRepository.Update(challenge);
+                return Ok("Successfully declined challenge");
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"An error occurred while update challenge: {ex.Message}");
+			}
+		}
+
+		[HttpPut("Accept/{challengeId}")]
+		[Authorize(Roles = Role.User)]
+		public async Task<IActionResult> AcceptChallenge(int challengeId)
+		{
+			try
+			{
+				int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+				var challenge = await _challengeRepository.GetChallengeById(challengeId);
+
+				challenge.Action = ChallengeInvitationType.Accept;
+                challenge.StartTime = DateTime.Now;
+                challenge.EndTime = challenge.StartTime + new TimeSpan(challenge.DaysTime, challenge.HoursTime, challenge.MinutesTime, challenge.SecondsTime);
+				await _challengeRepository.Update(challenge);
+				return Ok("Successfully accepted challenge");
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"An error occurred while update challenge: {ex.Message}");
+			}
+		}
+	}
 }
