@@ -1,4 +1,93 @@
 ﻿@page
 @model HomeChoreTracker.Portal.Pages.Challenges.HistoryModel
-@{
+@section HeadContent
+{
+    <title>@ViewData["Title"] - Home Chore Tracker</title>
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" asp-append-version="true">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet" asp-append-version="true">
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" asp-append-version="true">
+    <!-- Add the following lines to include required Bootstrap and jQuery files -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+}
+
+@if (!User.Identity.IsAuthenticated)
+{
+	Response.Redirect("/Auth/Login");
+}
+else if (User.IsInRole("User"))
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<a class="btn btn-light btn-sm mb-2" href="~/Challenges"><i class="fas fa-user fa-sm fa-fw mr-2"></i>Current Challenges</a>
+			<a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-hourglass-start mr-2" aria-hidden="true"></i>Create challenge</a>
+			<a class="btn btn-secondary btn-sm mb-2" asp-page="./History"><i class="fa fa-user-astronaut mr-2" aria-hidden="true"></i>History</a>
+	<div class="card mb-4 py-3 border-left-primary">
+		<div class="card-body">
+			@if (Model.HistoryChallengeResponses != null && Model.HistoryChallengeResponses.Any())
+			{
+				<h4>Historical challenges</h4>
+				<div class="table-responsive">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Invitee opponent</th>
+								<th>Invited opponent</th>
+								<th>Challenge home/user</th>
+								<th>Challenge type</th>
+								<th>Tasks/Points</th>
+								<th>Result</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var challenge in Model.HistoryChallengeResponses)
+							{
+								<tr>
+									@if (challenge.OpponentType.Equals(HomeChoreTracker.Portal.Constants.OpponentType.User))
+									{
+										<td>@challenge.UserName</td>
+										<td>@challenge.OpponentUserName</td>
+									}
+									else
+									{
+										<td>@challenge.HomeTitle</td>
+										<td>@challenge.OpponentHomeTitle</td>
+									}
+
+									<td>@challenge.OpponentType</td>
+									<td>@challenge.ChallengeType</td>
+									<td>@challenge.ChallengeCount</td>
+									<td>@challenge.ResultType</td>
+
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+			else
+			{
+				<p>No historical challenges found.</p>
+			}
+		</div>
+	</div>
+	</div>
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card mb-4 py-3 border-left-primary">
+				<div class="collapse show">
+					<div class="card-body">
+						<p>You don't have permission to view this content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }

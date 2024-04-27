@@ -97,7 +97,8 @@ namespace HomeChoreTracker.Api
             builder.Services.AddScoped<IAvatarRepository, AvatarRepository>();
             builder.Services.AddScoped<IChallengeRepository, ChallengeRepository>();
             builder.Services.AddHostedService<GamificationService>();
-            var app = builder.Build();
+			builder.Services.AddHostedService<NotificationService>();
+			var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {

@@ -28,9 +28,14 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly INotificationRepository _notificationRepository;
         private readonly IGamificationRepository _gamificationRepository;
         private readonly IPurchaseRepository _purchaseRepository;
+        private readonly IChallengeRepository _challengeRepository;
         private readonly IMapper _mapper;
 
-        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IPurchaseRepository purchaseRepository, IGamificationRepository gamificationRepository, IMapper mapper, IUserRepository userRepository, INotificationRepository notificationRepository, IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository)
+        public HomeChoreController(IHomeChoreRepository homeChoreRepository, IPurchaseRepository purchaseRepository, 
+                                   IGamificationRepository gamificationRepository, IMapper mapper, 
+                                   IUserRepository userRepository, INotificationRepository notificationRepository,
+                                   IHomeChoreBaseRepository homeChoreBaseRepository, IHomeRepository homeRepository,
+                                   IChallengeRepository challengeRepository)
         {
             _homeChoreRepository = homeChoreRepository;
             _mapper = mapper;
@@ -40,6 +45,7 @@ namespace HomeChoreTracker.Api.Controllers
             _userRepository = userRepository;
             _gamificationRepository = gamificationRepository;
             _purchaseRepository = purchaseRepository;
+            _challengeRepository = challengeRepository;
         }
 
         [HttpPost("{homeId}")]
@@ -49,7 +55,6 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 int id = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
-
 				bool isMember = await _homeRepository.OrHomeMember(homeId, id);
 
 				if (!isMember)
@@ -58,16 +63,12 @@ namespace HomeChoreTracker.Api.Controllers
 				}
 
 				var homeChoreBase = await _homeChoreBaseRepository.GetChoreBase(taskId);
-
                 await _homeChoreRepository.AddHomeChoreBase(homeChoreBase, homeId);
-
                 var users = await _homeRepository.GetHomeMembers(homeId);
                
-
                 if(homeChoreBase.UserId != null)
                 {
                     bool newFamily = false;
-
                     foreach (var familyMember in users)
                     {
                         if (familyMember.HomeMemberId.Equals(id) && !homeChoreBase.UserId.Equals(id))
@@ -144,8 +145,8 @@ namespace HomeChoreTracker.Api.Controllers
 			}
 
 			HomeChoreTask task = await _homeChoreRepository.CreateHomeChore(homeChoreBaseRequest, id, homeId);
-
             await _homeChoreRepository.Save();
+
             if (task == null)
             {
                 return NotFound("No home chore found");
@@ -187,7 +188,6 @@ namespace HomeChoreTracker.Api.Controllers
             try
             {
                 TaskAssignment task = await _homeChoreRepository.GetTaskAssigment(taskId);
-
                 bool taskAssigned = await _homeChoreRepository.CheckOrHomeChoreWasAssigned(taskId);
 
                 if (!taskAssigned)
@@ -200,15 +200,11 @@ namespace HomeChoreTracker.Api.Controllers
                 {
                     await _homeChoreRepository.DeleteAssignedTasks(taskId);
                     await _homeChoreRepository.Save();
-
                     TaskAssignment findLastAssignedTask = await _homeChoreRepository.GetLastAssigmentTask(taskId);
-
                     HomeChoreTask getTask = await _homeChoreRepository.Get(taskId);
                     getTask.EndDate = findLastAssignedTask.EndDate;
                     await _homeChoreRepository.Update(getTask);
                 }
-
-                
 
                 return Ok($"Home chore base with ID {taskId} deleted successfully");
             }
@@ -248,10 +244,10 @@ namespace HomeChoreTracker.Api.Controllers
                 var homeChore = await _homeChoreRepository.GetTaskAssigment(id);
                 var task = await _homeChoreRepository.Get(homeChore.TaskId);
                 var user = await _userRepository.GetUserById((int)homeChore.HomeMemberId);
-
                 var pointHistory = await _gamificationRepository.GetPointsHistoryByTaskId(id);
                 BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
                 homeChore.IsDone = isDone;
+
                 if (isDone && pointHistory == null)
                 {
                     homeChore.Points = task.Points;
@@ -281,7 +277,6 @@ namespace HomeChoreTracker.Api.Controllers
                     var hasBadge = await _gamificationRepository.UserHasDoneFirstTaskBadge(user.Id);
                     if (!hasBadge)
                     {
-                        
                         wallet.DoneFirstTask = true;
                         await _gamificationRepository.UpdateBadgeWallet(wallet);
 
@@ -464,6 +459,8 @@ namespace HomeChoreTracker.Api.Controllers
 					shoppingItem.Time = shoppingItem.Time - 1;
 					await _purchaseRepository.UpdateShoppingItem(shoppingItem);
 				}
+
+                await _challengeRepository.UpdateChallenge(homeChore);
 
 				if (homeChore == null)
                 {

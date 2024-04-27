@@ -15,7 +15,6 @@ namespace HomeChoreTracker.Api.Services
             _serviceProvider = serviceProvider;
         }
 
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             using (var scope = _serviceProvider.CreateScope())
@@ -25,6 +24,7 @@ namespace HomeChoreTracker.Api.Services
                 var _notificationRepository = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
                 var _homeChoreRepository = scope.ServiceProvider.GetRequiredService<IHomeChoreRepository>();
 				var _purchaseRepository = scope.ServiceProvider.GetRequiredService<IPurchaseRepository>();
+				var _challengeRepository = scope.ServiceProvider.GetRequiredService<IChallengeRepository>();
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -158,7 +158,6 @@ namespace HomeChoreTracker.Api.Services
                         }
 
                         DateTime time = DateTime.Now.AddDays(-1);
-
                         List<TaskAssignment> tasks = await _homeChoreRepository.GetDoneTasks(time);
 
                         foreach(TaskAssignment task in tasks)
@@ -197,6 +196,7 @@ namespace HomeChoreTracker.Api.Services
 
 							var pointHistory = await _gamificationRepository.GetPointsHistoryByTaskId(task.Id);
 							BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
+
 							if (pointHistory == null)
 							{
 								task.Points = homeChore.Points;
@@ -222,8 +222,8 @@ namespace HomeChoreTracker.Api.Services
 								};
 
 								await _gamificationRepository.AddPointsHistory(pointsHistory);
-
 								var hasBadge = await _gamificationRepository.UserHasDoneFirstTaskBadge(user.Id);
+
 								if (!hasBadge)
 								{
 
@@ -385,9 +385,8 @@ namespace HomeChoreTracker.Api.Services
 							}
 
 							await _homeChoreRepository.UpdateTaskAssignment(task);
+							await _challengeRepository.UpdateChallenge(task);
 						}    
-
-
 
 						await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
                     }
