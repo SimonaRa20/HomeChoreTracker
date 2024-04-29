@@ -12,6 +12,8 @@ using HomeChoreTracker.Api.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
+using HomeChoreTracker.Api.Settings;
+using Microsoft.Extensions.Options;
 
 namespace HomeChoreTracker.Api.Controllers
 {
@@ -22,12 +24,20 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly IConfiguration _config;
         private readonly IAuthRepository _authRepository;
         private readonly IMapper _mapper;
+        private readonly AuthSettings _authSettings;
+		private readonly EmailConfigServer _emailConfigServer;
+        private readonly JwtSettings _jwtSettings;
 
-        public AuthController(IConfiguration config, IAuthRepository authRepository, IMapper mapper)
+		public AuthController(IConfiguration config, IAuthRepository authRepository, 
+                              IMapper mapper, IOptions<AuthSettings> authSettings, 
+                              IOptions<EmailConfigServer> emailConfigServer, IOptions<JwtSettings> jwtSettings)
         {
             _config = config;
             _authRepository = authRepository;
             _mapper = mapper;
+            _authSettings = authSettings.Value;
+            _emailConfigServer = emailConfigServer.Value;
+            _jwtSettings = jwtSettings.Value;
         }
 
         [Route("Register")]
@@ -141,7 +151,7 @@ namespace HomeChoreTracker.Api.Controllers
             {
                 string resetToken = GeneratePasswordResetToken(user);
 
-                string resetLink = $"https://localhost:44336/Auth/RestorePassword?token={HttpUtility.UrlEncode(resetToken)}";
+                string resetLink = $"{_authSettings.AppUrl}/Auth/RestorePassword?token={HttpUtility.UrlEncode(resetToken)}";
 
                 SendPasswordResetEmail(email, resetLink);
 
@@ -155,19 +165,19 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
-                string fromMail = "homechoretracker@gmail.com";
-                string fromPassword = "fbkigruisnpntbww";
+                string fromMail = _emailConfigServer.Email;
+                string fromPassword = _emailConfigServer.Password;
 
                 MailMessage message = new MailMessage();
                 message.From = new MailAddress(fromMail);
-                message.Subject = "Password Reset";
+                message.Subject = _emailConfigServer.Name;
                 message.To.Add(new MailAddress(email));
                 message.Body = $"<html><body>Click the following link to reset your password: <a href=\"{resetLink}\">{resetLink}</a></body></html>";
                 message.IsBodyHtml = true;
 
-                var smtpClient = new SmtpClient("smtp.gmail.com")
+                var smtpClient = new SmtpClient(_emailConfigServer.Server)
                 {
-                    Port = 587,
+                    Port = _emailConfigServer.Port,
                     Credentials = new NetworkCredential(fromMail, fromPassword),
                     EnableSsl = true,
                     UseDefaultCredentials = false,
@@ -233,7 +243,7 @@ namespace HomeChoreTracker.Api.Controllers
         private string GeneratePasswordResetToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("hdtp26741yyeett212rrrr1111de32132128bhwi");
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.Id.ToString()) }),
@@ -276,7 +286,7 @@ namespace HomeChoreTracker.Api.Controllers
         private string GenerateAccessToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("hdtp26741yyeett212rrrr1111de32132128bhwi");
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] 
@@ -286,8 +296,8 @@ namespace HomeChoreTracker.Api.Controllers
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = "Simona",
-                Audience = "TrustedClient"
+                Issuer = _jwtSettings.Issuer,
+                Audience = _jwtSettings.Audience
 			};
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
@@ -295,7 +305,7 @@ namespace HomeChoreTracker.Api.Controllers
 
         private string HashPassword(string password)
         {
-            var saltValue = "dsdjiajeefiajofijaoifjoaijfoiajgorjag";
+            var saltValue = _authSettings.Salt;
             byte[] salt = Encoding.ASCII.GetBytes(saltValue);
             string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,

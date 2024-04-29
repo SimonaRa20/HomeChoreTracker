@@ -8,10 +8,12 @@ using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
 using HomeChoreTracker.Api.Repositories;
+using HomeChoreTracker.Api.Settings;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Linq.Expressions;
@@ -28,13 +30,19 @@ namespace HomeChoreTracker.Api.Tests.Controllers
         private readonly Mock<IAuthRepository> _authRepositoryMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly AuthController _authController;
+        private readonly IOptions<AuthSettings> _authSettings;
+		private readonly IOptions<EmailConfigServer> _emailConfigServer;
+        private readonly IOptions<JwtSettings> _jwtSettings;
 
-        public AuthControllerTests()
+		public AuthControllerTests()
         {
             _fixture = new Fixture();
             _authRepositoryMock = new Mock<IAuthRepository>();
             _mapperMock = new Mock<IMapper>();
-            _authController = new AuthController(null, _authRepositoryMock.Object, _mapperMock.Object);
+            _authSettings = Options.Create(new AuthSettings{ Salt = "dsdjiajeefiajofijaoifjoaijfoiajgorjag", AppUrl = "https://localhost:44336" });
+            _emailConfigServer = Options.Create(new EmailConfigServer { Server = "smtp.gmail.com" , Port = 587, Name = "Restore Password", Email = "homechoretracker@gmail.com", Password = "fbkigruisnpntbww" });
+            _jwtSettings = Options.Create(new JwtSettings { Key = "hdtp26741yyeett212rrrr1111de32132128bhwi", Issuer = "Simona", Audience = "TrustedClient" });
+			_authController = new AuthController(null, _authRepositoryMock.Object, _mapperMock.Object, _authSettings, _emailConfigServer, _jwtSettings);
         }
 
         [Fact]
@@ -250,7 +258,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			var authRepositoryMock = new Mock<IAuthRepository>();
 			authRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
 
-			var authController = new AuthController(null, authRepositoryMock.Object, null);
+			var authController = new AuthController(null, authRepositoryMock.Object, null, _authSettings, _emailConfigServer, _jwtSettings);
 
 			// Act
 			var result = await authController.RestorePassword(userEmail);
