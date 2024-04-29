@@ -31,6 +31,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 		private readonly Mock<INotificationRepository> _notificationRepositoryMock;
 		private readonly Mock<IHomeChoreBaseRepository> _homeChoreBaseRepositoryMock;
 		private readonly Mock<IHomeRepository> _homeRepositoryMock;
+		private readonly Mock<IChallengeRepository> _challengeRepositoryMock;
 		private readonly Mock<IMapper> _mapperMock;
 
 		public HomeChoreControllerTests()
@@ -43,12 +44,14 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			_gamificationRepositoryMock = new Mock<IGamificationRepository>();
 			_notificationRepositoryMock = new Mock<INotificationRepository>();
 			_homeChoreBaseRepositoryMock = new Mock<IHomeChoreBaseRepository>();
+			_challengeRepositoryMock = new Mock<IChallengeRepository>(); 
 			_homeRepositoryMock = new Mock<IHomeRepository>();
 			_mapperMock = new Mock<IMapper>();
 			_homeChoreController = new HomeChoreController(_homeChoreRepositoryMock.Object, _purchaseRepositoryMock.Object,
 														   _gamificationRepositoryMock.Object, _mapperMock.Object,
 														   _userRepositoryMock.Object, _notificationRepositoryMock.Object,
-														   _homeChoreBaseRepositoryMock.Object, _homeRepositoryMock.Object);
+														   _homeChoreBaseRepositoryMock.Object, _homeRepositoryMock.Object,
+														   _challengeRepositoryMock.Object);
 		}
 
 		[Fact]
