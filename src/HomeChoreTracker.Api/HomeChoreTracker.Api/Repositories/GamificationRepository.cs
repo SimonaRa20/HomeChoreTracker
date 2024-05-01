@@ -82,7 +82,7 @@ namespace HomeChoreTracker.Api.Repositories
             DateTime endOfWeek = startOfWeek.AddDays(6);
 
             return await _dbContext.PointsHistory
-                .Where(x => x.TaskId == homeId && x.EarnedDate >= startOfWeek && x.EarnedDate <= endOfWeek)
+                .Where(x => x.HomeId == homeId && x.EarnedDate >= startOfWeek && x.EarnedDate <= endOfWeek)
                 .ToListAsync();
         }
 
@@ -94,7 +94,7 @@ namespace HomeChoreTracker.Api.Repositories
             DateTime endOfPreviousWeek = startOfPreviousWeek.AddDays(6);
 
             return await _dbContext.PointsHistory
-                .Where(x => x.TaskId == homeId && x.EarnedDate >= startOfPreviousWeek && x.EarnedDate <= endOfPreviousWeek)
+                .Where(x => x.HomeId == homeId && x.EarnedDate >= startOfPreviousWeek && x.EarnedDate <= endOfPreviousWeek)
                 .ToListAsync();
         }
 

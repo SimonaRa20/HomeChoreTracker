@@ -311,7 +311,7 @@ namespace HomeChoreTracker.Api.Controllers
 
             string invitationToken = await _homeRepository.InviteUserToHome(userId, inviteUserRequest.HomeId, inviteUserRequest.InviteeEmail);
 
-            string invitationLink = $"{_config["AppUrl"]}/Homes/Invite?token={HttpUtility.UrlEncode(invitationToken)}";
+            string invitationLink = $"{_config["AuthSettings:AppUrl"]}/Homes/Invite?token={HttpUtility.UrlEncode(invitationToken)}";
 
             SendInvitationEmail(inviteUserRequest.InviteeEmail, invitationLink, sender);
 
@@ -322,7 +322,7 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
-                string registerLink = $"{_config["AppUrl"]}/Auth/Register";
+                string registerLink = $"{_config["AuthSettings:AppUrl"]}/Auth/Register";
 
                 string fromMail = _config["EmailConfigServer:Email"];
                 string fromPassword = _config["EmailConfigServer:Password"];

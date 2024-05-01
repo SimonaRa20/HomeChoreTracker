@@ -658,7 +658,7 @@ namespace HomeChoreTracker.Api.Controllers
 					FinancialCategory newfinancialCategory = new FinancialCategory
 					{
 						Name = expenseRequest.NewFinancialCategory,
-						Type = FinancialType.Income,
+						Type = FinancialType.Expense,
 						UserId = userId,
 						HomeId = expenseRequest.HomeId
 					};
@@ -739,7 +739,7 @@ namespace HomeChoreTracker.Api.Controllers
 					FinancialCategory newfinancialCategory = new FinancialCategory
 					{
 						Name = expenseRequest.NewFinancialCategory,
-						Type = FinancialType.Income,
+						Type = FinancialType.Expense,
 						UserId = userId,
 						HomeId = expenseRequest.HomeId
 					};
