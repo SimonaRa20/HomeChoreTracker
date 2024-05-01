@@ -88,6 +88,8 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 		{
 			var token = User.FindFirstValue("Token");
 			var itemsToUpdateJson = HttpContext.Request.Form["itemsToUpdate"];
+			var priceForProducts = HttpContext.Request.Form["priceForProducts"];
+			UpdatePurchaseRequest purchaseRequest = new UpdatePurchaseRequest();
 
 			if (!string.IsNullOrEmpty(itemsToUpdateJson))
 			{
@@ -99,7 +101,10 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 
 					var apiUrl = $"{_config["ApiUrl"]}/Purchase/UpdateShoppingItems";
 
-					var response = await httpClient.PostAsJsonAsync(apiUrl, itemsToUpdate);
+					purchaseRequest.Items = itemsToUpdate;
+					purchaseRequest.PriceForProducts = decimal.Parse(priceForProducts);
+
+					var response = await httpClient.PostAsJsonAsync(apiUrl, purchaseRequest);
 
 					if (response.IsSuccessStatusCode)
 					{

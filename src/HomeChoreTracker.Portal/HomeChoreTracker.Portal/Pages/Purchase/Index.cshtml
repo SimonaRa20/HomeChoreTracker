@@ -141,6 +141,7 @@ else if (User.IsInRole("User"))
 	</div>
 	<form id="updateShoppingItemsForm" method="post" asp-page-handler="UpdateShoppingItems">
 		<input type="hidden" id="itemsToUpdateInput" name="itemsToUpdate" />
+		<input type="hidden" id="priceForProductsInput" name="priceForProducts" />
 		<input type="hidden" name="purchaseId" value="@Model.PurchaseId" />
 	</form>
 	<form id="updateShoppingPurchaseForm" method="post" asp-page-handler="UpdateShoppingPurchase">
@@ -419,6 +420,7 @@ else
 			success: function (data) {
 				$('#purchaseDetailModalLabel').text("Purchase Details");
 				var purchaseDate = new Date(data.purchaseDate);
+				var purchasePrice = data.priceForProducts;
 				var formattedDate = (purchaseDate.getMonth() + 1) + '/' + purchaseDate.getDate() + '/' + purchaseDate.getFullYear();
 				var content = "<p><strong>Date:</strong> " + formattedDate + "</p>";
 				content += "<p><strong>Items:</strong> ";
@@ -430,6 +432,9 @@ else
 				});
 				content += "</ul>";
 				content += "</p>";
+				content += "<div class='form-group'><label asp-for='PriceForProducts'>Total Price for Home Chore Tasks Products:</label>";
+				content += "<input id='priceForProducts' asp-for='PriceForProducts' value='" + purchasePrice + "' class='form-control' />";
+				content += "</div>";
 				$('#purchaseDetailContent').html(content);
 				$('#purchaseIdInput').val(purchaseId);
 
@@ -560,6 +565,9 @@ else
 				value: JSON.stringify(itemsToUpdate)
 			});
 
+			var priceForProducts = $('#priceForProducts').val();
+
+			$('#priceForProductsInput').val(priceForProducts);
 			$('#updateShoppingItemsForm').append(hiddenInput);
 
 			$('#updateShoppingItemsForm').submit();

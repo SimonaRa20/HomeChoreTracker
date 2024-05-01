@@ -7,5 +7,6 @@
         public List<ShoppingItem> Items { get; set; }
         public DateTime PurchaseDate { get; set; }
         public bool IsCompleted { get; set; }
-    }
+		public decimal PriceForProducts { get; set; }
+	}
 }

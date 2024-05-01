@@ -196,9 +196,9 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 				new ShoppingItemUpdateRequest { Id = 1, IsCompleted = true }
 			};
 			_purchaseRepositoryMock.Setup(repo => repo.GetShoppingItemById(It.IsAny<int>())).ReturnsAsync((ShoppingItem)null);
-
+			var purchaseProduct = new UpdatePurchaseRequest { PriceForProducts = 0, Items = new List<ShoppingItemUpdateRequest> { new ShoppingItemUpdateRequest { Id = 1, IsCompleted = true } } };
 			// Act
-			var result = await _purchaseController.UpdateShoppingItems(itemsToUpdate);
+			var result = await _purchaseController.UpdateShoppingItems(1, purchaseProduct);
 
 			// Assert
 			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -216,11 +216,12 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			var purchaseId = 1;
 			var shoppingItem = new ShoppingItem { Id = 1, IsCompleted = true, PurchaseId = purchaseId };
 			var purchase = new Purchase { Id = purchaseId, Items = new List<ShoppingItem> { shoppingItem } };
+			var purchaseProduct = new UpdatePurchaseRequest { PriceForProducts = 0, Items = new List<ShoppingItemUpdateRequest> { new ShoppingItemUpdateRequest { Id = 1, IsCompleted = true } } };
 			_purchaseRepositoryMock.Setup(repo => repo.GetShoppingItemById(It.IsAny<int>())).ReturnsAsync(shoppingItem);
 			_purchaseRepositoryMock.Setup(repo => repo.GetPurchaseById(purchaseId)).ReturnsAsync(purchase);
 
 			// Act
-			var result = await _purchaseController.UpdateShoppingItems(itemsToUpdate);
+			var result = await _purchaseController.UpdateShoppingItems(1, purchaseProduct);
 
 			// Assert
 			var okResult = Assert.IsType<OkObjectResult>(result);

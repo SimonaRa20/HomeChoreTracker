@@ -113,11 +113,11 @@ namespace HomeChoreTracker.Api.Controllers
 
         [HttpPost("UpdateShoppingItems")]
         [Authorize]
-        public async Task<IActionResult> UpdateShoppingItems(List<ShoppingItemUpdateRequest> itemsToUpdate)
+        public async Task<IActionResult> UpdateShoppingItems(UpdatePurchaseRequest itemsToUpdate)
         {
             try
             {
-                foreach (var item in itemsToUpdate)
+                foreach (var item in itemsToUpdate.Items)
                 {
                     var shoppingItem = await _purchaseRepository.GetShoppingItemById(item.Id);
                     if (shoppingItem == null)
@@ -131,7 +131,7 @@ namespace HomeChoreTracker.Api.Controllers
                 }
 
 
-                var firstShoppingItem = await _purchaseRepository.GetShoppingItemById(itemsToUpdate[0].Id);
+                var firstShoppingItem = await _purchaseRepository.GetShoppingItemById(itemsToUpdate.Items[0].Id);
                 var purchaseId = firstShoppingItem?.PurchaseId;
                 if (purchaseId.HasValue)
                 {
@@ -145,7 +145,8 @@ namespace HomeChoreTracker.Api.Controllers
                     {
                         purchase.IsCompleted = false;
 						await _purchaseRepository.UpdatePurchase(purchase);
-                    }    
+                    }
+                    purchase.PriceForProducts = itemsToUpdate.PriceForProducts;
                 }
 
                 await _purchaseRepository.Save();

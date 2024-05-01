@@ -69,7 +69,22 @@ namespace HomeChoreTracker.Api.Controllers
             return Ok(totalIncome);
         }
 
-        [HttpPost("income")]
+		[HttpGet("totalHomeChores/{homeId}")]
+		[Authorize]
+		public async Task<IActionResult> GetCurrentMonthTotalHomeChores(int homeId)
+		{
+			int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+			bool isMember = await _homeRepository.OrHomeMember(homeId, userId);
+
+			if (!isMember)
+			{
+				return Forbid();
+			}
+			decimal totalIncome = await _incomeRepository.GetCurrentMonthTotalHomeChores(homeId);
+			return Ok(totalIncome);
+		}
+
+		[HttpPost("income")]
 		[Authorize]
 		public async Task<IActionResult> AddIncome(IncomeRequest incomeRequest)
 		{

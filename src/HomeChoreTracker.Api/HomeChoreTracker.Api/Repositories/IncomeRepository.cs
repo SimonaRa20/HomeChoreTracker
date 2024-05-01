@@ -130,7 +130,18 @@ namespace HomeChoreTracker.Api.Repositories
                 .SumAsync(i => i.Amount);
         }
 
-        public async Task<List<FinancialRecord>> GetHomeAll(int id)
+		public async Task<decimal> GetCurrentMonthTotalHomeChores(int id)
+		{
+			DateTime currentDate = DateTime.Now;
+			DateTime startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+			DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+			return await _dbContext.Purchases
+				.Where(i => i.HomeId.Equals(id) && i.PurchaseDate >= startOfMonth && i.PurchaseDate <= endOfMonth)
+				.SumAsync(i => i.PriceForProducts);
+		}
+
+		public async Task<List<FinancialRecord>> GetHomeAll(int id)
         {
             return await _dbContext.FinancialRecords.Where(x => x.Type.Equals(FinancialType.Income) && x.HomeId.Equals(id)).ToListAsync();
         }

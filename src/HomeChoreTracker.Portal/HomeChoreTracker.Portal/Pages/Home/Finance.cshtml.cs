@@ -14,7 +14,8 @@ namespace HomeChoreTracker.Portal.Pages.Home
         public double CurrentMonthTotalBalance { get; set; }
         public double CurrentMonthTotalIncome { get; set; }
         public double CurrentMonthTotalExpense { get; set; }
-        public List<MonthlySummary> MonthlySummaries { get; set; }
+		public double CurrentMonthTotalHomeChoresExpense { get; set; }
+		public List<MonthlySummary> MonthlySummaries { get; set; }
         public Dictionary<string, int> ExpenseCategories { get; set; }
         public Dictionary<string, int> IncomeCategories { get; set; }
         public bool Unauthorized { get; set; }
@@ -57,11 +58,13 @@ namespace HomeChoreTracker.Portal.Pages.Home
             var apiUrlBalance = $"{_config["ApiUrl"]}/Finance/totalBalance/{Id}";
             var apiUrlIncome = $"{_config["ApiUrl"]}/Finance/totalIncome/{Id}";
             var apiUrlExpense = $"{_config["ApiUrl"]}/Finance/totalExpense/{Id}";
+            var apiUrlHomeChoresExpense = $"{_config["ApiUrl"]}/Finance/totalHomeChores/{Id}";
 
-            CurrentMonthTotalBalance = await GetApiResponse<double>(httpClient, apiUrlBalance);
+			CurrentMonthTotalBalance = await GetApiResponse<double>(httpClient, apiUrlBalance);
             CurrentMonthTotalIncome = await GetApiResponse<double>(httpClient, apiUrlIncome);
             CurrentMonthTotalExpense = await GetApiResponse<double>(httpClient, apiUrlExpense);
-        }
+			CurrentMonthTotalHomeChoresExpense = await GetApiResponse<double>(httpClient, apiUrlHomeChoresExpense);
+		}
 
         private async Task GetMonthlySummaries(HttpClient httpClient)
         {

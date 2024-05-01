@@ -54,7 +54,7 @@ else if (User.IsInRole("User"))
 	else
 	{
 		<div class="row">
-			<div class="col-lg-4">
+			<div class="col-lg-3">
 				<div class="card mb-4 border-left-primary">
 					<div class="card-body">
 						<h7>Current month total balance</h7>
@@ -62,7 +62,7 @@ else if (User.IsInRole("User"))
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-4">
+			<div class="col-lg-3">
 				<div class="card mb-4 border-left-success">
 					<div class="card-body">
 						<h7>Current month total income</h7>
@@ -71,11 +71,20 @@ else if (User.IsInRole("User"))
 				</div>
 			</div>
 
-			<div class="col-lg-4">
+			<div class="col-lg-3">
 				<div class="card mb-4 border-left-danger">
 					<div class="card-body">
 						<h7>Current month total expense</h7>
 						<h3>@Model.CurrentMonthTotalExpense Eur</h3>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-3">
+				<div class="card mb-4 border-left-warning">
+					<div class="card-body">
+						<h7>Current month total home chores expense</h7>
+						<h3>@Model.CurrentMonthTotalHomeChoresExpense Eur</h3>
 					</div>
 				</div>
 			</div>

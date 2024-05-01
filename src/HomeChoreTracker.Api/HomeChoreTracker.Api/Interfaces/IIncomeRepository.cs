@@ -14,7 +14,8 @@ namespace HomeChoreTracker.Api.Interfaces
 		Task Delete(int id);
 		Task<decimal> GetCurrentMonthTotalIncome(int userId);
         Task<decimal> GetCurrentMonthTotalHomeIncome(int id);
-        Task<IncomeResponse> GetIncomeById(int id);
+		Task<decimal> GetCurrentMonthTotalHomeChores(int id);
+		Task<IncomeResponse> GetIncomeById(int id);
 		Task<decimal> GetTotalIncomeForMonth(DateTime month, int userId);
         Task<decimal> GetTotalHomeIncomeForMonth(DateTime month, int id);
         Task<int> GetIncomeCountByCategory(int category, int userId);
