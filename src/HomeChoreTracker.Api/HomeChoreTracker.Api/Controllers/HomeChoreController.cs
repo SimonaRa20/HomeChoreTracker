@@ -475,29 +475,6 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        private int GetMinutesFromTimeLong(TimeLong timeLong)
-        {
-            switch (timeLong)
-            {
-                case TimeLong.fiveMinutes: return 5;
-                case TimeLong.tenMinutes: return 10;
-                case TimeLong.fifteenMinutes: return 15;
-                case TimeLong.twentyMinutes: return 20;
-                case TimeLong.thirtyMinutes: return 30;
-                case TimeLong.fourtyFiveMinutes: return 45;
-                case TimeLong.hour: return 60;
-                case TimeLong.hourAndHalf: return 90;
-                case TimeLong.twoHours: return 120;
-                case TimeLong.twoHoursAndHalf: return 150;
-                case TimeLong.threeHours: return 180;
-                case TimeLong.threeHoursAndHalf: return 210;
-                case TimeLong.fourHours: return 240;
-                case TimeLong.fourHoursAndHalf: return 270;
-                case TimeLong.fiveHours: return 300;
-                default: return 0;
-            }
-        }
-
         private async Task SetHomeChoreDates(HomeChoreTask homeChore)
         {
             try
@@ -507,7 +484,7 @@ namespace HomeChoreTracker.Api.Controllers
                     DateTime startDate = (DateTime)homeChore.StartDate;
                     DateTime endDate = (DateTime)homeChore.EndDate;
                     int id = homeChore.Id;
-
+                    int minutes = homeChore.HoursTime * 60 + homeChore.MinutesTime;
                     if (homeChore.Unit == RepeatUnit.Day)
                     {
                         int numberOfDays = (int)(endDate - startDate).TotalDays;
@@ -520,7 +497,7 @@ namespace HomeChoreTracker.Api.Controllers
                             {
                                 TaskId = id,
                                 StartDate = assignmentDate,
-                                EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
+                                EndDate = assignmentDate.AddMinutes(minutes),
                                 IsDone = false,
                                 IsApproved = false,
                                 HomeId = homeChore.HomeId
@@ -547,7 +524,7 @@ namespace HomeChoreTracker.Api.Controllers
                                 {
                                     TaskId = id,
                                     StartDate = assignmentDate,
-                                    EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
+                                    EndDate = assignmentDate.AddMinutes(minutes),
                                     IsDone = false,
                                     IsApproved = false,
                                     HomeId = homeChore.HomeId
@@ -592,7 +569,7 @@ namespace HomeChoreTracker.Api.Controllers
                             {
                                 TaskId = id,
                                 StartDate = assignmentDate,
-                                EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
+                                EndDate = assignmentDate.AddMinutes(minutes),
                                 IsDone = false,
                                 IsApproved = false,
                                 HomeId = homeChore.HomeId
@@ -616,7 +593,7 @@ namespace HomeChoreTracker.Api.Controllers
                                 {
                                     TaskId = id,
                                     StartDate = assignmentDate,
-                                    EndDate = assignmentDate.AddMinutes(GetMinutesFromTimeLong(homeChore.Time)),
+                                    EndDate = assignmentDate.AddMinutes(minutes),
                                     IsDone = false,
                                     IsApproved = false,
                                     HomeId = homeChore.HomeId
@@ -774,7 +751,8 @@ namespace HomeChoreTracker.Api.Controllers
                     homeChore.Description = homeChoreBaseRequest.Description;
                     homeChore.Points = homeChoreBaseRequest.Points;
                     homeChore.LevelType = homeChoreBaseRequest.LevelType;
-                    homeChore.Time = homeChoreBaseRequest.Time;
+                    homeChore.HoursTime = homeChoreBaseRequest.HoursTime;
+                    homeChore.MinutesTime = homeChoreBaseRequest.MinutesTime;
                     homeChore.Interval = homeChoreBaseRequest.Interval;
                     homeChore.Unit = homeChoreBaseRequest.Unit;
                     homeChore.DaysOfWeek = dayOfWeeks;
@@ -800,7 +778,8 @@ namespace HomeChoreTracker.Api.Controllers
                     homeChoreRequest.Description = homeChoreBaseRequest.Description;
                     homeChoreRequest.Points = homeChoreBaseRequest.Points;
                     homeChoreRequest.LevelType = homeChoreBaseRequest.LevelType;
-                    homeChoreRequest.Time = homeChoreBaseRequest.Time;
+                    homeChoreRequest.HoursTime = homeChoreBaseRequest.HoursTime;
+                    homeChoreRequest.MinutesTime = homeChoreBaseRequest.MinutesTime;
                     homeChoreRequest.Interval = homeChoreBaseRequest.Interval;
                     homeChoreRequest.Unit = homeChoreBaseRequest.Unit;
                     homeChoreRequest.DaysOfWeek = homeChoreBaseRequest.DaysOfWeek;
@@ -873,7 +852,8 @@ namespace HomeChoreTracker.Api.Controllers
                     homeChore.Description = homeChoreBaseRequest.Description;
                     homeChore.Points = homeChoreBaseRequest.Points;
                     homeChore.LevelType = homeChoreBaseRequest.LevelType;
-                    homeChore.Time = homeChoreBaseRequest.Time;
+                    homeChore.HoursTime = homeChoreBaseRequest.HoursTime;
+                    homeChore.MinutesTime = homeChoreBaseRequest.MinutesTime;
                     homeChore.Interval = homeChoreBaseRequest.Interval;
                     homeChore.Unit = homeChoreBaseRequest.Unit;
                     homeChore.DaysOfWeek = dayOfWeeks;

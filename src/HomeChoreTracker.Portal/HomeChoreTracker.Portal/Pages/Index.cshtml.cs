@@ -77,8 +77,9 @@ namespace HomeChoreTracker.Portal.Pages
                             assigned = chore.HomeMemberId,
                             description = chore.Task.Description,
                             type = chore.Task.ChoreType.ToString(),
-                            time = chore.Task.Time.ToString(),
-                            product = chore.Product != string.Empty ? chore.Product : "-"
+							timeHours = chore.Task.HoursTime,
+							timeMinutes = chore.Task.MinutesTime,
+							product = chore.Product != string.Empty ? chore.Product : "-"
                         });
                     }
                     return Page();

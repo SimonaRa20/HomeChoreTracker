@@ -193,7 +193,7 @@ else
 				<p>Task Name: <span id="task-name"></span></p>
 				<p>Description: <span id="task-description"></span></p>
 				<p>Type: <span id="task-type"></span></p>
-				<p>Long Type: <span id="task-long-type"></span></p>
+				<p>How long: <span id="task-long-type"></span></p>
 				<p>Assigned member: <span id="task-assigned"></span></p>
 				<div id="vote-to-selection">
 					<p>Total votes: <span id="task-totalVotes"></span> (if half of the household members agree, assigned user receive a penalty of -10 points)</p>
@@ -225,6 +225,19 @@ else
 								}
 							</select>
 						</div>
+						<div class="form-check ml-2">
+							<input type="checkbox" class="form-check-input" id="detailedGoogleCheck" name="detailedGoogleCheck" />
+							<label class="form-check-label" for="detailedGoogleCheck">Google events time</label>
+						</div>
+						<div class="form-check ml-2">
+							<input type="checkbox" class="form-check-input" id="detailedBusyIntervalCheck" name="detailedBusyIntervalCheck" />
+							<label class="form-check-label" for="detailedBusyIntervalCheck">Busy intervals time</label>
+						</div>
+						<div class="form-check ml-2">
+							<input type="checkbox" class="form-check-input" id="detailedAssignedHomeChoresCheck" name="detailedAssignedHomeChoresCheck" />
+							<label class="form-check-label" for="detailedAssignedHomeChoresCheck">Assigned home chores time</label>
+						</div>
+
 						@if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
 						{
 							<div class="alert alert-danger" role="alert">
@@ -282,7 +295,8 @@ else
 						start: '@chore.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")',
 						end: '@chore.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
 						type: '@chore.Task.ChoreType',
-						time: '@chore.Task.Time',
+						timeHours: @chore.Task.HoursTime,
+						timeMinutes: @chore.Task.MinutesTime,
 						assigned: '@chore.HomeMemberId',
 						color: '@(chore.HomeMemberId == null ? "#4e73df" : userColorMap.GetValueOrDefault(chore.HomeMemberId.ToString(), "#4e73df"))',
 						textColor: '@(chore.HomeMemberId == null ? "white" : "black")',
@@ -293,6 +307,7 @@ else
 	}
 					],
 			eventRender: function (event, element) {
+
 				var assignedMemberId = event.assigned;
 				var assignedMemberInitials = '';
 
@@ -364,7 +379,26 @@ else
 				$('#task-name').text(calEvent.name);
 				$('#task-description').text(calEvent.description);
 				$('#task-type').text(calEvent.type);
-				$('#task-long-type').text(calEvent.time);
+
+				console.log(calEvent)
+
+				var hours = calEvent.timeHours;
+				var minutes = calEvent.timeMinutes;
+
+				var timeText = '';
+
+				if (hours > 0) {
+					timeText += hours + ' h';
+				}
+
+				if (minutes > 0) {
+					if (timeText.length > 0) {
+						timeText += ' ';
+					}
+					timeText += minutes + ' min';
+				}
+
+				$('#task-long-type').text(timeText);
 				$('#task-isDone').text(calEvent.isDone);
 				$('#task-totalVotes').text(calEvent.votes);
 				$('#vote-to-selection form').find('input[name="taskId"]').val(calEvent.id);

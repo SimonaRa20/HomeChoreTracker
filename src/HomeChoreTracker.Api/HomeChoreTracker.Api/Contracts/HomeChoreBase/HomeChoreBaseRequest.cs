@@ -9,7 +9,8 @@ namespace HomeChoreTracker.Api.Contracts.HomeChoreBase
         public string? Description { get; set; }
 		public int Points { get; set; }
 		public LevelType LevelType { get; set; }
-		public TimeLong Time { get; set; }
+		public int HoursTime { get; set; }
+		public int MinutesTime { get; set; }
 		public int Interval { get; set; }
 		public RepeatUnit Unit { get; set; }
 		public List<int>? DaysOfWeek { get; set; }

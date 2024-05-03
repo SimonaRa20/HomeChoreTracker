@@ -190,15 +190,19 @@ else if (User.IsInRole("User"))
 								}
 							</select>
 						</div>
-						<div class="form-group">
-							<label for="editTime">Time</label>
-							<select class="form-control" name="editTimeLong" id="editTimeLong" asp-for="EditHomeChore.Time" required>
-								@foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
-								{
-									<option value="@((int)time)">@time</option>
-								}
-							</select>
+
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="editHoursTime">Hours</label>
+								<input type="number" class="form-control" id="editHoursTime" name="editHoursTime" asp-for="EditHomeChore.HoursTime" step="1" value="0">
+							</div>
+							<div class="form-group col-md-6">
+								<label for="editMinutesTime">Minutes</label>
+								<input type="number" class="form-control" id="editMinutesTime" name="editMinutesTime" asp-for="EditHomeChore.MinutesTime" step="1" value="0">
+							</div>
+							<div id="validationError" class="text-danger"></div>
 						</div>
+
 						<div class="form-group">
 							<label for="editInterval">Interval</label>
 							<input asp-for="EditHomeChore.Interval" name="editInterval" class="form-control" id="editInterval" />
@@ -295,6 +299,18 @@ else
 			} else {
 				$('#intervalError').hide();
 			}
+
+			var hours = parseInt($('#editHoursTime').val());
+			var minutes = parseInt($('#editMinutesTime').val());
+
+			if (hours === 0 && minutes === 0) {
+				$('#validationError').text('Either Hours or Minutes must be greater than 0.');
+				event.preventDefault();
+			}
+			else if (hours < 0 || minutes < 0 || hours < 0 && minutes < 0) {
+				$('#validationError').text('Hours or Minutes must be greater than 0.');
+				event.preventDefault();
+			}
 		});
 	});
 
@@ -337,7 +353,24 @@ else
 				$('#choreName').text("Name: " + data.name);
 				$('#choreType').text("Chore Type: " + data.choreType);
 				$('#description').text("Description: " + data.description);
-				$('#time').text("How long time take to do this task: " + data.time);
+
+				var hours = data.timeHours;
+				var minutes = data.timeMinutes;
+
+				var timeText = '';
+
+				if (hours > 0) {
+					timeText += hours + ' h';
+				}
+
+				if (minutes > 0) {
+					if (timeText.length > 0) {
+						timeText += ' ';
+					}
+					timeText += minutes + ' min';
+				}
+
+				$('#time').text("How long time take to do this task: " + timeText);
 				$('#repeatingData').text("Repeating Data: " + data.repeatingData);
 
 				$('#detailModal').modal('show');
@@ -357,7 +390,10 @@ else
 		$('#editInterval').val('');
 		$('#editDayOfMonth').val('');
 		$('#editChoreType').val('');
-		$('#editTimeLong').val('');
+		
+		$('#editHoursTime').val('');
+		$('#editMinutesTime').val('');
+
 		$('#editLevelType').val('');
 		$('#editRepeatUnit').val('');
 		$('#editMonthlyRepeatType').val('');
@@ -383,10 +419,14 @@ else
 					if (data.endDate) {
 						$('#editEndDate').val(new Date(data.endDate).toISOString().substr(0, 10));
 					}
-					var timeLongText = data.time;
-					$('#editTimeLong option').filter(function () {
-						return $(this).text() === timeLongText;
-					}).prop('selected', true);
+
+					console.log(data)
+
+					$('#editHoursTime').val(data.timeHours);
+					$('#editMinutesTime').val(data.timeMinutes);
+					
+
+
 					var levelTypeText = data.levelType;
 					$('#editLevelType option').filter(function () {
 						return $(this).text() === levelTypeText;

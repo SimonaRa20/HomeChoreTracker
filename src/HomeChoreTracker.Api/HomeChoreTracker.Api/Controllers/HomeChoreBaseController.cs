@@ -179,7 +179,8 @@ namespace HomeChoreTracker.Api.Controllers
 				homeChoreBase.Description = homeChoreBaseRequest.Description;
                 homeChoreBase.Points = homeChoreBaseRequest.Points;
                 homeChoreBase.LevelType = homeChoreBaseRequest.LevelType;
-                homeChoreBase.Time = homeChoreBaseRequest.Time;
+                homeChoreBase.HoursTime = homeChoreBaseRequest.HoursTime;
+                homeChoreBase.MinutesTime = homeChoreBaseRequest.MinutesTime;
                 homeChoreBase.Interval = homeChoreBaseRequest.Interval;
 				homeChoreBase.Unit = homeChoreBaseRequest.Unit;
 				homeChoreBase.DaysOfWeek = dayOfWeeks;

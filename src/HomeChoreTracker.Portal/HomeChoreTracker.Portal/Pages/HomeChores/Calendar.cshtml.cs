@@ -70,7 +70,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                         assigned = chore.HomeMemberId,
                         description = chore.Task.Description,
                         type = chore.Task.ChoreType.ToString(),
-                        time = chore.Task.Time.ToString(),
+                        timeHours = chore.Task.HoursTime,
+                        timeMinutes = chore.Task.MinutesTime,
                         isDone = chore.IsDone,
                         votes = chore.TotalVotes,
                         product = chore.Product,
@@ -110,10 +111,29 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
             using (var httpClient = _httpClientFactory.CreateClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var apiUrl = _config["ApiUrl"] + $"/Calendar/{homeId}";
                 var selectedMemberId = Request.Form["AssignedHomeMember.HomeMemberId"];
 
-                if (string.IsNullOrEmpty(selectedMemberId))
+				bool googleCheck = false;
+				if (Request.Form["detailedGoogleCheck"] == "on")
+				{
+					googleCheck = true;
+				}
+
+				bool busyIntervalCheck = false;
+				if (Request.Form["detailedBusyIntervalCheck"] == "on")
+				{
+					busyIntervalCheck = true;
+				}
+
+				bool assignedHomeChoresCheck = false;
+				if (Request.Form["detailedAssignedHomeChoresCheck"] == "on")
+				{
+					assignedHomeChoresCheck = true;
+				}
+
+				var apiUrl = _config["ApiUrl"] + $"/Calendar/{homeId}?googleCheck={googleCheck}&busyIntervalCheck={busyIntervalCheck}&assignedHomeChoresCheck={assignedHomeChoresCheck}";
+
+				if (string.IsNullOrEmpty(selectedMemberId))
                 {
                     
                     AssignedHomeMember = new AssignedHomeMember

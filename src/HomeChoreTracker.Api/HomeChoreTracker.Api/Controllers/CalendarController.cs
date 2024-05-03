@@ -152,7 +152,8 @@ namespace HomeChoreTracker.Api.Controllers
                 Description = homeChoreTask.Description?.ToString(),
                 Points = homeChoreTask.Points,
                 LevelType = homeChoreTask.LevelType.ToString(),
-                Time = homeChoreTask.Time.ToString(),
+                HoursTime = homeChoreTask.HoursTime,
+                MinutesTime = homeChoreTask.MinutesTime,
                 IsDone = task.IsDone,
                 Product = shoppingItem != null ? shoppingItem.Title : string.Empty
             };
@@ -195,13 +196,15 @@ namespace HomeChoreTracker.Api.Controllers
                         List<TaskAssignment> userTasksAssigned = await _homeChoreRepository.GetAssignedTasks(member.Id);
                         List<BusyInterval> busyIntervals = await _userRepository.GetUserBusyIntervals(member.Id);
 
-                        List<(DateTime start, DateTime end)> suitableIntervals = FindHomersSuitableTimeIntervals(member, task.StartDate, member.CalendarEvents, hometask.Time, userTasksAssigned, busyIntervals, googleCheck, busyIntervalCheck, assignedHomeChoresCheck);
+                        int minutes = hometask.HoursTime * 60 + hometask.MinutesTime;
+
+                        List<(DateTime start, DateTime end)> suitableIntervals = FindHomersSuitableTimeIntervals(member, task.StartDate, member.CalendarEvents, minutes, userTasksAssigned, busyIntervals, googleCheck, busyIntervalCheck, assignedHomeChoresCheck);
 
                         if (suitableIntervals.Any())
                         {
                             var (start, end) = suitableIntervals.First();
                             task.StartDate = start;
-                            task.EndDate = start.AddMinutes(GetMinutesFromTimeLong(hometask.Time));
+                            task.EndDate = start.AddMinutes(minutes);
                             task.HomeMemberId = member.Id;
                             await _homeChoreRepository.UpdateTaskAssignment(task);
                             assignedPoints[member.Id] += hometask.Points;
@@ -234,21 +237,21 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        private List<(DateTime start, DateTime end)> FindHomersSuitableTimeIntervals(User user, DateTime startTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals, bool googleCheck, bool busyIntervalCheck, bool assignedHomeChoresCheck)
+        private List<(DateTime start, DateTime end)> FindHomersSuitableTimeIntervals(User user, DateTime startTime, List<Event> events, int minutes, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals, bool googleCheck, bool busyIntervalCheck, bool assignedHomeChoresCheck)
         {
             List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
             DateTime currentDate = startTime.Date;
             TimeSpan startDayTime = user.StartDayTime;
             TimeSpan endDayTime = user.EndDayTime;
 
-            suitableIntervals = GetSuitableIntervalsForDay(currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals, googleCheck, busyIntervalCheck, assignedHomeChoresCheck);
+            suitableIntervals = GetSuitableIntervalsForDay(currentDate, startDayTime, endDayTime, events, minutes, assignedTasks, busyIntervals, googleCheck, busyIntervalCheck, assignedHomeChoresCheck);
 
             return suitableIntervals;
         }
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> AssignTaskToMember(int id, AssignedHomeMember assignedHomeMember)
+        public async Task<IActionResult> AssignTaskToMember(int id, AssignedHomeMember assignedHomeMember, bool googleCheck, bool busyIntervalCheck, bool assignedHomeChoresCheck)
         {
             try
             {
@@ -272,13 +275,15 @@ namespace HomeChoreTracker.Api.Controllers
                 List<TaskAssignment> userTasksAssigned = await _homeChoreRepository.GetAssignedTasks(assignedUser.Id);
                 List<BusyInterval> busyIntervals = await _userRepository.GetUserBusyIntervals(assignedUser.Id);
 
-                List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, taskAssignment.StartDate, user.CalendarEvents, task.Time, userTasksAssigned, busyIntervals);
+                int minutes = task.HoursTime * 60 + task.MinutesTime;
+
+                List<(DateTime start, DateTime end)> suitableIntervals = FindSuitableTimeIntervals(user, taskAssignment.StartDate, user.CalendarEvents, minutes, userTasksAssigned, busyIntervals, googleCheck, busyIntervalCheck, assignedHomeChoresCheck);
 
                 if (suitableIntervals.Any())
                 {
                     var (start, end) = suitableIntervals.First();
                     taskAssignment.StartDate = start;
-                    taskAssignment.EndDate = start.AddMinutes(GetMinutesFromTimeLong(task.Time));
+                    taskAssignment.EndDate = start.AddMinutes(task.HoursTime * 60 + task.MinutesTime);
                 }
                 else
                 {
@@ -294,7 +299,7 @@ namespace HomeChoreTracker.Api.Controllers
             }
         }
 
-        private List<(DateTime start, DateTime end)> FindSuitableTimeIntervals(User user, DateTime startTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals)
+        private List<(DateTime start, DateTime end)> FindSuitableTimeIntervals(User user, DateTime startTime, List<Event> events, int minutes, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals, bool googleCheck, bool busyIntervalCheck, bool assignedHomeChoresCheck)
         {
             List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
 
@@ -302,12 +307,12 @@ namespace HomeChoreTracker.Api.Controllers
             TimeSpan startDayTime = user.StartDayTime;
             TimeSpan endDayTime = user.EndDayTime;
 
-            suitableIntervals = GetSuitableIntervalsForDay(currentDate, startDayTime, endDayTime, events, choreTime, assignedTasks, busyIntervals, true, true, true);
+            suitableIntervals = GetSuitableIntervalsForDay(currentDate, startDayTime, endDayTime, events, minutes, assignedTasks, busyIntervals, googleCheck, busyIntervalCheck, assignedHomeChoresCheck);
 
             return suitableIntervals;
         }
 
-        private List<(DateTime start, DateTime end)> GetSuitableIntervalsForDay(DateTime date, TimeSpan startDayTime, TimeSpan endDayTime, List<Event> events, TimeLong choreTime, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals, bool googleCheck, bool busyIntervalCheck, bool assignedHomeChoresCheck)
+        private List<(DateTime start, DateTime end)> GetSuitableIntervalsForDay(DateTime date, TimeSpan startDayTime, TimeSpan endDayTime, List<Event> events, int minutes, List<TaskAssignment> assignedTasks, List<BusyInterval> busyIntervals, bool googleCheck, bool busyIntervalCheck, bool assignedHomeChoresCheck)
         {
             List<(DateTime start, DateTime end)> suitableIntervals = new List<(DateTime start, DateTime end)>();
 
@@ -346,36 +351,41 @@ namespace HomeChoreTracker.Api.Controllers
 
             if (busyIntervalCheck)
             {
-                busyIntervals = busyIntervals.OrderBy(x => x.StartTime).ToList();
+				busyIntervals = busyIntervals.OrderBy(x => x.StartTime).ToList();
 
-                foreach (BusyInterval busyInterval in busyIntervals)
-                {
-                    List<(DateTime start, DateTime end)> updatedIntervals = new List<(DateTime start, DateTime end)>();
+				foreach (BusyInterval busyInterval in busyIntervals)
+				{
+					List<(DateTime start, DateTime end)> updatedIntervals = new List<(DateTime start, DateTime end)>();
 
-                    foreach (var interval in suitableIntervals)
-                    {
-                        if (interval.end.TimeOfDay > busyInterval.StartTime && interval.start.TimeOfDay < busyInterval.EndTime)
-                        {
-                            if (interval.start.TimeOfDay < busyInterval.StartTime)
-                                updatedIntervals.Add((interval.start, interval.start.Date.Add(busyInterval.StartTime)));
-                            if (interval.end.TimeOfDay > busyInterval.EndTime)
-                                updatedIntervals.Add((interval.start.Date.Add(busyInterval.EndTime), interval.end));
-                        }
-                        else
-                        {
-                            updatedIntervals.Add(interval);
-                        }
-                    }
+					foreach (var interval in suitableIntervals)
+					{
+						if (interval.end.TimeOfDay > busyInterval.StartTime && interval.start.TimeOfDay < busyInterval.EndTime
+							&& interval.start.DayOfWeek == busyInterval.Day)
+						{
+							DateTime busyIntervalStartDateTime = interval.start.Date + busyInterval.StartTime;
+							DateTime busyIntervalEndDateTime = interval.start.Date + busyInterval.EndTime;
 
-                    suitableIntervals = updatedIntervals;
-                }
+							if (interval.start.TimeOfDay < busyInterval.StartTime)
+								updatedIntervals.Add((interval.start, busyIntervalStartDateTime));
 
-                suitableIntervals = suitableIntervals
-                    .Where(i => (i.end - i.start).TotalMinutes >= GetMinutesFromTimeLong(choreTime))
-                    .ToList();
-            }
+							if (interval.end.TimeOfDay > busyInterval.EndTime)
+								updatedIntervals.Add((busyIntervalEndDateTime, interval.end));
+						}
+						else
+						{
+							updatedIntervals.Add(interval);
+						}
+					}
 
-            if (assignedHomeChoresCheck)
+					suitableIntervals = updatedIntervals;
+				}
+
+				suitableIntervals = suitableIntervals
+					.Where(i => (i.end - i.start).TotalMinutes >= minutes)
+					.ToList();
+			}
+
+			if (assignedHomeChoresCheck)
             {
                 foreach (var assignedTask in assignedTasks)
                 {
@@ -401,30 +411,6 @@ namespace HomeChoreTracker.Api.Controllers
             }
 
             return suitableIntervals;
-        }
-
-
-        private int GetMinutesFromTimeLong(TimeLong timeLong)
-        {
-            switch (timeLong)
-            {
-                case TimeLong.fiveMinutes: return 5;
-                case TimeLong.tenMinutes: return 10;
-                case TimeLong.fifteenMinutes: return 15;
-                case TimeLong.twentyMinutes: return 20;
-                case TimeLong.thirtyMinutes: return 30;
-                case TimeLong.fourtyFiveMinutes: return 45;
-                case TimeLong.hour: return 60;
-                case TimeLong.hourAndHalf: return 90;
-                case TimeLong.twoHours: return 120;
-                case TimeLong.twoHoursAndHalf: return 150;
-                case TimeLong.threeHours: return 180;
-                case TimeLong.threeHoursAndHalf: return 210;
-                case TimeLong.fourHours: return 240;
-                case TimeLong.fourHoursAndHalf: return 270;
-                case TimeLong.fiveHours: return 300;
-                default: return 0;
-            }
         }
 
         [HttpGet("Chores/File")]

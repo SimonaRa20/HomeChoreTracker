@@ -115,7 +115,8 @@
 					<p id="choreName"></p>
 					<p id="choreType"></p>
 					<p id="description"></p>
-					<p id="time"></p>
+					<p id="timeHours"></p>
+					<p id="timeMinutes"></p>
 					<p id="repeatingData"></p>
 				</div>
 				<div class="modal-footer">
@@ -170,13 +171,14 @@
 							</select>
 						</div>
 						<div class="form-group">
-							<label for="editTime">Time</label>
-							<select class="form-control" name="editTimeLong" id="editTimeLong" asp-for="EditHomeChore.Time" required>
-								@foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
-								{
-									<option value="@((int)time)">@time</option>
-								}
-							</select>
+							<label for="editHoursTime">Hours</label>
+							<input asp-for="EditHomeChore.HoursTime" name="editHoursTime" class="form-control" id="editHoursTime" />
+							<div id="pointsError" class="text-danger" style="display: none;">Hours are required.</div>
+						</div>
+						<div class="form-group">
+							<label for="editMinutesTime">Minutes</label>
+							<input asp-for="EditHomeChore.MinutesTime" name="editMinutesTime" class="form-control" id="editMinutesTime" />
+							<div id="pointsError" class="text-danger" style="display: none;">Minutes are required.</div>
 						</div>
 						<div class="form-group">
 							<label for="editInterval">Interval</label>

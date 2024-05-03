@@ -84,7 +84,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     {
                         var daysOfWeekList = choreDetails.DaysOfWeek;
                         string choreTypeText = ((HomeChoreType)choreDetails.ChoreType).ToString();
-                        string choreTimeText = ((TimeLong)choreDetails.Time).ToString();
                         string choreLevelTypeText = ((LevelType)choreDetails.LevelType).ToString();
                         string choreUnitText = ((RepeatUnit)choreDetails.Unit).ToString();
                         string choreMonthlyRepeatTypeText = ((MonthlyRepeatType)choreDetails.MonthlyRepeatType).ToString();
@@ -98,7 +97,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                             choreType = choreTypeText,
                             description = descriptionText,
                             points = choreDetails.Points,
-                            time = choreTimeText,
+                            timeHours = choreDetails.HoursTime,
+                            timeMinutes = choreDetails.MinutesTime,
                             levelType = choreLevelTypeText,
                             interval = choreDetails.Interval,
                             unit = choreUnitText,
@@ -144,7 +144,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
                     EditHomeChore.Description = Request.Form["editDescription"];
                     EditHomeChore.Points = int.Parse(Request.Form["editPoints"]);
                     EditHomeChore.LevelType = (int)Enum.Parse<LevelType>(Request.Form["editLevelType"]);
-                    EditHomeChore.Time = (int)Enum.Parse<TimeLong>(Request.Form["editTimeLong"]);
+					EditHomeChore.HoursTime = int.Parse(Request.Form["editHoursTime"]);
+					EditHomeChore.MinutesTime = int.Parse(Request.Form["editMinutesTime"]);
                     EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
                     EditHomeChore.Unit = (int)Enum.Parse<RepeatUnit>(Request.Form["editRepeatUnit"]);
                     EditHomeChore.DaysOfWeek = Request.Form["editDaysOfWeek"].SelectMany(s => s.Split(',')).Select(int.Parse).ToList();

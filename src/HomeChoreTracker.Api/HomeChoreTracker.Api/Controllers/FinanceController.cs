@@ -588,6 +588,18 @@ namespace HomeChoreTracker.Api.Controllers
 						}
 					}
 				}
+				if (line.Trim().StartsWith("Moketa"))
+				{
+					string[] tokens = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (string token in tokens)
+					{
+						string cleanedToken = token.Replace(",", ".").Trim();
+						if (decimal.TryParse(cleanedToken, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
+						{
+							return value;
+						}
+					}
+				}
 				if (line.Trim().StartsWith("SUMA"))
 				{
 					string[] tokens = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);

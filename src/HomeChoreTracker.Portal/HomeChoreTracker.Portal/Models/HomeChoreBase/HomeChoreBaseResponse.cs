@@ -11,7 +11,8 @@ namespace HomeChoreTracker.Portal.Models.HomeChoreBase
 		public string? Description { get; set; }
 		public int Points { get; set; }
 		public LevelType LevelType { get; set; }
-		public TimeLong Time { get; set; }
+		public int HoursTime { get; set; }
+		public int MinutesTime { get; set; }
 		public int Interval { get; set; }
 		public RepeatUnit Unit { get; set; }
 		public List<DayOfWeek>? DaysOfWeek { get; set; }

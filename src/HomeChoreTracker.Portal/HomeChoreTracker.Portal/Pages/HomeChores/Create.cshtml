@@ -70,16 +70,19 @@ else if (User.IsInRole("User"))
 								</select>
 								<span asp-validation-for="CreateHomeChore.LevelType" class="text-danger"></span>
 							</div>
-							<div class="form-group">
-								<label for="Time">Time</label>
-								<select class="form-control" id="Time" name="CreateHomeChore.Time" asp-for="CreateHomeChore.Time" required>
-									@foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
-									{
-										<option value="@((int)time)">@time</option>
-									}
-								</select>
-								<span asp-validation-for="CreateHomeChore.Time" class="text-danger"></span>
+
+							<div class="form-row">
+								<div class="form-group col-md-6">
+									<label for="Hours">Hours</label>
+									<input type="number" class="form-control" id="Hours" name="CreateHomeChore.HoursTime" asp-for="CreateHomeChore.HoursTime" step="1" value="0">
+								</div>
+								<div class="form-group col-md-6">
+									<label for="Minutes">Minutes</label>
+									<input type="number" class="form-control" id="Minutes" name="CreateHomeChore.MinutesTime" asp-for="CreateHomeChore.MinutesTime" step="1" value="0">
+								</div>
+								<div id="validationError" class="text-danger"></div>
 							</div>
+
 							<div class="form-group">
 								<label for="Interval">Interval</label>
 								<input type="number" class="form-control" id="Interval" name="CreateHomeChore.Interval" asp-for="CreateHomeChore.Interval" min="1" step="1" value="1">
@@ -167,6 +170,20 @@ else
 			d.setMonth(d.getMonth() + months);
 			return d.toISOString().slice(0, 10);
 		}
+		$('form').submit(function (e) {
+			var hours = parseInt($('#Hours').val());
+			var minutes = parseInt($('#Minutes').val());
+
+			if (hours === 0 && minutes === 0) {
+				$('#validationError').text('Either Hours or Minutes must be greater than 0.');
+			}
+			else if (hours < 0 || minutes < 0 || hours < 0 && minutes < 0) {
+				$('#validationError').text('Hours or Minutes must be greater than 0.');
+			}
+			else {
+				this.submit();
+			}
+		});
 
 		var today = new Date().toISOString().slice(0, 10);
 		$('#StartDate').val(today);

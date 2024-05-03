@@ -185,7 +185,25 @@ else
 
                         $('#modalStartDate').text(startDate);
                         $('#modalEndDate').text(endDate);
-                        $('#modalTime').text(response.time);
+
+                        var hours = response.hoursTime;
+                        var minutes = response.minutesTime;
+
+                        var timeText = '';
+
+                        if (hours > 0) {
+                            timeText += hours + ' h';
+                        }
+
+                        if (minutes > 0) {
+                            if (timeText.length > 0) {
+                                timeText += ' ';
+                            }
+                            timeText += minutes + ' min';
+                        }
+
+                        $('#modalTime').text(timeText);
+
 
                         $('#done').prop('checked', response.isDone);
                         console.log(response.isDone)

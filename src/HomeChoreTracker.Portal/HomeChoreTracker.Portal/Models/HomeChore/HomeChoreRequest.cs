@@ -12,8 +12,9 @@ namespace HomeChoreTracker.Portal.Models.HomeChore
         [Required(ErrorMessage = "Points are required.")]
         public int? Points { get; set; }
         public LevelType LevelType { get; set; }
-        public TimeLong Time { get; set; }
-        [Required(ErrorMessage = "Interval is required.")]
+		public int HoursTime { get; set; }
+		public int MinutesTime { get; set; }
+		[Required(ErrorMessage = "Interval is required.")]
         public int? Interval { get; set; }
         public RepeatUnit Unit { get; set; }
         public List<int>? DaysOfWeek { get; set; }

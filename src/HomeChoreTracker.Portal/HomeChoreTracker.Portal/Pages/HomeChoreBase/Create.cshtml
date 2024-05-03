@@ -64,14 +64,14 @@
 							<span asp-validation-for="CreateHomeChoreBase.LevelType" class="text-danger"></span>
 						</div>
 						<div class="form-group">
-							<label for="Time">Time</label>
-							<select class="form-control" id="Time" name="CreateHomeChoreBase.Time" asp-for="CreateHomeChoreBase.Time" required>
-								@foreach (var time in Enum.GetValues(typeof(HomeChoreTracker.Portal.Constants.TimeLong)))
-								{
-									<option value="@((int)time)">@time</option>
-								}
-							</select>
-							<span asp-validation-for="CreateHomeChoreBase.Time" class="text-danger"></span>
+							<label for="Hours">Hours</label>
+							<input type="number" class="form-control" id="Hours" name="CreateHomeChoreBase.HoursTime" asp-for="CreateHomeChoreBase.HoursTime" min="1" step="1" value="1">
+							<span asp-validation-for="CreateHomeChoreBase.HoursTime" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<label for="Minutes">Minutes</label>
+							<input type="number" class="form-control" id="Minutes" name="CreateHomeChoreBase.MinutesTime" asp-for="CreateHomeChoreBase.MinutesTime" min="1" step="1" value="1">
+							<span asp-validation-for="CreateHomeChoreBase.MinutesTime" class="text-danger"></span>
 						</div>
 						<div class="form-group">
 							<label for="Interval">Interval</label>

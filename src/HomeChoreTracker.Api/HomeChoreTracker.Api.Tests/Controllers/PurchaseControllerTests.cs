@@ -198,7 +198,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			_purchaseRepositoryMock.Setup(repo => repo.GetShoppingItemById(It.IsAny<int>())).ReturnsAsync((ShoppingItem)null);
 			var purchaseProduct = new UpdatePurchaseRequest { PriceForProducts = 0, Items = new List<ShoppingItemUpdateRequest> { new ShoppingItemUpdateRequest { Id = 1, IsCompleted = true } } };
 			// Act
-			var result = await _purchaseController.UpdateShoppingItems(1, purchaseProduct);
+			var result = await _purchaseController.UpdateShoppingItems(purchaseProduct);
 
 			// Assert
 			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -221,7 +221,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			_purchaseRepositoryMock.Setup(repo => repo.GetPurchaseById(purchaseId)).ReturnsAsync(purchase);
 
 			// Act
-			var result = await _purchaseController.UpdateShoppingItems(1, purchaseProduct);
+			var result = await _purchaseController.UpdateShoppingItems(purchaseProduct);
 
 			// Assert
 			var okResult = Assert.IsType<OkObjectResult>(result);

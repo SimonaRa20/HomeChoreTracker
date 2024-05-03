@@ -98,7 +98,6 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     {
                         var daysOfWeekList = choreDetails.DaysOfWeek;
                         string choreTypeText = ((HomeChoreType)choreDetails.ChoreType).ToString();
-                        string choreTimeText = ((TimeLong)choreDetails.Time).ToString();
                         string choreLevelTypeText = ((LevelType)choreDetails.LevelType).ToString();
                         string choreUnitText = ((RepeatUnit)choreDetails.Unit).ToString();
                         string choreMonthlyRepeatTypeText = ((MonthlyRepeatType)choreDetails.MonthlyRepeatType).ToString();
@@ -111,7 +110,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                             choreType = choreTypeText,
                             description = descriptionText,
                             points = choreDetails.Points,
-                            time = choreTimeText,
+                            timeHours = choreDetails.HoursTime,
+                            timeMinutes = choreDetails.MinutesTime,
                             levelType = choreLevelTypeText,
                             interval = choreDetails.Interval,
                             unit = choreUnitText,
@@ -156,7 +156,8 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                     EditHomeChore.Name = Request.Form["editName"];
                     EditHomeChore.Interval = int.Parse(Request.Form["editInterval"]);
                     EditHomeChore.ChoreType = (int)Enum.Parse<HomeChoreType>(Request.Form["editChoreType"]);
-                    EditHomeChore.Time = (int)Enum.Parse<TimeLong>(Request.Form["editTimeLong"]);
+					EditHomeChore.HoursTime = int.Parse(Request.Form["editHoursTime"]);
+					EditHomeChore.MinutesTime = int.Parse(Request.Form["editMinutesTime"]);
                     EditHomeChore.Description = Request.Form["editDescription"];
                     EditHomeChore.StartDate = DateTime.Parse(Request.Form["editStartDate"]);
                     EditHomeChore.EndDate = DateTime.Parse(Request.Form["editEndDate"]);
