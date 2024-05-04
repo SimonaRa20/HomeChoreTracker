@@ -39,7 +39,10 @@ namespace HomeChoreTracker.Portal.Pages.Auth
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToPage("./Login");
+                    TempData["ToastType"] = "success";
+                    TempData["ToastMessage"] = "Password update email has been sent.";
+
+                    return Page();
                 }
                 else
                 {

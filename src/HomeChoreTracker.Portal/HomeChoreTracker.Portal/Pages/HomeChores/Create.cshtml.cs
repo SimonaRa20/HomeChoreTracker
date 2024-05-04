@@ -80,8 +80,11 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage("/HomeChores/Index", new { id = Id });
-                    }
+						TempData["ToastType"] = "success";
+						TempData["ToastMessage"] = "Home chore was created successfully.";
+
+						return Page();
+					}
                     else
                     {
                         ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");

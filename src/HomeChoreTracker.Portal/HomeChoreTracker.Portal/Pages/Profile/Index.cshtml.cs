@@ -58,14 +58,19 @@ namespace HomeChoreTracker.Portal.Pages.Profile
 
                     if (response.IsSuccessStatusCode)
                     {
-                        UserProfile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
-                    }
+						
+						UserProfile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
+                        TempData["ToastType"] = "success";
+						TempData["ToastMessage"] = "Profile was updated successfully.";
+						return Page();
+					}
                     else
                     {
                         var errorMessage = await response.Content.ReadAsStringAsync();
                         ModelState.AddModelError(string.Empty, errorMessage);
-                    }
-                    return await OnGetAsync();
+						await OnGetAsync();
+						return Page();
+					}
                 }
             }
             catch (Exception ex)

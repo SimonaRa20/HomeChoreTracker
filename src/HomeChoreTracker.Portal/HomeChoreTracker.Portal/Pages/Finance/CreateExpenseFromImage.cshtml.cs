@@ -105,7 +105,10 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 
 						if (response.IsSuccessStatusCode)
 						{
-							return RedirectToPage("/Finance/Index");
+							TempData["ToastType"] = "success";
+							TempData["ToastMessage"] = "Expense was created successfully.";
+							await LoadHomes();
+							return Page();
 						}
 						else
 						{

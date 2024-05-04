@@ -28,6 +28,14 @@
 
 			<div class="card mb-4 py-3 mt-2 border-left-primary">
 				<div class="card-body">
+					@if (!string.IsNullOrEmpty(TempData["ToastMessage"] as string) && (TempData["ToastType"] as string) == "success")
+					{
+						<div class="toast text-white bg-success border-0" id="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2500" style="width: auto; max-width: 100%;">
+							<div class="toast-body">
+								@TempData["ToastMessage"]
+							</div>
+						</div>
+					}
 					<form method="post" asp-action="Create">
 						<div class="form-group">
 							<label for="Name">Name</label>
@@ -63,16 +71,19 @@
 							</select>
 							<span asp-validation-for="CreateHomeChoreBase.LevelType" class="text-danger"></span>
 						</div>
-						<div class="form-group">
-							<label for="Hours">Hours</label>
-							<input type="number" class="form-control" id="Hours" name="CreateHomeChoreBase.HoursTime" asp-for="CreateHomeChoreBase.HoursTime" min="1" step="1" value="1">
-							<span asp-validation-for="CreateHomeChoreBase.HoursTime" class="text-danger"></span>
-						</div>
-						<div class="form-group">
-							<label for="Minutes">Minutes</label>
-							<input type="number" class="form-control" id="Minutes" name="CreateHomeChoreBase.MinutesTime" asp-for="CreateHomeChoreBase.MinutesTime" min="1" step="1" value="1">
-							<span asp-validation-for="CreateHomeChoreBase.MinutesTime" class="text-danger"></span>
-						</div>
+
+						<div class="form-row">
+								<div class="form-group col-md-6">
+									<label for="Hours">Hours</label>
+								<input type="number" class="form-control" id="Hours" name="CreateHomeChoreBase.HoursTime" asp-for="CreateHomeChoreBase.HoursTime" step="1" value="0">
+								</div>
+								<div class="form-group col-md-6">
+									<label for="Minutes">Minutes</label>
+								<input type="number" class="form-control" id="Minutes" name="CreateHomeChoreBase.MinutesTime" asp-for="CreateHomeChoreBase.MinutesTime" step="1" value="0">
+								</div>
+								<div id="validationError" class="text-danger"></div>
+							</div>
+
 						<div class="form-group">
 							<label for="Interval">Interval</label>
 							<input type="number" class="form-control" id="Interval" name="CreateHomeChoreBase.Interval" asp-for="CreateHomeChoreBase.Interval" min="1" step="1" value="1">
@@ -118,6 +129,7 @@
 			</div>
 		</div>
 	</div>
+
 }
 else
 {
@@ -133,7 +145,9 @@ else
 		</div>
 	</div>
 }
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K+1ClXaRhPU17yAPQnQA4Gn4kKgdCjP/vt3kS2uF78w=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
 	$(document).ready(function () {
 		$('#Unit').change(function () {
@@ -154,6 +168,39 @@ else
 				$('#dayOfWeekField').hide();
 				$('#dayOfMonthField').hide();
 				$('#monthlyRepeatTypeField').hide();
+			}
+		});
+
+		$('form').submit(function (e) {
+			var hours = parseInt($('#Hours').val());
+			var minutes = parseInt($('#Minutes').val());
+
+			if (hours === 0 && minutes === 0) {
+				$('#validationError').text('Either Hours or Minutes must be greater than 0.');
+				e.preventDefault();
+			}
+			else if (hours < 0 || minutes < 0 || hours < 0 && minutes < 0) {
+				$('#validationError').text('Hours or Minutes must be greater than 0.');
+				e.preventDefault();
+			}
+		});
+
+		$(window).on('load', function () {
+			var toastMessage = '@TempData["ToastMessage"]';
+			var toastType = '@TempData["ToastType"]';
+
+			if (toastMessage && toastType === "success") {
+				var toastEl = document.getElementById('toast');
+				if (toastEl) {
+					try {
+						var toast = new bootstrap.Toast(toastEl);
+						toast.show();
+					} catch (error) {
+						console.error("Error initializing toast:", error);
+					}
+				} else {
+					console.error("Toast element not found");
+				}
 			}
 		});
 	});

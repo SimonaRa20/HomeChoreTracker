@@ -75,8 +75,10 @@ namespace HomeChoreTracker.Portal.Pages.Home
 
 					if (response.IsSuccessStatusCode)
 					{
+						TempData["ToastType"] = "success";
+						TempData["ToastMessage"] = "Invitation to home was sent successfully.";
 
-						return RedirectToAction("Index");
+						return Page();
 					}
 					else
 					{

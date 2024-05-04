@@ -106,7 +106,10 @@ namespace HomeChoreTracker.Api.Controllers
                 if(history.TaskId != null)
                 {
                     TaskAssignment taskAssignment = await _homeChoreRepository.GetTaskAssigment((int)history.TaskId);
-                    sum += (int)taskAssignment.Points;
+                    if(taskAssignment != null)
+                    {
+						sum += (int)taskAssignment.Points;
+					}
                 }
                 else
                 {

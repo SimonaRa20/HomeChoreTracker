@@ -40,8 +40,11 @@ namespace HomeChoreTracker.Portal.Pages.Auth
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToPage("/Auth/Login");
-                }
+					TempData["ToastType"] = "success";
+					TempData["ToastMessage"] = "Profile was created successfully.";
+
+					return Page();
+				}
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();

@@ -18,6 +18,14 @@ else if (User.IsInRole("User"))
 			<div class="card border-left-primary">
 				<div class="card-body">
 					<h4>Update Profile</h4>
+					@if (!string.IsNullOrEmpty(TempData["ToastMessage"] as string) && (TempData["ToastType"] as string) == "success")
+					{
+						<div class="toast text-white bg-success border-0" id="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2500" style="width: auto; max-width: 100%;">
+							<div class="toast-body">
+								@TempData["ToastMessage"]
+							</div>
+						</div>
+					}
 					<form method="post">
 						<div class="form-group">
 							<label for="UserName">User Name:</label>
@@ -55,7 +63,9 @@ else if (User.IsInRole("User"))
 						<div class="form-group">
 							<button type="submit" class="btn btn-primary btn-sm float-left mb-2">Update Profile</button>
 						</div>
+						
 					</form>
+					
 				</div>
 			</div>
 		</div>
@@ -77,3 +87,29 @@ else
 	</div>
 }
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K+1ClXaRhPU17yAPQnQA4Gn4kKgdCjP/vt3kS2uF78w=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+	$(document).ready(function () {
+		var toastMessage = '@TempData["ToastMessage"]';
+		var toastType = '@TempData["ToastType"]';
+
+		if (toastMessage && toastType === "success") {
+			$(window).on('load', function () {
+				var toastEl = document.getElementById('toast');
+				if (toastEl) {
+					try {
+						var toast = new bootstrap.Toast(toastEl);
+						toast.show();
+					} catch (error) {
+						console.error("Error initializing toast:", error);
+					}
+				} else {
+					console.error("Toast element not found");
+				}
+			});
+		}
+	});
+</script>

@@ -17,6 +17,9 @@ else if (User.IsInRole("Admin"))
 
 			<div class="card mb-4 py-3 border-left-primary">
 				<div class="card-body">
+					<div class="d-sm-flex align-items-center justify-content-between mb-4">
+						<h1 class="h3 mb-0 text-gray-800">Levels</h1>
+					</div>
 					@if (Model.LevelResponse != null && Model.LevelResponse.Any())
 					{
 						<table class="table">

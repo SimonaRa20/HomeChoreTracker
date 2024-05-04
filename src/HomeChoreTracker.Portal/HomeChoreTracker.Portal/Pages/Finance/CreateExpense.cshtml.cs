@@ -79,9 +79,12 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 
 					if (response.IsSuccessStatusCode)
 					{
-						await OnGetAsync();
-						return RedirectToPage("/Finance/Index");
-					}
+                        TempData["ToastType"] = "success";
+                        TempData["ToastMessage"] = "Expense was created successfully.";
+
+                        await OnGetAsync();
+                        return Page();
+                    }
 					else
 					{
 						ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");

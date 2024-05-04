@@ -90,7 +90,10 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
 
 							if (response.IsSuccessStatusCode)
 							{
-								return RedirectToPage("/Gamification/Index");
+								TempData["ToastType"] = "success";
+								TempData["ToastMessage"] = "Level created successfully.";
+
+								return Page();
 							}
 							else
 							{

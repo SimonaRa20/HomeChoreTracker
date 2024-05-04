@@ -61,7 +61,10 @@ namespace HomeChoreTracker.Portal.Pages.Avatars
 
 							if (response.IsSuccessStatusCode)
 							{
-								return RedirectToPage("/Avatars/Index");
+                                TempData["ToastType"] = "success";
+                                TempData["ToastMessage"] = "Avatar created successfully.";
+
+                                return Page();
 							}
 							else
 							{

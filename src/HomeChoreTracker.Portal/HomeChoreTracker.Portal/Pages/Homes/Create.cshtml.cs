@@ -37,7 +37,10 @@ namespace HomeChoreTracker.Portal.Pages.Homes
 
 					if (response.IsSuccessStatusCode)
 					{
-						return RedirectToPage("/Homes/Index");
+						TempData["ToastType"] = "success";
+						TempData["ToastMessage"] = "Home was created successfully.";
+
+						return Page();
 					}
 					else
 					{

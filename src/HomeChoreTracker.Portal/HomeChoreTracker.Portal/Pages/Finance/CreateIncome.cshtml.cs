@@ -79,7 +79,10 @@ namespace HomeChoreTracker.Portal.Pages.Finance
 					if (response.IsSuccessStatusCode)
 					{
 						await OnGetAsync();
-						return RedirectToPage("/Finance/Index");
+						TempData["ToastType"] = "success";
+						TempData["ToastMessage"] = "Income was created successfully.";
+
+						return Page();
 					}
 					else
 					{

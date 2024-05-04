@@ -15,6 +15,9 @@
 			<a class="btn btn-light btn-sm mb-2" asp-page="./Create"><i class="fa fa-plus-circle mr-2" aria-hidden="true"></i>Create</a>
 			<div class="card mb-4 py-3 border-left-primary">
 				<div class="card-body">
+					<div class="d-sm-flex align-items-center justify-content-between mb-4">
+					<h1 class="h3 mb-0 text-gray-800">Avatars</h1>
+				</div>
 					@if (Model.AvatarsResponse != null && Model.AvatarsResponse.Any())
 					{
 						<table class="table">

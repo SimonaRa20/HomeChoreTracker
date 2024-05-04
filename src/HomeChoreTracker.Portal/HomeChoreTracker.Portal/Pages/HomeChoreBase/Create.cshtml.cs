@@ -45,7 +45,10 @@ namespace HomeChoreTracker.Portal.Pages.HomeChoreBase
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToPage("/HomeChoreBase/Index");
+                        TempData["ToastType"] = "success";
+                        TempData["ToastMessage"] = "Home Chore created successfully.";
+
+                        return Page();
                     }
                     else
                     {

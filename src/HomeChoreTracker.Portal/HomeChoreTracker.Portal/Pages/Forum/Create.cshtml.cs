@@ -38,7 +38,10 @@ namespace HomeChoreTracker.Portal.Pages.Forum
 
 					if (response.IsSuccessStatusCode)
 					{
-						return RedirectToPage("/Forum/Index");
+						TempData["ToastType"] = "success";
+						TempData["ToastMessage"] = "Advice was created successfully.";
+
+						return Page();
 					}
 					else
 					{

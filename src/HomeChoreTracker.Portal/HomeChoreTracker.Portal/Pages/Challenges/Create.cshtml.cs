@@ -86,8 +86,11 @@ namespace HomeChoreTracker.Portal.Pages.Challenges
 
                         if (response.IsSuccessStatusCode)
                         {
-                            return RedirectToPage("/Challenges/Index");
-                        }
+							TempData["ToastType"] = "success";
+							TempData["ToastMessage"] = "Challenge created successfully.";
+                            await OnGetAsync();
+							return Page();
+						}
                         else
                         {
                             ModelState.AddModelError(string.Empty, $"Error: {response.StatusCode}");
