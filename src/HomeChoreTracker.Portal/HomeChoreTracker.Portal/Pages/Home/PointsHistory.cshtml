@@ -49,10 +49,13 @@ else if (User.IsInRole("User"))
 			{
 				<div class="card mb-4 py-3 border-left-primary">
 					<div class="card-body">
+						
 						<h3>Points history</h3>
+						<div class="text-center">
 						@if (Model.History != null && Model.History.Any())
 						{
-							<table class="table">
+							<div class="table-responsive">
+								<table class="table table-bordered">
 								<thead>
 									<tr>
 										<th>Time</th>
@@ -71,6 +74,7 @@ else if (User.IsInRole("User"))
 									}
 								</tbody>
 							</table>
+							</div>
 							<div>
 								<ul class="pagination">
 									@if (Model.ShowPrevious)
@@ -94,6 +98,7 @@ else if (User.IsInRole("User"))
 						{
 							<p>No home chore bases found.</p>
 						}
+						</div>
 					</div>
 				</div>
 			}

@@ -22,7 +22,9 @@ else if (User.IsInRole("Admin"))
 					</div>
 					@if (Model.LevelResponse != null && Model.LevelResponse.Any())
 					{
-						<table class="table">
+						<div class="text-center">
+							<div class="table-responsive">
+								<table class="table table-bordered">
 							<thead>
 								<tr>
 									<th>Level</th>
@@ -40,7 +42,7 @@ else if (User.IsInRole("Admin"))
 										<td>
 											@if (level.Image != null && level.Image.Length > 0)
 											{
-												<div style="overflow: hidden; width:100px;overflow: hidden;">
+														<div style=" display: block;margin: 0 auto; max-width: 100%; height: auto;width: 100px;  overflow: hidden;">
 													<img src="data:image/jpeg;base64,@Convert.ToBase64String(level.Image)" alt="Level Image" class="card-img-top w-100" style="object-fit: cover; height:100%" />
 												</div>
 											}
@@ -90,6 +92,8 @@ else if (User.IsInRole("Admin"))
 								}
 							</tbody>
 						</table>
+						</div>
+						</div>
 						<div>
 							<ul class="pagination">
 								@if (Model.ShowPrevious)

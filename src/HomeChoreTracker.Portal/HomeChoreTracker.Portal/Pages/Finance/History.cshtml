@@ -35,7 +35,9 @@ else if (User.IsInRole("User"))
 				<div class="card-body">
 					@if (Model.TransferHistory != null && Model.TransferHistory.Any())
 					{
-						<table class="table">
+						<div class="text-center">
+							<div class="table-responsive">
+								<table class="table table-bordered">
 							<thead>
 								<tr class="text-center">
 									<th>Type</th>
@@ -117,6 +119,8 @@ else if (User.IsInRole("User"))
 								}
 							</tbody>
 						</table>
+						</div>
+						</div>
 						<div>
 							<ul class="pagination">
 								@if (Model.ShowPrevious)

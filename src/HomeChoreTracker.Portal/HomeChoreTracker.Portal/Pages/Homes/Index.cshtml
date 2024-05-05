@@ -30,7 +30,9 @@ else if (User.IsInRole("User"))
 					</div>
 					@if (Model.Homes != null && Model.Homes.Any())
 					{
-						<table class="table">
+						<div class="text-center">
+							<div class="table-responsive">
+								<table class="table table-bordered">
 							<thead>
 								<tr>
 									<th>Title</th>
@@ -45,6 +47,8 @@ else if (User.IsInRole("User"))
 								}
 							</tbody>
 						</table>
+						</div>
+						</div>
 					}
 					else
 					{

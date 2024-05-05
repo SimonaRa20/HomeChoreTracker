@@ -26,27 +26,29 @@ else if (User.IsInRole("User"))
 								<h5>Rating By Badges</h5>
 								@if (Model.GetRatingsByBadges != null && Model.GetRatingsByBadges.Any())
 								{
-									<table class="table">
-										<thead>
-											<tr>
-												<th>UserName</th>
-												<th>Badges</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>@Model.GetRatingsByBadges[0].UserName</td>
-												<td>@Model.GetRatingsByBadges[0].EarnedBadgesCount</td>
-											</tr>
-											@foreach (var rate in Model.GetRatingsByBadges.Skip(1))
-											{
-												<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
-													<td>@rate.UserName</td>
-													<td>@rate.EarnedBadgesCount</td>
+									<div class="table-responsive">
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+													<th>UserName</th>
+													<th>Badges</th>
 												</tr>
-											}
-										</tbody>
-									</table>
+											</thead>
+											<tbody>
+												<tr>
+													<td>@Model.GetRatingsByBadges[0].UserName</td>
+													<td>@Model.GetRatingsByBadges[0].EarnedBadgesCount</td>
+												</tr>
+												@foreach (var rate in Model.GetRatingsByBadges.Skip(1))
+												{
+													<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
+														<td>@rate.UserName</td>
+														<td>@rate.EarnedBadgesCount</td>
+													</tr>
+												}
+											</tbody>
+										</table>
+									</div>
 								}
 								else
 								{
@@ -59,27 +61,29 @@ else if (User.IsInRole("User"))
 								<h5>Rating By Points</h5>
 								@if (Model.GetRatingsByPoints != null && Model.GetRatingsByPoints.Any())
 								{
-									<table class="table">
-										<thead>
-											<tr>
-												<th>UserName</th>
-												<th>Points</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>@Model.GetRatingsByPoints[0].UserName</td>
-												<td>@Model.GetRatingsByPoints[0].EarnedPoints</td>
-											</tr>
-											@foreach (var rate in Model.GetRatingsByPoints.Skip(1))
-											{
-												<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
-													<td>@rate.UserName</td>
-													<td>@rate.EarnedPoints</td>
+									<div class="table-responsive">
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+													<th>UserName</th>
+													<th>Points</th>
 												</tr>
-											}
-										</tbody>
-									</table>
+											</thead>
+											<tbody>
+												<tr>
+													<td>@Model.GetRatingsByPoints[0].UserName</td>
+													<td>@Model.GetRatingsByPoints[0].EarnedPoints</td>
+												</tr>
+												@foreach (var rate in Model.GetRatingsByPoints.Skip(1))
+												{
+													<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
+														<td>@rate.UserName</td>
+														<td>@rate.EarnedPoints</td>
+													</tr>
+												}
+											</tbody>
+										</table>
+									</div>
 								}
 								else
 								{

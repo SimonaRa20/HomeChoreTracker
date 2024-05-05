@@ -42,7 +42,9 @@ else if (User.IsInRole("User"))
 					{
 						@if (Model.HomeChoreResponse != null && Model.HomeChoreResponse.Any())
 						{
-							<table class="table">
+							<div class="text-center">
+							<div class="table-responsive">
+								<table class="table table-bordered">
 								<thead>
 									<tr>
 										<th>Name</th>
@@ -111,6 +113,8 @@ else if (User.IsInRole("User"))
 									}
 								</tbody>
 							</table>
+							</div>
+							</div>
 							<div>
 								<ul class="pagination">
 									@if (Model.ShowPrevious)

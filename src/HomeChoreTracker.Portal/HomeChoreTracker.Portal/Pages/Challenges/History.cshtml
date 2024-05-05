@@ -30,6 +30,7 @@ else if (User.IsInRole("User"))
 			@if (Model.HistoryChallengeResponses != null && Model.HistoryChallengeResponses.Any())
 			{
 				<h4>Challenges history</h4>
+						<div class="text-center">
 				<div class="table-responsive">
 					<table class="table table-bordered">
 						<thead>
@@ -66,6 +67,7 @@ else if (User.IsInRole("User"))
 							}
 						</tbody>
 					</table>
+					</div>
 							<div>
 								<ul class="pagination">
 									@if (Model.ShowPrevious)

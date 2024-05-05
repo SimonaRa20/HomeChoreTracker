@@ -21,7 +21,9 @@ else if (User.IsInRole("User"))
 					<div class="card-body">
 						@if (Model.Notifications != null && Model.Notifications.Any())
 						{
-							<table class="table">
+							<div class="text-center">
+								<div class="table-responsive">
+									<table class="table table-bordered">
 								<thead>
 									<tr>
 										<th>Time</th>
@@ -38,6 +40,8 @@ else if (User.IsInRole("User"))
 									}
 								</tbody>
 							</table>
+							</div>
+							</div>
 							<div>
 								<ul class="pagination">
 									@if (Model.ShowPrevious)

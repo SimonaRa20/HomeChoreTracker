@@ -36,13 +36,16 @@ else if (User.IsInRole("User"))
 			<div class="card mb-4 py-3 border-left-primary mt-2">
 				<div class="collapse show">
 					<div class="card-body">
+
 						@if (Model.Unauthorized)
 						{
 							<p>You don't have permission to view this content.</p>
 						}
 						else if (Model.HomeMembers != null && Model.HomeMembers.Any())
 						{
-							<table class="table">
+							<div class="text-center">
+							<div class="table-responsive">
+								<table class="table table-bordered">
 								<thead>
 									<tr>
 										<th>Username</th>
@@ -59,6 +62,8 @@ else if (User.IsInRole("User"))
 									}
 								</tbody>
 							</table>
+							</div>
+							</div>
 						}
 						else
 						{

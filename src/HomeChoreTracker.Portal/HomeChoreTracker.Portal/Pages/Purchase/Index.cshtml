@@ -29,15 +29,11 @@ else if (User.IsInRole("User"))
 
 			<div class="card mb-4 py-3 border-left-primary">
 				<div class="card-body">
-					<div class="d-sm-flex align-items-center justify-content-between mb-4">
-						<h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
-						<div class="btn btn-sm btn-primary shadow-sm d-inline-block d-sm-none" data-toggle="modal" data-target="#createHomeChoreModal">
-							<i class="fa fa-plus-circle mr-2" aria-hidden="true"></i> Home Chore
-						</div>
-					</div>
 					@if (Model.Purchases != null && Model.Purchases.Any())
 					{
-						<table class="table">
+						<div class="text-center">
+							<div class="table-responsive">
+								<table class="table table-bordered">
 							<thead>
 								<tr>
 									<th>Date</th>
@@ -91,6 +87,8 @@ else if (User.IsInRole("User"))
 								}
 							</tbody>
 						</table>
+						</div>
+						</div>
 
 						<div>
 							<ul class="pagination">
