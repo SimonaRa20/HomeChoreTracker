@@ -29,7 +29,7 @@ else if (User.IsInRole("User"))
 		<div class="card-body">
 			@if (Model.HistoryChallengeResponses != null && Model.HistoryChallengeResponses.Any())
 			{
-				<h4>Historical challenges</h4>
+				<h4>Challenges history</h4>
 				<div class="table-responsive">
 					<table class="table table-bordered">
 						<thead>
@@ -66,6 +66,24 @@ else if (User.IsInRole("User"))
 							}
 						</tbody>
 					</table>
+							<div>
+								<ul class="pagination">
+									@if (Model.ShowPrevious)
+									{
+										<li class="page-item">
+											<a asp-page="/Challenges/History" asp-route-currentpage="@(Model.CurrentPage -1)"
+											   class="page-link">Previous</a>
+										</li>
+									}
+									@if (Model.ShowNext)
+									{
+										<li class="page-item">
+											<a asp-page="/Challenges/History" asp-route-currentpage="@(Model.CurrentPage + 1)"
+											   class="page-link">Next</a>
+										</li>
+									}
+								</ul>
+							</div>
 				</div>
 			}
 			else

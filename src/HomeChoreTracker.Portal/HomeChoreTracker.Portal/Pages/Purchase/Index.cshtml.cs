@@ -23,7 +23,17 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
 		[BindProperty]
         public int PurchaseId { get; set; }
 
-        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+
+		[BindProperty(SupportsGet = true)]
+		public int CurrentPage { get; set; } = 1;
+
+		public int Count { get; set; }
+		public int PageSize { get; set; } = 8;
+		public int TotalPages { get; set; }
+		public bool ShowPrevious => CurrentPage > 1;
+		public bool ShowNext => CurrentPage < TotalPages;
+
+		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
@@ -39,10 +49,15 @@ namespace HomeChoreTracker.Portal.Pages.Purchase
                 var apiUrl = $"{_config["ApiUrl"]}/Purchase/{PurchaseId}";
 
                 var response = await httpClient.GetAsync(apiUrl);
+				int pageSize = PageSize;
+				int skip = (CurrentPage - 1) * pageSize;
 
-                if (response.IsSuccessStatusCode)
+				if (response.IsSuccessStatusCode)
                 {
-                    Purchases = await response.Content.ReadFromJsonAsync<List<Models.Purchase.Purchase>>();
+					List < Models.Purchase.Purchase > list = await response.Content.ReadFromJsonAsync<List<Models.Purchase.Purchase>>();
+					Count = list.Count;
+					TotalPages = (int)Math.Ceiling((double)Count / pageSize);
+					Purchases  = list.Skip(skip).Take(pageSize).ToList();
 					var apiHomeChoreUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
 					var responseHomeChore = await httpClient.GetAsync(apiHomeChoreUrl);
 

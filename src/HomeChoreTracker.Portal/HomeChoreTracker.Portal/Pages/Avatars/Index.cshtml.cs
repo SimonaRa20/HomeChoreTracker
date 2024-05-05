@@ -1,9 +1,11 @@
 using HomeChoreTracker.Portal.Constants;
 using HomeChoreTracker.Portal.Models.Avatar;
 using HomeChoreTracker.Portal.Models.Gamification;
+using HomeChoreTracker.Portal.Models.HomeChore;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace HomeChoreTracker.Portal.Pages.Avatars
@@ -16,6 +18,15 @@ namespace HomeChoreTracker.Portal.Pages.Avatars
         public List<AvatarResponse> AvatarsResponse { get; set; }
 		[BindProperty]
 		public AvatarUpdateRequest EditAvatar { get; set; }
+
+		[BindProperty(SupportsGet = true)]
+		public int CurrentPage { get; set; } = 1;
+
+		public int Count { get; set; }
+		public int PageSize { get; set; } = 4;
+		public int TotalPages { get; set; }
+		public bool ShowPrevious => CurrentPage > 1;
+		public bool ShowNext => CurrentPage < TotalPages;
 
 		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -34,11 +45,16 @@ namespace HomeChoreTracker.Portal.Pages.Avatars
                 var apiUrl = $"{_config["ApiUrl"]}/Avatar";
 
                 var response = await httpClient.GetAsync(apiUrl);
+				int pageSize = PageSize;
+				int skip = (CurrentPage - 1) * pageSize;
 
-                if (response.IsSuccessStatusCode)
+				if (response.IsSuccessStatusCode)
                 {
-                    AvatarsResponse = await response.Content.ReadFromJsonAsync<List<AvatarResponse>>();
-                    return Page();
+					List<AvatarResponse> list = await response.Content.ReadFromJsonAsync<List<AvatarResponse>>();
+					Count = list.Count;
+					TotalPages = (int)Math.Ceiling((double)Count / pageSize);
+					AvatarsResponse = list.Skip(skip).Take(pageSize).ToList();
+					return Page();
                 }
                 else
                 {

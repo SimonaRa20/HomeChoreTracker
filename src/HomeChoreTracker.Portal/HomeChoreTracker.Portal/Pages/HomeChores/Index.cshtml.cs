@@ -25,7 +25,16 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
 		[BindProperty]
 		public int HomeId { get; set; }
 
-		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        [BindProperty(SupportsGet = true)]
+        public int CurrentPage { get; set; } = 1;
+
+        public int Count { get; set; }
+        public int PageSize { get; set; } = 8;
+        public int TotalPages { get; set; }
+        public bool ShowPrevious => CurrentPage > 1;
+        public bool ShowNext => CurrentPage < TotalPages;
+
+        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
@@ -41,10 +50,15 @@ namespace HomeChoreTracker.Portal.Pages.HomeChores
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var apiUrl = $"{_config["ApiUrl"]}/HomeChore/{id}";
                 var response = await httpClient.GetAsync(apiUrl);
+                int pageSize = PageSize;
+                int skip = (CurrentPage - 1) * pageSize;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    HomeChoreResponse = await response.Content.ReadFromJsonAsync<List<HomeChoreResponse>>();
+                    List<HomeChoreResponse> list = await response.Content.ReadFromJsonAsync<List<HomeChoreResponse>>();
+                    Count = list.Count;
+                    TotalPages = (int)Math.Ceiling((double)Count / pageSize);
+                    HomeChoreResponse = list.Skip(skip).Take(pageSize).ToList();
                     return Page();
                 }
 				else if (response.StatusCode == HttpStatusCode.Forbidden)

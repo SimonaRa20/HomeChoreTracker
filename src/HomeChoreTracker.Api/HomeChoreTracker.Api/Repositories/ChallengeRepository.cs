@@ -83,7 +83,14 @@ namespace HomeChoreTracker.Api.Repositories
 			return challenges;
 		}
 
-		public async Task<List<Challenge>> GetHistoryChallenges()
+        public async Task<List<Challenge>> GetChallenges()
+        {
+            var challenges = await _dbContext.Challenges.Where(x => x.Action.Equals(ChallengeInvitationType.Accept)).ToListAsync();
+            challenges = challenges.Where(x => x.ResultType.Equals(ChallengeResultType.None)).ToList();
+            return challenges;
+        }
+
+        public async Task<List<Challenge>> GetHistoryChallenges()
 		{
 			return await _dbContext.Challenges.Where(x => !x.ResultType.Equals(ChallengeInvitationType.None) && !x.ResultType.Equals(ChallengeResultType.None)).ToListAsync();
 		}

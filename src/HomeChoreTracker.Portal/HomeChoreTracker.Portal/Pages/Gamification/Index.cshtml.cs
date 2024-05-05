@@ -3,6 +3,7 @@ using HomeChoreTracker.Portal.Models.HomeChore;
 using HomeChoreTracker.Portal.Models.HomeChoreBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
 
@@ -18,7 +19,16 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
         [BindProperty]
         public GamificationLevelUpdateRequest EditLevel { get; set; }
 
-        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		[BindProperty(SupportsGet = true)]
+		public int CurrentPage { get; set; } = 1;
+
+		public int Count { get; set; }
+		public int PageSize { get; set; } = 4;
+		public int TotalPages { get; set; }
+		public bool ShowPrevious => CurrentPage > 1;
+		public bool ShowNext => CurrentPage < TotalPages;
+
+		public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _config = configuration;
@@ -34,11 +44,16 @@ namespace HomeChoreTracker.Portal.Pages.Gamification
                 var apiUrl = $"{_config["ApiUrl"]}/Gamification";
 
                 var response = await httpClient.GetAsync(apiUrl);
+				int pageSize = PageSize;
+				int skip = (CurrentPage - 1) * pageSize;
 
-                if (response.IsSuccessStatusCode)
+				if (response.IsSuccessStatusCode)
                 {
-                    LevelResponse = await response.Content.ReadFromJsonAsync<List<GamificationLevelResponse>>();
-                    return Page();
+					List<GamificationLevelResponse> list = await response.Content.ReadFromJsonAsync<List<GamificationLevelResponse>>();
+					Count = list.Count;
+					TotalPages = (int)Math.Ceiling((double)Count / pageSize);
+					LevelResponse = list.Skip(skip).Take(pageSize).ToList();
+					return Page();
                 }
                 else
                 {

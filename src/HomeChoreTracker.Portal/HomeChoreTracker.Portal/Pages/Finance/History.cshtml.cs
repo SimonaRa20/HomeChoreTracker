@@ -28,7 +28,7 @@ namespace HomeChoreTracker.Portal.Pages.Finance
         [BindProperty(SupportsGet = true)]
         public int CurrentPage { get; set; } = 1;
         public int Count { get; set; }
-        public int PageSize { get; set; } = 10;
+        public int PageSize { get; set; } = 8;
         public int TotalPages { get; set; }
 
         public bool ShowPrevious => CurrentPage > 1;
