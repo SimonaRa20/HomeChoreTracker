@@ -78,15 +78,15 @@ else
 									<button type="submit" class="btn btn-primary btn-user btn-block">
 										Register Account
 									</button>
-									@if (!string.IsNullOrEmpty(TempData["ToastMessage"] as string) && (TempData["ToastType"] as string) == "success")
-									{
-										<div class="toast text-white bg-success border-0 mt-1" id="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2500" style="width: auto; max-width: 100%;">
-											<div class="toast-body">
-												@TempData["ToastMessage"]
-											</div>
-										</div>
-									}
 								</form>
+								@if (!string.IsNullOrEmpty(TempData["ToastMessage"] as string) && (TempData["ToastType"] as string) == "success")
+								{
+									<div class="toast text-white bg-success border-0 mt-1" id="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2500" style="width: auto; max-width: 100%;">
+										<div class="toast-body">
+											@TempData["ToastMessage"]
+										</div>
+									</div>
+								}
 								<hr>
 								<div class="text-center">
 									<a class="small" href="ForgotPassword">Forgot Password?</a>

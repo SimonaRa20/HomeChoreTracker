@@ -1,3 +1,4 @@
+using HomeChoreTracker.Portal.Models.Challenge;
 using HomeChoreTracker.Portal.Models.Gamification;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,7 +11,9 @@ namespace HomeChoreTracker.Portal.Pages
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
 
-        public List<RatingsResponse> GetRatingsByBadges { get; set; }
+		public ChallengeMVPRequest GetUserChallengeMVP { get; set; }
+		public ChallengeMVPRequest GetHomeChallengeMVP { get; set; }
+		public List<RatingsResponse> GetRatingsByBadges { get; set; }
         public List<RatingsResponse> GetRatingsByPoints { get; set; }
         public int UserId { get; set; }
 
@@ -39,7 +42,20 @@ namespace HomeChoreTracker.Portal.Pages
                     if (responseGetRatingsByPoints.IsSuccessStatusCode)
                     {
                         GetRatingsByPoints = await responseGetRatingsByPoints.Content.ReadFromJsonAsync<List<RatingsResponse>>();
-                    }
+
+						var apiUrlGetUserChallenges = _config["ApiUrl"] + "/Challenge/UserChallengesMVP";
+						var responseGetUserChallenges = await httpClient.GetAsync(apiUrlGetUserChallenges);
+						if (responseGetUserChallenges.IsSuccessStatusCode)
+                        {
+							GetUserChallengeMVP = await responseGetUserChallenges.Content.ReadFromJsonAsync<ChallengeMVPRequest>();
+							var apiUrlGetHomeChallenges = _config["ApiUrl"] + "/Challenge/HomeChallengesMVP";
+							var responseGetHomeChallenges = await httpClient.GetAsync(apiUrlGetHomeChallenges);
+							if (responseGetHomeChallenges.IsSuccessStatusCode)
+							{
+								GetHomeChallengeMVP = await responseGetHomeChallenges.Content.ReadFromJsonAsync<ChallengeMVPRequest>();
+							}
+						}
+					}
                     return Page();
                 }
                 else

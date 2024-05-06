@@ -1,5 +1,7 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.ExtendedProperties;
+using DocumentFormat.OpenXml.Spreadsheet;
 using HomeChoreTracker.Api.Constants;
+using HomeChoreTracker.Api.Contracts.Challenge;
 using HomeChoreTracker.Api.Database;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
@@ -93,6 +95,81 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task<List<Challenge>> GetHistoryChallenges()
 		{
 			return await _dbContext.Challenges.Where(x => !x.ResultType.Equals(ChallengeInvitationType.None) && !x.ResultType.Equals(ChallengeResultType.None)).ToListAsync();
+		}
+
+		public async Task<ChallengeMVPRequest> GetUserChallengesMVP()
+		{
+			ChallengeMVPRequest challengeMVPRequest = new ChallengeMVPRequest();
+			List<ChallengeMVPRequest> challengeMVPs = new List<ChallengeMVPRequest>();
+
+			List<User> users = await _dbContext.Users.ToListAsync();
+			List<Challenge> challenges = await _dbContext.Challenges.Where(x=>x.ResultType.Equals(ChallengeResultType.Win) || x.ResultType.Equals(ChallengeResultType.Lost)).ToListAsync();
+
+			foreach(var user in users)
+			{
+				foreach (var challenge in challenges)
+				{
+					if(challenge.ResultType.Equals(ChallengeResultType.Win) && challenge.UserId.Equals(user.Id))
+					{
+						ChallengeMVPRequest mvpRequest = new ChallengeMVPRequest { Id = user.Id, Name = user.UserName, Count = 1 };
+						challengeMVPs.Add(mvpRequest);
+					}
+					else if(challenge.ResultType.Equals(ChallengeResultType.Lost) && challenge.OpponentUserId.Equals(user.Id))
+					{
+						ChallengeMVPRequest mvpRequest = new ChallengeMVPRequest { Id = user.Id, Name = user.UserName, Count = 1 };
+						challengeMVPs.Add(mvpRequest);
+					}
+				}
+			}
+
+			List<ChallengeMVPRequest> result = challengeMVPs.GroupBy(c => c.Id)
+															.Select(cl => new ChallengeMVPRequest{
+																				Id = cl.First().Id,
+																				Name = cl.First().Name,
+																				Count = cl.Sum(c => c.Count),
+															}).ToList();
+
+			challengeMVPRequest = result.OrderBy(x=>x.Count).Last();
+
+			return challengeMVPRequest;
+		}
+
+		public async Task<ChallengeMVPRequest> GetHomeChallengesMVP()
+		{
+			ChallengeMVPRequest challengeMVPRequest = new ChallengeMVPRequest();
+			List<ChallengeMVPRequest> challengeMVPs = new List<ChallengeMVPRequest>();
+
+			List<Home> homes = await _dbContext.Homes.ToListAsync();
+			List<Challenge> challenges = await _dbContext.Challenges.Where(x => x.ResultType.Equals(ChallengeResultType.Win) || x.ResultType.Equals(ChallengeResultType.Lost)).ToListAsync();
+
+			foreach (var home in homes)
+			{
+				foreach (var challenge in challenges)
+				{
+					if (challenge.ResultType.Equals(ChallengeResultType.Win) && challenge.HomeId.Equals(home.Id))
+					{
+						ChallengeMVPRequest mvpRequest = new ChallengeMVPRequest { Id = home.Id, Name = home.Title, Count = 1 };
+						challengeMVPs.Add(mvpRequest);
+					}
+					else if (challenge.ResultType.Equals(ChallengeResultType.Lost) && challenge.OpponentHomeId.Equals(home.Id))
+					{
+						ChallengeMVPRequest mvpRequest = new ChallengeMVPRequest { Id = home.Id, Name = home.Title, Count = 1 };
+						challengeMVPs.Add(mvpRequest);
+					}
+				}
+			}
+
+			List<ChallengeMVPRequest> result = challengeMVPs.GroupBy(c => c.Id)
+															.Select(cl => new ChallengeMVPRequest
+															{
+																Id = cl.First().Id,
+																Name = cl.First().Name,
+																Count = cl.Sum(c => c.Count),
+															}).ToList();
+
+			challengeMVPRequest = result.OrderBy(x => x.Count).Last();
+
+			return challengeMVPRequest;
 		}
 
 		public async Task UpdateChallenge(TaskAssignment assignment)

@@ -22,6 +22,22 @@ else if (User.IsInRole("User"))
 					<h3>Ratings</h3>
 					<div class="row">
 						<div class="col-lg-6">
+							<div class="card mb-4">
+								<div class="card-body">
+									<h7>Number 1 of users in challenges</h7>
+									<h5>@Model.GetUserChallengeMVP.Name - @Model.GetUserChallengeMVP.Count won challenges</h5>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="card mb-4">
+								<div class="card-body">
+									<h7>Number 1 of homes in challenges</h7>
+									<h5>@Model.GetHomeChallengeMVP.Name - @Model.GetHomeChallengeMVP.Count won challenges</h5>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
 							<div class="text-center">
 								<h5>Rating By Badges</h5>
 								@if (Model.GetRatingsByBadges != null && Model.GetRatingsByBadges.Any())
@@ -41,7 +57,7 @@ else if (User.IsInRole("User"))
 												</tr>
 												@foreach (var rate in Model.GetRatingsByBadges.Skip(1))
 												{
-													<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
+													<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "blurred")">
 														<td>@rate.UserName</td>
 														<td>@rate.EarnedBadgesCount</td>
 													</tr>
@@ -76,7 +92,7 @@ else if (User.IsInRole("User"))
 												</tr>
 												@foreach (var rate in Model.GetRatingsByPoints.Skip(1))
 												{
-													<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "") @((rate.UserId >= Model.UserId - 1 && rate.UserId <= Model.UserId + 1) ? "" : "blurred")">
+													<tr class="@((rate.UserId == Model.UserId) ? "bg-secondary text-white" : "blurred")">
 														<td>@rate.UserName</td>
 														<td>@rate.EarnedPoints</td>
 													</tr>

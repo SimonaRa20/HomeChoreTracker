@@ -335,5 +335,37 @@ namespace HomeChoreTracker.Api.Controllers
 				return BadRequest($"An error occurred while get avatar: {ex.Message}");
 			}
 		}
+
+		[HttpGet("UserChallengesMVP")]
+		[Authorize]
+		public async Task<IActionResult> GetUserChallengesMVP()
+		{
+			try
+			{
+				ChallengeMVPRequest challenge = await _challengeRepository.GetUserChallengesMVP();
+
+				return Ok(challenge);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"An error occurred while get avatar: {ex.Message}");
+			}
+		}
+
+		[HttpGet("HomeChallengesMVP")]
+		[Authorize]
+		public async Task<IActionResult> GetHomeChallengesMVP()
+		{
+			try
+			{
+				ChallengeMVPRequest challenge = await _challengeRepository.GetHomeChallengesMVP();
+
+				return Ok(challenge);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"An error occurred while get avatar: {ex.Message}");
+			}
+		}
 	}
 }
