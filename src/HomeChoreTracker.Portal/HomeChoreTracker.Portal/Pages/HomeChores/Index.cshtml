@@ -63,7 +63,7 @@ else if (User.IsInRole("User"))
 											<td>
 												@if (choreBase.StartDate != null)
 												{
-													<p>@choreBase.StartDate.Value.ToString("yyyy/MM/dd")</p>
+															<p>@choreBase.StartDate.Value.ToString("yyyy-MM-dd")</p>
 												}
 												else
 												{
@@ -73,7 +73,7 @@ else if (User.IsInRole("User"))
 											<td>
 												@if (!string.IsNullOrEmpty(choreBase.EndDate.ToString()))
 												{
-													<p>@choreBase.EndDate.Value.ToString("yyyy/MM/dd")</p>
+													<p>@choreBase.EndDate.Value.ToString("yyyy-MM-dd")</p>
 												}
 												else
 												{
@@ -222,7 +222,7 @@ else if (User.IsInRole("User"))
 								<label for="editMinutesTime">Minutes</label>
 								<input type="number" class="form-control" id="editMinutesTime" name="editMinutesTime" asp-for="EditHomeChore.MinutesTime" step="1" value="0">
 							</div>
-							<div id="validationError" class="text-danger"></div>
+							<div style="margin-left:4px;" id="validationError" class="text-danger"></div>
 						</div>
 
 						<div class="form-group">
@@ -327,14 +327,42 @@ else
 
 			if (hours === 0 && minutes === 0) {
 				$('#validationError').text('Either Hours or Minutes must be greater than 0.');
-				event.preventDefault();
-			}
-			else if (hours < 0 || minutes < 0 || hours < 0 && minutes < 0) {
-				$('#validationError').text('Hours or Minutes must be greater than 0.');
-				event.preventDefault();
+				event.preventDefault(); // Prevent form submission
+			} else {
+				$('#validationError').text(''); // Clear validation error if validation passes
 			}
 		});
+
+		$('#editRepeatUnit').change(function () {
+			var unit = $(this).val();
+			toggleRepeatFields(unit, 'edit');
+		});
+
+		// Initial toggle based on the default unit value
+		toggleRepeatFields($('#editRepeatUnit').val(), 'edit');
 	});
+
+	function toggleRepeatFields(unit, prefix) {
+		var prefixId = prefix === 'edit' ? 'edit' : '';
+
+		if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Day)') {
+			$('#' + prefixId + 'DayOfWeekField').hide();
+			$('#' + prefixId + 'DayOfMonthField').hide();
+			$('#' + prefixId + 'MonthlyRepeatTypeField').hide();
+		} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Week)') {
+			$('#' + prefixId + 'DayOfWeekField').show();
+			$('#' + prefixId + 'DayOfMonthField').hide();
+			$('#' + prefixId + 'MonthlyRepeatTypeField').hide();
+		} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Month)') {
+			$('#' + prefixId + 'DayOfWeekField').hide();
+			$('#' + prefixId + 'DayOfMonthField').show();
+			$('#' + prefixId + 'MonthlyRepeatTypeField').show();
+		} else if (unit == '@((int)HomeChoreTracker.Portal.Constants.RepeatUnit.Year)') {
+			$('#' + prefixId + 'DayOfWeekField').hide();
+			$('#' + prefixId + 'DayOfMonthField').hide();
+			$('#' + prefixId + 'MonthlyRepeatTypeField').hide();
+		}
+	}
 
 	$(document).ready(function () {
 		$('#editRepeatUnit').change(function () {

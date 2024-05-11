@@ -67,7 +67,7 @@ else if (User.IsInRole("User"))
 									@foreach (var history in Model.History)
 									{
 										<tr>
-											<td>@history.Time</td>
+											<td>@history.Time.ToString("yyyy-MM-dd, HH:m")</td>
 											<td>@history.Points</td>
 											<td>@history.Text</td>
 										</tr>

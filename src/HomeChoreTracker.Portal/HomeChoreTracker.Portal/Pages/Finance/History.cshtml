@@ -53,7 +53,7 @@ else if (User.IsInRole("User"))
 									<tr class="text-center">
 										<td>@transfer.Data.Category.Name</td>
 										<td>@transfer.Data.Title</td>
-										<td>@transfer.Data.Time.ToString("MM/dd/yyyy")</td>
+												<td>@transfer.Data.Time.ToString("yyyy-MM-dd")</td>
 										<td class="@((transfer.Type == "Expense") ? "text-danger" : "text-success")">
 											@if (transfer.Type == "Expense")
 											{

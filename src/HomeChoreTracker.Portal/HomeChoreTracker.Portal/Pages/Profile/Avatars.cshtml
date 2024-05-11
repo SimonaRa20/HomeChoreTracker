@@ -80,7 +80,7 @@ else if (User.IsInRole("User"))
             <a class="btn btn-secondary btn-sm mb-2" asp-page="./Avatars"><i class="fa fa-user-astronaut mr-2" aria-hidden="true"></i>Avatars</a>
             <div class="card border-left-primary" style="border-width: 2px;">
                 <div class="card-body">
-                    <h4 class="d-inline">Current your points: <h3 class="text-success d-inline">@Model.UserPoints px</h3></h4>
+                    <h4 class="d-inline">Your points: <h3 class="text-success d-inline">@Model.UserPoints</h3></h4>
                     @if (Model.UserAvatar.Image == null)
                     {
                         <div class="row">

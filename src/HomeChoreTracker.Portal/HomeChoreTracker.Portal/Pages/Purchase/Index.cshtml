@@ -46,7 +46,7 @@ else if (User.IsInRole("User"))
 								@foreach (var purchase in Model.Purchases)
 								{
 									<tr>
-										<td>@purchase.PurchaseDate.ToString("M/d/yyyy")</td>
+												<td>@purchase.PurchaseDate.ToString("yyyy-MM-dd")</td>
 										<td>
 											@purchase.Items.Count
 										</td>

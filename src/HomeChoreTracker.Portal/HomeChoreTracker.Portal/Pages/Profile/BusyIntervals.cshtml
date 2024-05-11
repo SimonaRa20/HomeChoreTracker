@@ -97,7 +97,7 @@ else if (User.IsInRole("User"))
 													{
 														@foreach (var interval in Model.BusyIntervals.Where(i => i.Day == dayOfWeek))
 														{
-															@interval.StartTime <br />
+															@interval.StartTime.ToString("hh\\:mm") <br />
 														}
 													}
 													else
@@ -110,7 +110,7 @@ else if (User.IsInRole("User"))
 													{
 														@foreach (var interval in Model.BusyIntervals.Where(i => i.Day == dayOfWeek))
 														{
-															@interval.EndTime <br />
+															@interval.EndTime.ToString("hh\\:mm") <br />
 														}
 													}
 													else

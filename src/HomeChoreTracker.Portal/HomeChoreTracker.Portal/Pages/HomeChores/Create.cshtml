@@ -88,7 +88,7 @@ else if (User.IsInRole("User"))
 									<label for="Minutes">Minutes</label>
 									<input type="number" class="form-control" id="Minutes" name="CreateHomeChore.MinutesTime" asp-for="CreateHomeChore.MinutesTime" step="1" value="0">
 								</div>
-								<div id="validationError" class="text-danger"></div>
+								<div style="margin-left:4px" id="validationError" class="text-danger"></div>
 							</div>
 
 							<div class="form-group">
@@ -184,12 +184,14 @@ else
 
 			if (hours === 0 && minutes === 0) {
 				$('#validationError').text('Either Hours or Minutes must be greater than 0.');
+				e.preventDefault();
 			}
 			else if (hours < 0 || minutes < 0 || hours < 0 && minutes < 0) {
 				$('#validationError').text('Hours or Minutes must be greater than 0.');
+				e.preventDefault();
 			}
 			else {
-				this.submit();
+				$('#validationError').text(''); // Clear validation error if validation passes
 			}
 		});
 
