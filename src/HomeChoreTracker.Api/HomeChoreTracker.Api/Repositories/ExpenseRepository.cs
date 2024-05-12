@@ -93,10 +93,10 @@ namespace HomeChoreTracker.Api.Repositories
 			return totalExpense;
 		}
 
-        public async Task<int> GetExpenseCountByCategory(int category, int userId)
+        public async Task<decimal> GetExpenseCountByCategory(int category, int userId)
         {
-            return await _dbContext.FinancialRecords.Where(x=> x.Type.Equals(FinancialType.Expense) && x.UserId.Equals(userId))
-                .CountAsync(e => e.FinancialCategoryId == category);
+            return await _dbContext.FinancialRecords.Where(x=> x.Type.Equals(FinancialType.Expense) && x.UserId.Equals(userId) && x.FinancialCategoryId.Equals(category))
+                .SumAsync(e => e.Amount);
         }
 
         public async Task<List<FinancialRecord>> GetExpensesByDateRange(DateTime startDate, DateTime endDate, int userId)
@@ -134,10 +134,10 @@ namespace HomeChoreTracker.Api.Repositories
             return totalExpense;
         }
 
-        public async Task<int> GetHomeExpenseCountByCategory(int category, int id)
+        public async Task<decimal> GetHomeExpenseCountByCategory(int category, int id)
         {
-            return await _dbContext.FinancialRecords.Where(x => x.Type.Equals(FinancialType.Expense) && x.HomeId.Equals(id))
-                .CountAsync(e => e.FinancialCategoryId == category);
+            return await _dbContext.FinancialRecords.Where(x => x.Type.Equals(FinancialType.Expense) && x.HomeId.Equals(id) && x.FinancialCategoryId.Equals(category))
+                .SumAsync(e => e.Amount);
         }
 
 		public async Task<List<FinancialCategory>> GetExpenseCategories()

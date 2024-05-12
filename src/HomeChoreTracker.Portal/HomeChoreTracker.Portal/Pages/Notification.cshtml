@@ -34,7 +34,7 @@ else if (User.IsInRole("User"))
 									@foreach (var notification in Model.Notifications)
 									{
 										<tr class="@((notification.IsRead) ? "" : "table-success")">
-											<td>@notification.Time</td>
+													<td>@notification.Time.ToString("yyyy-MM-dd, HH:mm")</td>
 											<td>@notification.Title</td>
 										</tr>
 									}

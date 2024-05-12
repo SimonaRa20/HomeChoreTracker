@@ -54,7 +54,7 @@ else if (User.IsInRole("User"))
 							<div class="row no-gutters align-items-center mb-4">
 								<div class="col mr-2">
 									<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-										How much points left to upgrade plant (@Model.LevelResponse.EarnedPoints / @Model.LevelResponse.MaxPoints)
+										@Model.LevelResponse.EarnedPoints OF @Model.LevelResponse.MaxPoints POINTS EARNED
 									</div>
 									<div class="row no-gutters align-items-center">
 										@{
@@ -63,7 +63,7 @@ else if (User.IsInRole("User"))
 											var percentage = Math.Min(earnedPoints / maxPoints * 100, 100);
 										}
 										<div class="col-auto">
-											<div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@percentage.ToString("0.00")%</div>
+											<div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@percentage.ToString("0")%</div>
 										</div>
 										<div class="col">
 

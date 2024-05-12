@@ -193,11 +193,17 @@ else
 			success: function (data) {
 				$('#purchaseIdInput').val(purchaseId);
 				$('#purchaseEditModalLabel').text("Update Purchase Items");
-				var purchaseDate = new Date(data.purchaseDate);
-				var formattedDate = (purchaseDate.getMonth() + 1) + '/' + purchaseDate.getDate() + '/' + purchaseDate.getFullYear();
+
+				var dateObj = new Date(data.purchaseDate);
+				var year = dateObj.getFullYear();
+				var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+				var day = ('0' + dateObj.getDate()).slice(-2);
+
+				var formattedTime = year + '-' + month + '-' + day;
+
 				var content = "<form id='updateItemsForm'>";
 				content += "<input type='hidden' id='purchaseId' value='" + purchaseId + "'>";
-				content += "<p><strong>Date:</strong> " + formattedDate + "</p>";
+				content += "<p><strong>Date:</strong> " + formattedTime + "</p>";
 				content += "<p><strong>Items:</strong> ";
 				content += "<ul id='itemsList' style='list-style-type: none; padding-left: 0;'>";
 				data.items.forEach(function (item) {
@@ -217,7 +223,6 @@ else
 					content += "<label for='productType_" + item.id + "'>Product Type:</label>";
 					content += "<select class='form-control' id='productType_" + item.id + "'>" + getProductTypeOptions(item.productType) + "</select>";
 
-					console.log(item)
 					content += "<label for='task_" + item.id + "'>Task:</label>";
 					content += "<select class='form-control' id='task_" + item.id + "'>" + getTaskOptions(item.homeChoreTaskId) + "</select>";
 					content += "<div id='timeGroup_" + item.id + "'>";
@@ -436,10 +441,14 @@ else
 			type: 'GET',
 			success: function (data) {
 				$('#purchaseDetailModalLabel').text("Purchase Details");
-				var purchaseDate = new Date(data.purchaseDate);
 				var purchasePrice = data.priceForProducts;
-				var formattedDate = (purchaseDate.getMonth() + 1) + '/' + purchaseDate.getDate() + '/' + purchaseDate.getFullYear();
-				var content = "<p><strong>Date:</strong> " + formattedDate + "</p>";
+				var dateObj = new Date(data.purchaseDate);
+				var year = dateObj.getFullYear();
+				var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+				var day = ('0' + dateObj.getDate()).slice(-2);
+
+				var formattedTime = year + '-' + month + '-' + day;
+				var content = "<p><strong>Date:</strong> " + formattedTime + "</p>";
 				content += "<p><strong>Items:</strong> ";
 				content += "<ul style='list-style-type: none; padding-left: 0;'>";
 				data.items.forEach(function (item) {

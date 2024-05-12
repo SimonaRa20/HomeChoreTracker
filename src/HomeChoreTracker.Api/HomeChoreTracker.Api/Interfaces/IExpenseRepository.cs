@@ -17,8 +17,8 @@ namespace HomeChoreTracker.Api.Interfaces
         Task<ExpenseResponse> GetExpenseById(int id);
 		Task<decimal> GetTotalExpenseForMonth(DateTime month, int userId);
         Task<decimal> GetTotalHomeExpenseForMonth(DateTime month, int id);
-        Task<int> GetExpenseCountByCategory(int category, int userId);
-        Task<int> GetHomeExpenseCountByCategory(int category, int id);
+        Task<decimal> GetExpenseCountByCategory(int category, int userId);
+        Task<decimal> GetHomeExpenseCountByCategory(int category, int id);
         Task<List<FinancialRecord>> GetExpensesByDateRange(DateTime startDate, DateTime endDate, int userId);
         Task<List<FinancialCategory>> GetExpenseCategories();
 		Task<FinancialCategory> CheckCategory(string financialCategory);

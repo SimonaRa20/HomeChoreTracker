@@ -16,8 +16,8 @@ namespace HomeChoreTracker.Portal.Pages.Home
         public double CurrentMonthTotalExpense { get; set; }
 		public double CurrentMonthTotalHomeChoresExpense { get; set; }
 		public List<MonthlySummary> MonthlySummaries { get; set; }
-        public Dictionary<string, int> ExpenseCategories { get; set; }
-        public Dictionary<string, int> IncomeCategories { get; set; }
+        public Dictionary<string, decimal> ExpenseCategories { get; set; }
+        public Dictionary<string, decimal> IncomeCategories { get; set; }
         public bool Unauthorized { get; set; }
 
         private readonly IHttpClientFactory _httpClientFactory;
@@ -75,13 +75,13 @@ namespace HomeChoreTracker.Portal.Pages.Home
         private async Task GetExpenseCategories(HttpClient httpClient)
         {
             var apiUrl = $"{_config["ApiUrl"]}/Finance/expenseCategories/{Id}";
-            ExpenseCategories = await GetApiResponse<Dictionary<string, int>>(httpClient, apiUrl);
+            ExpenseCategories = await GetApiResponse<Dictionary<string, decimal>>(httpClient, apiUrl);
         }
 
         private async Task GetIncomeCategories(HttpClient httpClient)
         {
             var apiUrl = $"{_config["ApiUrl"]}/Finance/incomeCategories/{Id}";
-            IncomeCategories = await GetApiResponse<Dictionary<string, int>>(httpClient, apiUrl);
+            IncomeCategories = await GetApiResponse<Dictionary<string, decimal>>(httpClient, apiUrl);
         }
 
         private async Task<T> GetApiResponse<T>(HttpClient httpClient, string apiUrl)

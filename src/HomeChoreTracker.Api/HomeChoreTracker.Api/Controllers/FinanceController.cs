@@ -652,7 +652,6 @@ namespace HomeChoreTracker.Api.Controllers
 			}
 		}
 
-
 		[HttpPost("expense")]
 		[Authorize]
 		public async Task<IActionResult> AddExpense(ExpenseRequest expenseRequest)
@@ -915,11 +914,11 @@ namespace HomeChoreTracker.Api.Controllers
         {
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
             var categories = await _expenseRepository.GetExpenseCategories();
-            var categoryCounts = new Dictionary<string, int>();
+            var categoryCounts = new Dictionary<string, decimal>();
 
             foreach (var category in categories)
             {
-                var count = await _expenseRepository.GetExpenseCountByCategory(category.Id, userId);
+				decimal count = await _expenseRepository.GetExpenseCountByCategory(category.Id, userId);
                 if(count > 0)
                 {
                     categoryCounts.Add(category.Name, count);
@@ -941,11 +940,11 @@ namespace HomeChoreTracker.Api.Controllers
                 return Forbid();
             }
             var categories = await _expenseRepository.GetExpenseCategories();
-            var categoryCounts = new Dictionary<string, int>();
+            var categoryCounts = new Dictionary<string, decimal>();
 
             foreach (var category in categories)
             {
-                var count = await _expenseRepository.GetHomeExpenseCountByCategory(category.Id, id);
+				decimal count = await _expenseRepository.GetHomeExpenseCountByCategory(category.Id, id);
                 if (count > 0)
                 {
                     categoryCounts.Add(category.Name, count);
@@ -967,7 +966,7 @@ namespace HomeChoreTracker.Api.Controllers
                 return Forbid();
             }
             var categories = await _incomeRepository.GetIncomeCategories();
-            var categoryCounts = new Dictionary<string, int>();
+            var categoryCounts = new Dictionary<string, decimal>();
 
             foreach (var category in categories)
             {
@@ -987,7 +986,7 @@ namespace HomeChoreTracker.Api.Controllers
         {
             int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
             var categories = await _incomeRepository.GetIncomeCategories();
-            var categoryCounts = new Dictionary<string, int>();
+            var categoryCounts = new Dictionary<string, decimal>();
 
             foreach (var category in categories)
             {

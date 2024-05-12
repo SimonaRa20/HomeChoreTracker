@@ -451,11 +451,20 @@ else
 			url: '/Finance/History?handler=IncomeDetail&id=' + choreId,
 			type: 'GET',
 			success: function (data) {
+				var dateObj = new Date(data.time);
+				var year = dateObj.getFullYear();
+				var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+				var day = ('0' + dateObj.getDate()).slice(-2);
+				var hours = ('0' + dateObj.getHours()).slice(-2);
+				var minutes = ('0' + dateObj.getMinutes()).slice(-2);
+
+				var formattedTime = year + '-' + month + '-' + day + ', ' + hours + ':' + minutes;
+
 				$('#detailIncomeModalLabel').text("Detailed info: " + data.title);
 				$('#incomeTitle').text("Title: " + data.title);
 				$('#incomeAmount').text("Amount: " + data.amount);
 				$('#incomeDescription').text("Description: " + (data.description || "-"));
-				$('#incomeTime').text("Time: " + data.time);
+				$('#incomeTime').text("Time: " + formattedTime);
 				$('#incomeType').text("Type: " + data.financialCategory);
 				$('#incomeHome').text("Home: " + data.home);
 
@@ -472,12 +481,20 @@ else
 			url: '/Finance/History?handler=ExpenseDetail&id=' + choreId,
 			type: 'GET',
 			success: function (data) {
-				console.log(data)
+				var dateObj = new Date(data.time);
+				var year = dateObj.getFullYear();
+				var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+				var day = ('0' + dateObj.getDate()).slice(-2);
+				var hours = ('0' + dateObj.getHours()).slice(-2);
+				var minutes = ('0' + dateObj.getMinutes()).slice(-2);
+
+				var formattedTime = year + '-' + month + '-' + day + ', ' + hours + ':' + minutes;
+
 				$('#detailExpenseModalLabel').text("Detailed info: " + data.title);
 				$('#expenseTitle').text("Title: " + data.title);
 				$('#expenseAmount').text("Amount: " + data.amount);
 				$('#expenseDescription').text("Description: " + data.description);
-				$('#expenseTime').text("Time: " + data.time);
+				$('#expenseTime').text("Time: " + formattedTime);
 				$('#expenseType').text("Type: " + data.financialCategory);
 				$('#expenseHome').text("Home: " + data.home);
 				$('#detailExpenseModal').modal('show');
