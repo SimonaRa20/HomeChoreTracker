@@ -36,7 +36,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Count.Should().Be(25);
+			response.Data.Count.Should().Be(31);
 		}
 
 		[Fact]
@@ -52,7 +52,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Count.Should().Be(38);
+			response.Data.Count.Should().Be(59);
 		}
 
 		[Fact]

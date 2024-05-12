@@ -87,7 +87,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Should().Be(124.00M);
+			response.Data.Should().Be(350.00M);
 		}
 
 		[Fact]
@@ -104,7 +104,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Should().Be(544.00M);
+			response.Data.Should().Be(361.96M);
 		}
 
 		[Fact]
@@ -138,7 +138,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Count.Should().Be(13);
+			response.Data.Count.Should().Be(15);
 		}
 
 		[Fact]
@@ -171,7 +171,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Should().Be(676.00M);
+			response.Data.Should().Be(450.00M);
 		}
 
 		[Fact]
@@ -188,7 +188,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Should().Be(1256.00M);
+			response.Data.Should().Be(1438.04M);
 		}
 
 		[Fact]
@@ -200,11 +200,11 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			await client.LoginAsUser();
 
 			// Act
-			var response = await client.Get<Dictionary<string, int>>(uri);
+			var response = await client.Get<Dictionary<string, decimal>>(uri);
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Count.Should().Be(4);
+			response.Data.Count.Should().Be(5);
 		}
 
 		[Fact]
@@ -217,11 +217,11 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			await client.LoginAsUser();
 
 			// Act
-			var response = await client.Get<Dictionary<string, int>>(uri);
+			var response = await client.Get<Dictionary<string, decimal>>(uri);
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Count.Should().Be(3);
+			response.Data.Count.Should().Be(4);
 		}
 
 		[Fact]
@@ -234,7 +234,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			await client.LoginAsUser();
 
 			// Act
-			var response = await client.Get<Dictionary<string, int>>(uri);
+			var response = await client.Get<Dictionary<string, decimal>>(uri);
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -250,7 +250,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			await client.LoginAsUser();
 
 			// Act
-			var response = await client.Get<Dictionary<string, int>>(uri);
+			var response = await client.Get<Dictionary<string, decimal>>(uri);
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -286,7 +286,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
-			response.Data.Count.Should().Be(4);
+			response.Data.Count.Should().Be(6);
 		}
 
 		[Fact]

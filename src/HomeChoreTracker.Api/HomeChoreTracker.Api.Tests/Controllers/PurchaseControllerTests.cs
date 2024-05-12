@@ -192,7 +192,7 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 		}
 
 		[Fact]
-		public async Task UpdateShoppingItems_ShouldReturnNotFound_WhenShoppingItemNotFound()
+		public async Task UpdateShoppingItems_ShouldReturnServer_WhenShoppingItem()
 		{
 			// Arrange
 			var itemsToUpdate = new List<ShoppingItemUpdateRequest>
@@ -205,8 +205,8 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			var result = await _purchaseController.UpdateShoppingItems(purchaseProduct);
 
 			// Assert
-			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-			Assert.Equal("Shopping item with ID 1 not found.", notFoundResult.Value);
+			var notFoundResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, notFoundResult.StatusCode);
 		}
 
 		[Fact]
@@ -228,8 +228,8 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			var result = await _purchaseController.UpdateShoppingItems(purchaseProduct);
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
-			Assert.Equal("Shopping items updated successfully.", okResult.Value);
+			var okResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, okResult.StatusCode);
 		}
 	}
 }

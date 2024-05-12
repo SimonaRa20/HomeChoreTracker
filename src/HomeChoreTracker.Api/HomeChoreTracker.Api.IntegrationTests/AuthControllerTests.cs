@@ -42,7 +42,7 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			// Assert
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
 			response.Data.Token.Should().NotBeNullOrEmpty();
-			response.Data.UserName.Should().Be("1User");
+			response.Data.UserName.Should().Be("Jonas Jonaitis");
 		}
 	}
 }

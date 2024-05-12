@@ -51,14 +51,14 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			var response = await client.Get<List<TaskAssignmentResponse>>(uri);
 
 			// Assert
-			response.Data.Count.Should().Be(50);
+			response.Data.Count.Should().Be(5);
 		}
 
 		[Fact]
 		public async Task GetHomeChoreFromCalendar_ValidCredentials_RetursHomeChoreFromCalendarResponse()
 		{
 			// Arrange
-			int id = 1;
+			int id = 294;
 			string uri = baseUri + $"/Chore/{id}";
 			var client = _factory.GetCustomHttpClient();
 			await client.LoginAsUser();

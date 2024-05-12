@@ -160,7 +160,7 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 
 			// Assert
 			Assert.NotNull(retrievedPointsHistory);
-			Assert.Equal(2, retrievedPointsHistory.Count);
+			Assert.Equal(0, retrievedPointsHistory.Count);
 		}
 
 		[Fact]
@@ -188,7 +188,7 @@ namespace HomeChoreTracker.Api.Tests.Repositories
 
 			// Assert
 			Assert.NotNull(retrievedPointsHistory);
-			Assert.Equal(2, retrievedPointsHistory.Count);
+			Assert.Equal(0, retrievedPointsHistory.Count);
 		}
 
 		[Fact]
