@@ -23,6 +23,8 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 		private readonly Mock<IUserRepository> _userRepositoryMock;
 		private readonly Mock<IGamificationRepository> _gamificationRepositoryMock;
 		private readonly Mock<INotificationRepository> _notificationRepositoryMock;
+		private readonly Mock<IExpenseRepository> _expenseRepositoryMock;
+		private readonly Mock<IIncomeRepository> _incomeRepositoryMock;
 
 		public PurchaseControllerTests()
 		{
@@ -32,7 +34,9 @@ namespace HomeChoreTracker.Api.Tests.Controllers
 			_purchaseRepositoryMock = new Mock<IPurchaseRepository>();
 			_gamificationRepositoryMock = new Mock<IGamificationRepository>();
 			_notificationRepositoryMock = new Mock<INotificationRepository>();
-			_purchaseController = new PurchaseController(_purchaseRepositoryMock.Object, _userRepositoryMock.Object, _gamificationRepositoryMock.Object, _notificationRepositoryMock.Object);
+			_expenseRepositoryMock = new Mock<IExpenseRepository>();
+			_incomeRepositoryMock = new Mock<IIncomeRepository>();
+			_purchaseController = new PurchaseController(_purchaseRepositoryMock.Object, _userRepositoryMock.Object, _gamificationRepositoryMock.Object, _notificationRepositoryMock.Object, _expenseRepositoryMock.Object, _incomeRepositoryMock.Object);
 		}
 
 		[Fact]

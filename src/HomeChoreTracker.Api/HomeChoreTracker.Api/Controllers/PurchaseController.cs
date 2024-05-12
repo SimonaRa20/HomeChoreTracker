@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Contracts.Finance;
 using HomeChoreTracker.Api.Contracts.Purchase;
 using HomeChoreTracker.Api.Interfaces;
@@ -20,13 +21,18 @@ namespace HomeChoreTracker.Api.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IGamificationRepository _gamificationRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IExpenseRepository _expenseRepository;
+        private readonly IIncomeRepository _incomeRepository;
 
-        public PurchaseController(IPurchaseRepository purchaseRepository, IUserRepository userRepository, IGamificationRepository gamificationRepository, INotificationRepository notificationRepository)
+        public PurchaseController(IPurchaseRepository purchaseRepository, IUserRepository userRepository, IGamificationRepository gamificationRepository, INotificationRepository notificationRepository, 
+                                    IExpenseRepository expenseRepository, IIncomeRepository incomeRepository)
         {
             _purchaseRepository = purchaseRepository;
             _userRepository = userRepository;
             _gamificationRepository = gamificationRepository;
             _notificationRepository = notificationRepository;
+            _expenseRepository = expenseRepository;
+            _incomeRepository = incomeRepository;
         }
 
         [HttpPost]
@@ -117,7 +123,9 @@ namespace HomeChoreTracker.Api.Controllers
         {
             try
             {
-                foreach (var item in itemsToUpdate.Items)
+				int userId = int.Parse(User.FindFirst(ClaimTypes.Name)?.Value);
+
+				foreach (var item in itemsToUpdate.Items)
                 {
                     var shoppingItem = await _purchaseRepository.GetShoppingItemById(item.Id);
                     if (shoppingItem == null)
@@ -147,7 +155,56 @@ namespace HomeChoreTracker.Api.Controllers
 						await _purchaseRepository.UpdatePurchase(purchase);
                     }
                     purchase.PriceForProducts = itemsToUpdate.PriceForProducts;
-                }
+
+                    bool wasSetAmount = await _purchaseRepository.CheckOrWasSetAmount(purchase);
+
+					FinancialCategory category = await _expenseRepository.CheckCategory("Home chores");
+					FinancialCategory addedCategory = new FinancialCategory();
+					if (category == null)
+					{
+						FinancialCategory newfinancialCategory = new FinancialCategory
+						{
+							Name = "Home chores",
+							Type = FinancialType.Expense,
+							UserId = userId,
+							HomeId = purchase.HomeId
+						};
+
+						addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
+                        await _incomeRepository.Save();
+					}
+
+					if (wasSetAmount)
+                    {
+                        var expenseRequest = await _purchaseRepository.GetRecord(purchase);
+						FinancialRecord expense = new FinancialRecord
+						{
+							Title = expenseRequest.Title,
+							Amount = purchase.PriceForProducts,
+							Time = expenseRequest.Time,
+							Type = FinancialType.Expense,
+							FinancialCategoryId = expenseRequest.FinancialCategoryId,
+							HomeId = expenseRequest.HomeId,
+							UserId = userId,
+                            PurchaseId = purchaseId
+						};
+					}
+                    else
+                    {
+						FinancialRecord expense = new FinancialRecord
+						{
+							Title = $"Purchase {purchase.PurchaseDate}",
+							Amount = purchase.PriceForProducts,
+							Time = DateTime.Now,
+							Type = FinancialType.Expense,
+							FinancialCategoryId = category.Id,
+							HomeId = purchase.HomeId,
+							UserId = userId,
+							PurchaseId = purchaseId
+						};
+						await _expenseRepository.AddExpense(expense);
+					}
+				}
 
                 await _purchaseRepository.Save();
 

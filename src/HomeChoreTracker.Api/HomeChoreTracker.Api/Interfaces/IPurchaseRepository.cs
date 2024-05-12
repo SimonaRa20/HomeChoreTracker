@@ -14,5 +14,7 @@ namespace HomeChoreTracker.Api.Interfaces
         Task UpdatePurchase(Purchase purchase);
         Task DeletePurchase(Purchase purchase);
 		Task Save();
-    }
+        Task<bool> CheckOrWasSetAmount(Purchase purchase);
+        Task<FinancialRecord> GetRecord(Purchase purchase);
+	}
 }

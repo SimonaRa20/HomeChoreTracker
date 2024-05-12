@@ -13,6 +13,7 @@ namespace HomeChoreTracker.Api.Models
 
         public int? FinancialCategoryId { get; set; }
         public int? HomeId { get; set; }
+        public int? PurchaseId { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }
     }
