@@ -57,7 +57,7 @@ namespace HomeChoreTracker.Api.Repositories
 		public async Task Update(FinancialRecord expense)
 		{
 			_dbContext.Entry(expense).State = EntityState.Modified;
-			await Save();
+			await _dbContext.SaveChangesAsync();
 		}
 
 		public async Task Delete(int id)

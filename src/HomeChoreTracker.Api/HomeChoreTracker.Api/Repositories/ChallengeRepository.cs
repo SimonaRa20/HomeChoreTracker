@@ -203,18 +203,21 @@ namespace HomeChoreTracker.Api.Repositories
 			}
 			else
 			{
-				var userHomes = await GetUserHomes((int)assignment.HomeMemberId);
-				var isUserHome = userHomes.Select(x => x.Id).Contains((int)challenge.HomeId);
-				if (isUserHome)
+				if(assignment.HomeMemberId !=null)
 				{
-					Home home = userHomes.Where(x => x.Id.Equals(challenge.HomeId)).FirstOrDefault();
-					if (challenge.HomeId.Equals(home.Id))
+					var userHomes = await GetUserHomes((int)assignment.HomeMemberId);
+					var isUserHome = userHomes.Select(x => x.Id).Contains((int)challenge.HomeId);
+					if (isUserHome)
 					{
-						challenge = await UpdateChallengePoints(challenge, task, false);
-					}
-					else if (challenge.OpponentHomeId.Equals(home.Id))
-					{
-						challenge = await UpdateChallengePoints(challenge, task, true);
+						Home home = userHomes.Where(x => x.Id.Equals(challenge.HomeId)).FirstOrDefault();
+						if (challenge.HomeId.Equals(home.Id))
+						{
+							challenge = await UpdateChallengePoints(challenge, task, false);
+						}
+						else if (challenge.OpponentHomeId.Equals(home.Id))
+						{
+							challenge = await UpdateChallengePoints(challenge, task, true);
+						}
 					}
 				}
 			}

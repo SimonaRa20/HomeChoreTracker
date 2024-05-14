@@ -102,38 +102,5 @@ namespace HomeChoreTracker.Api.IntegrationTests
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
 			response.Data.Id.Should().Be(1);
 		}
-
-		//[Fact]
-		//public async Task GetHomeChoresBases_ValidCredentials_RetursHomeChoresBasesResponse()
-		//{
-		//	// Arrange
-		//	var client = _factory.GetCustomHttpClient();
-		//	string uri = baseUri;
-		//	await client.LoginAsUser();
-
-		//	// Act
-		//	var response = await client.Get<List<HomeChoreBase>>(uri);
-
-		//	// Assert
-		//	response.StatusCode.Should().Be(HttpStatusCode.OK);
-		//	response.Data.Count.Should().Be(9);
-		//}
-
-		//[Fact]
-		//public async Task GetHomeChoreBase_ValidCredentials_RetursHomeChoreBaseResponse()
-		//{
-		//	// Arrange
-		//	int id = 1;
-		//	var client = _factory.GetCustomHttpClient();
-		//	string uri = baseUri + $"/{id}";
-		//	await client.LoginAsUser();
-
-		//	// Act
-		//	var response = await client.Get<HomeChoreBase>(uri);
-
-		//	// Assert
-		//	response.StatusCode.Should().Be(HttpStatusCode.OK);
-		//	response.Data.Name.Should().Be("Vacuuming");
-		//}
 	}
 }

@@ -66,7 +66,8 @@ namespace HomeChoreTracker.Api.Repositories
         public async Task UpdatePurchase(Purchase purchase)
         {
             _dbContext.Entry(purchase).State = EntityState.Modified;
-        }
+			await _dbContext.SaveChangesAsync();
+		}
 
         public async Task DeletePurchase(Purchase purchase)
         {
@@ -86,9 +87,9 @@ namespace HomeChoreTracker.Api.Repositories
             return hasAmount;
         }
 
-		public async Task<FinancialRecord> GetRecord(Purchase purchase)
+		public async Task<FinancialRecord> GetRecord(int purchase)
 		{
-			return await _dbContext.FinancialRecords.Where(x => x.PurchaseId.Equals(purchase.Id)).FirstOrDefaultAsync(); ;
+			return await _dbContext.FinancialRecords.Where(x => x.PurchaseId.Equals(purchase)).FirstOrDefaultAsync(); ;
 		}
 	}
 }

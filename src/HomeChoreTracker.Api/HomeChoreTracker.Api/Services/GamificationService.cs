@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Spreadsheet;
 using HomeChoreTracker.Api.Constants;
 using HomeChoreTracker.Api.Interfaces;
 using HomeChoreTracker.Api.Models;
@@ -162,8 +163,13 @@ namespace HomeChoreTracker.Api.Services
 
                         foreach(TaskAssignment task in tasks)
                         {
+							var user = new User();
 							var homeChore = await _homeChoreRepository.Get(task.TaskId);
-							var user = await _userRepository.GetUserById((int)task.HomeMemberId);
+							if(task.HomeMemberId != null)
+							{
+								user = await _userRepository.GetUserById((int)task.HomeMemberId);
+							}
+							
 							task.IsDone = true;
 
                             List<ShoppingItem> shoppingItems = await _purchaseRepository.GetShoppingItemsByTaskId(task.TaskId);
@@ -197,7 +203,7 @@ namespace HomeChoreTracker.Api.Services
 							var pointHistory = await _gamificationRepository.GetPointsHistoryByTaskId(task.Id);
 							BadgeWallet wallet = await _gamificationRepository.GetUserBadgeWallet(user.Id);
 
-							if (pointHistory == null)
+							if (pointHistory == null && task.HomeMemberId != null)
 							{
 								task.Points = homeChore.Points;
 								Notification notification = new Notification

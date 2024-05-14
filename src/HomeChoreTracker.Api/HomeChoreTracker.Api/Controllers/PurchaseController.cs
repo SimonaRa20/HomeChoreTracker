@@ -138,7 +138,6 @@ namespace HomeChoreTracker.Api.Controllers
                     await _purchaseRepository.UpdateShoppingItem(shoppingItem);
                 }
 
-
                 var firstShoppingItem = await _purchaseRepository.GetShoppingItemById(itemsToUpdate.Items[0].Id);
                 var purchaseId = firstShoppingItem?.PurchaseId;
                 if (purchaseId.HasValue)
@@ -147,16 +146,15 @@ namespace HomeChoreTracker.Api.Controllers
                     if (purchase != null && purchase.Items.All(item => item.IsCompleted))
                     {
                         purchase.IsCompleted = true;
-                        await _purchaseRepository.UpdatePurchase(purchase);
                     }
                     else
                     {
                         purchase.IsCompleted = false;
-						await _purchaseRepository.UpdatePurchase(purchase);
                     }
                     purchase.PriceForProducts = itemsToUpdate.PriceForProducts;
+					await _purchaseRepository.UpdatePurchase(purchase);
 
-                    bool wasSetAmount = await _purchaseRepository.CheckOrWasSetAmount(purchase);
+					bool wasSetAmount = await _purchaseRepository.CheckOrWasSetAmount(purchase);
 
 					FinancialCategory category = await _expenseRepository.CheckCategory("Home chores");
 					FinancialCategory addedCategory = new FinancialCategory();
@@ -171,23 +169,13 @@ namespace HomeChoreTracker.Api.Controllers
 						};
 
 						addedCategory = await _incomeRepository.AddCategory(newfinancialCategory);
-                        await _incomeRepository.Save();
 					}
 
 					if (wasSetAmount)
                     {
-                        var expenseRequest = await _purchaseRepository.GetRecord(purchase);
-						FinancialRecord expense = new FinancialRecord
-						{
-							Title = expenseRequest.Title,
-							Amount = purchase.PriceForProducts,
-							Time = expenseRequest.Time,
-							Type = FinancialType.Expense,
-							FinancialCategoryId = expenseRequest.FinancialCategoryId,
-							HomeId = expenseRequest.HomeId,
-							UserId = userId,
-                            PurchaseId = purchaseId
-						};
+                        var expenseRequest = await _purchaseRepository.GetRecord(purchase.Id);
+                        expenseRequest.Amount = purchase.PriceForProducts;
+						await _expenseRepository.Update(expenseRequest);
 					}
                     else
                     {
@@ -205,8 +193,6 @@ namespace HomeChoreTracker.Api.Controllers
 						await _expenseRepository.AddExpense(expense);
 					}
 				}
-
-                await _purchaseRepository.Save();
 
                 return Ok("Shopping items updated successfully.");
             }
